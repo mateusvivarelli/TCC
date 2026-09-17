@@ -1,5 +1,51 @@
 # README — Status do TCC (espacialização da MUSLE)
 
+## Sincronização entre dispositivos (git + Google Drive)
+
+Este projeto vive em dois canais, por causa do tamanho dos rasters:
+
+- **Git (GitHub privado, https://github.com/mateusvivarelli/TCC)**: código (`Scripts/`),
+  documentação (`Notas Claude/`, este README), planilha de resultados, shapefiles e PDFs de
+  referência. `.gitignore` exclui `*.tif`/`*.sdat` (rasters) e `.claude/` (estado local).
+- **Google Drive**: as pastas `Dados Iniciais/` e `Evento 1` a `Evento 17` (rasters, ~3GB) moram
+  fisicamente em `G:\Meu Drive\TCC_Dados\` (conta Google do usuário) e são acessadas de dentro de
+  `C:\TCC` via **junction NTFS** (não são cópias — o conteúdo real está só no Drive, o
+  `C:\TCC\Dados Iniciais` é um atalho especial do Windows que aponta pra lá). Isso existe porque os
+  scripts têm caminhos fixos tipo `r"C:/TCC/Dados Iniciais"` — a junction deixa isso funcionar sem
+  precisar editar nenhum script.
+
+### Instruções pra configurar um PC novo (ex.: notebook) — pode ser seguido por outra instância do Claude Code
+
+1. Confirmar que o Google Drive for Desktop está instalado e logado com a mesma conta, e que
+   `TCC_Dados` (dentro de "Meu Drive") já sincronizou (~3GB — pode levar um tempo na primeira vez).
+   Descobrir a letra de unidade do Google Drive nesse PC (pode não ser `G:`):
+   ```powershell
+   Get-PSDrive -PSProvider FileSystem | Select-Object Name, Root
+   ```
+   Procurar a pasta `Meu Drive\TCC_Dados` dentro da unidade encontrada.
+2. `git clone https://github.com/mateusvivarelli/TCC.git "C:\TCC"` (ou outro caminho — mas se for
+   outro caminho, os scripts em `Scripts/*.py` que têm `BASE = r"C:\TCC"` fixo vão precisar ser
+   ajustados; mais simples manter `C:\TCC`).
+3. Recriar as junctions (ajustar a letra de unidade `G:` se for diferente nesse PC):
+   ```powershell
+   $drive = "G:\Meu Drive\TCC_Dados"   # ajustar se a letra for outra
+   cmd /c mklink /J "C:\TCC\Dados Iniciais" "$drive\Dados Iniciais"
+   1..17 | ForEach-Object {
+       cmd /c mklink /J "C:\TCC\Evento $_" "$drive\Evento $_"
+   }
+   ```
+4. Instalar o QGIS 3.44 (mesma versão, se possível) — os scripts chamam caminhos fixos como
+   `C:\Program Files\QGIS 3.44.14\bin\python-qgis-ltr.bat` e `qgis_process-qgis-ltr.bat`. Se a
+   versão instalada for outra, tem que ajustar esses caminhos nos scripts (`grep -rn "QGIS 3.44"
+   Scripts/` pra achar todas as ocorrências).
+5. Conferir que `python-qgis-ltr.bat` tem `pdfplumber`, `pandas`, `scipy`, `openpyxl` instalados
+   (mesmos pacotes usados nas sessões anteriores).
+6. Ler este README e todo o conteúdo de `Notas Claude/` antes de continuar qualquer trabalho — é
+   isso que dá o contexto completo do projeto, não alguma sincronização automática de memória
+   entre instâncias do Claude Code (essa memória é local a cada máquina).
+7. Depois de trabalhar em qualquer um dos dois PCs: `git add`/`commit`/`push` as mudanças de
+   código/notas (o Google Drive sincroniza os rasters sozinho, por fora do git).
+
 Ponto de partida pra retomar o trabalho. Detalhes completos em
 [Notas Claude/notas_qgis_calibracao_qp.md](Notas%20Claude/notas_qgis_calibracao_qp.md) (Fase 1 —
 calibração de Q e Qp) e [Notas Claude/notas_musle_espacializada.md](Notas%20Claude/notas_musle_espacializada.md)
