@@ -33,7 +33,7 @@ gdal.UseExceptions()
 BASE = r"C:\TCC"
 PASTA_DADOS = os.path.join(BASE, "Dados Iniciais")
 PASTA_QP = os.path.join(PASTA_DADOS, "qp_spatial")
-QGIS_PROCESS = r"C:\Program Files\QGIS 3.44.14\bin\qgis_process-qgis-ltr.bat"
+QGIS_PROCESS = r"C:\Program Files\QGIS 4.2.1\bin\qgis_process-qgis.bat"
 DEM_FILLED = os.path.join(PASTA_QP, "carvedDEM_corrigido_filled.tif")
 
 OUTLET_X, OUTLET_Y = 318980.7663669552, 7432307.0820886735
@@ -141,6 +141,51 @@ def roda_saga_val_mean(val_input_path, saida_path):
     ], capture_output=True, text=True)
 
 
+# Em maquinas sem o provider sagang disponivel no QGIS (ex.: QGIS 4.x sem plugin
+# SAGA instalado), a media de montante (VAL_MEAN do sagang:catchmentarea) e
+# recalculada aqui em Python puro, via acumulacao topologica (Kahn) sobre a MESMA
+# rede D8 ja usada no Ddn (downstream_row/downstream_col) - evita a dependencia do
+# SAGA para Q-barra/pr-barra por evento. Nota: o pipeline original usava METHOD=4
+# (Multiple Flow Direction) do SAGA para Dup e D8 puro para Ddn - inconsistencia
+# preexistente entre numerador e denominador. Esta funcao usa D8 nos dois, o que e
+# mais consistente internamente, mas os valores de Dup podem diferir ligeiramente
+# dos calculados antes com MFD.
+_in_degree_base = np.bincount(
+    np.ravel_multi_index((dest_r, dest_c), (nrows, ncols)),
+    minlength=nrows * ncols,
+).reshape(nrows, ncols)
+
+
+def calcula_upslope_mean(valor):
+    val = np.where(np.isfinite(valor), valor, 0.0)
+    peso = np.isfinite(valor).astype(np.float64)
+    soma = np.zeros((nrows, ncols), dtype=np.float64)
+    conta = np.zeros((nrows, ncols), dtype=np.float64)
+    soma[VALIDO] = val[VALIDO]
+    conta[VALIDO] = peso[VALIDO]
+
+    in_degree = _in_degree_base.copy()
+    rr, cc = np.where(VALIDO & (in_degree == 0))
+    for passo in range(nrows + ncols):
+        if rr.size == 0:
+            break
+        tem_dest = tem_destino[rr, cc]
+        rr_d, cc_d = rr[tem_dest], cc[tem_dest]
+        dr_d = downstream_row[rr_d, cc_d]
+        dc_d = downstream_col[rr_d, cc_d]
+        np.add.at(soma, (dr_d, dc_d), soma[rr_d, cc_d])
+        np.add.at(conta, (dr_d, dc_d), conta[rr_d, cc_d])
+        np.subtract.at(in_degree, (dr_d, dc_d), 1)
+
+        destinos = np.unique(np.ravel_multi_index((dr_d, dc_d), (nrows, ncols)))
+        dr_u, dc_u = np.unravel_index(destinos, (nrows, ncols))
+        prontos_agora = in_degree[dr_u, dc_u] == 0
+        rr, cc = dr_u[prontos_agora], dc_u[prontos_agora]
+
+    media = np.where(conta > 0, soma / np.clip(conta, 1, None), np.nan)
+    return media
+
+
 def reprojeta_para_dem(caminho_origem, caminho_saida, nodata_saida=-9999):
     ds = gdal.Open(caminho_origem)
     gdal.Warp(
@@ -181,31 +226,37 @@ def salva_raster(caminho, arr, nodata=-9999):
 # 2. FATORES FIXOS (K-barra, C-barra, S-barra) - calculados 1 vez
 # ============================================================
 
-print("\nCalculando K-barra e C-barra (medias de montante, fixas)...")
+print("\nCarregando/calculando K-barra, C-barra e S-barra (medias de montante, fixas)...")
 
-caminho_k_dem = os.path.join(PASTA_QP, "_K_dem_tmp.tif")
-reprojeta_para_dem(os.path.join(PASTA_DADOS, "K_raster.tif"), caminho_k_dem)
+# Reaproveita os rasters ja calculados/salvos (validados na sessao anterior via
+# SAGA MFD) quando existem no disco - sao constantes (nao dependem do evento nem
+# da correcao do piso de W). So recalcula (via D8 puro, Python) se estiverem
+# ausentes, ex.: repositorio clonado do zero sem esses arquivos versionados.
 caminho_k_mean = os.path.join(PASTA_QP, "K_mean_upslope.tif")
-roda_saga_val_mean(caminho_k_dem, caminho_k_mean)
-K_BARRA = le_raster(caminho_k_mean)
+if os.path.exists(caminho_k_mean):
+    K_BARRA = le_raster(caminho_k_mean)
+else:
+    caminho_k_dem = os.path.join(PASTA_QP, "_K_dem_tmp.tif")
+    reprojeta_para_dem(os.path.join(PASTA_DADOS, "K_raster.tif"), caminho_k_dem)
+    K_BARRA = calcula_upslope_mean(le_raster(caminho_k_dem))
+    salva_raster(caminho_k_mean, K_BARRA)
+    os.remove(caminho_k_dem)
 
-caminho_c_dem = os.path.join(PASTA_QP, "_C_dem_tmp.tif")
-reprojeta_para_dem(os.path.join(PASTA_DADOS, "C_raster.tif"), caminho_c_dem)
 caminho_c_mean = os.path.join(PASTA_QP, "C_mean_upslope.tif")
-roda_saga_val_mean(caminho_c_dem, caminho_c_mean)
-C_BARRA = le_raster(caminho_c_mean)
+if os.path.exists(caminho_c_mean):
+    C_BARRA = le_raster(caminho_c_mean)
+else:
+    caminho_c_dem = os.path.join(PASTA_QP, "_C_dem_tmp.tif")
+    reprojeta_para_dem(os.path.join(PASTA_DADOS, "C_raster.tif"), caminho_c_dem)
+    C_BARRA = calcula_upslope_mean(le_raster(caminho_c_dem))
+    salva_raster(caminho_c_mean, C_BARRA)
+    os.remove(caminho_c_dem)
 
 S_BARRA = le_raster(os.path.join(PASTA_QP, "slope_mean_upslope_pct.tif")) / 100.0
 S_BARRA = np.where(np.isfinite(S_BARRA), np.clip(S_BARRA, 0.001, None), np.nan)
 
 print(f"K-barra: media={np.nanmean(K_BARRA):.4f} | C-barra: media={np.nanmean(C_BARRA):.4f} | "
       f"S-barra: media={np.nanmean(S_BARRA):.4f}")
-
-for tmp in (caminho_k_dem, caminho_c_dem):
-    try:
-        os.remove(tmp)
-    except OSError:
-        pass
 
 # ============================================================
 # 3. LOOP DOS 17 EVENTOS: Q-barra, pr-barra, Dup, Ddn, FCI
@@ -217,19 +268,15 @@ for numero_evento in range(1, 18):
     t0 = time.time()
     PASTA_EVENTO = os.path.join(BASE, f"Evento {numero_evento}")
 
-    # Q-barra (media de montante de Q)
+    # Q-barra (media de montante de Q) - D8 puro (Python), sem depender do SAGA
     caminho_q_dem = os.path.join(PASTA_QP, f"_Q_dem_tmp{numero_evento}.tif")
     reprojeta_para_dem(os.path.join(PASTA_EVENTO, f"Q{numero_evento}_CN1.tif"), caminho_q_dem)
-    caminho_q_mean = os.path.join(PASTA_QP, f"_Q_mean_tmp{numero_evento}.tif")
-    roda_saga_val_mean(caminho_q_dem, caminho_q_mean)
-    Q_BARRA = le_raster(caminho_q_mean)
+    Q_BARRA = calcula_upslope_mean(le_raster(caminho_q_dem))
 
     # pr-barra (media de montante de pr)
     caminho_pr_dem = os.path.join(PASTA_QP, f"_pr_dem_tmp{numero_evento}.tif")
     reprojeta_para_dem(os.path.join(PASTA_EVENTO, f"pr{numero_evento}.tif"), caminho_pr_dem)
-    caminho_pr_mean = os.path.join(PASTA_QP, f"_pr_mean_tmp{numero_evento}.tif")
-    roda_saga_val_mean(caminho_pr_dem, caminho_pr_mean)
-    PR_BARRA = le_raster(caminho_pr_mean)
+    PR_BARRA = calcula_upslope_mean(le_raster(caminho_pr_dem))
 
     # Dup (Eq. 7): 11,8*(Q-barra*pr-barra)^0,56 * K-barra * C-barra * P-barra * S-barra * sqrt(A)
     base = np.clip(Q_BARRA * PR_BARRA, 0, None)
@@ -240,7 +287,22 @@ for numero_evento in range(1, 18):
     caminho_w_dem = os.path.join(PASTA_QP, f"_W_dem_tmp{numero_evento}.tif")
     reprojeta_para_dem(caminho_e_unit, caminho_w_dem)
     W_evento = le_raster(caminho_w_dem)
-    W_evento = np.where(np.isfinite(W_evento) & (W_evento > 0), W_evento, 1e-6)
+    # Pixels de agua/area urbana (C=0) tem E_unit exatamente 0 - fisicamente correto
+    # como erosao local, mas usado aqui como peso de impedancia ao fluxo, um piso
+    # proximo de zero (ex.: 1e-6) faz esses pixels virarem barreiras quase
+    # infinitas no acumulo de Ddn. Como ~14% da bacia e agua/urbano (e outro tanto
+    # de pixels rurais tem E_unit quase nulo em eventos fracos - a cauda baixa da
+    # distribuicao ja e ~15-20% contaminada por esses casos) e praticamente todo
+    # caminho de fluxo passa por pelo menos um deles a caminho do exutorio, isso
+    # inflava o Ddn (e por consequencia o FCI) da bacia inteira em dezenas de
+    # ordens de grandeza. Um piso no percentil 5 da propria distribuicao ainda cai
+    # dentro dessa cauda contaminada (testado - nao resolveu). Uso a MEDIANA dos
+    # pixels validos com erosao real: trata agua/urbano/pixels quase-zero como
+    # tendo impedancia "tipica" pra fins de roteamento de sedimento, em vez de um
+    # extremo artificial sem base fisica.
+    validos_pos = np.isfinite(W_evento) & (W_evento > 0)
+    piso_W = np.median(W_evento[validos_pos]) if validos_pos.any() else 1e-6
+    W_evento = np.where(validos_pos, W_evento, piso_W)
 
     Ddn_2d, n_pendentes = calcula_ddn(W_evento)
 
@@ -254,7 +316,7 @@ for numero_evento in range(1, 18):
     resumo.append((numero_evento, valido_fci.sum(), np.nanmean(FCI[valido_fci]),
                    np.nanmin(FCI[valido_fci]), np.nanmax(FCI[valido_fci])))
 
-    for tmp in (caminho_q_dem, caminho_q_mean, caminho_pr_dem, caminho_pr_mean, caminho_w_dem):
+    for tmp in (caminho_q_dem, caminho_pr_dem, caminho_w_dem):
         try:
             os.remove(tmp)
         except OSError:

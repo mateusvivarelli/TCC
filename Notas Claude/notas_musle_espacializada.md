@@ -270,12 +270,129 @@ Isso é o alvo (SY_obs) para calibrar FCI₀ e k_FCI (seção 7 do roadmap).
 - [x] E_unit calculado por pixel/evento (K, C, LS, Q, pr).
 - [x] FCI final por evento (Eq. 7 exata, W = E_unit) — 17/17 rodados com sucesso, checagem visual
       confirmou padrão espacial coerente (baixa conectividade nas zonas de baixa declividade).
-- [x] Normalizar FCI em DSC (sigmoide, Eq. 8) e calibrar FCI₀/k_FCI (log-NSE, Eq. 11) — script
-      `Scripts/calcular_dsc_calibrar_validar.py` rodando/rodado (ver resultado mais recente).
-- [ ] Validar: comparar SY_sim com SY_obs (NSE, WIA, PBIAS, erro %).
-- [ ] Mapas finais de produção de sedimentos (hot spots).
+- [x] Normalizar FCI em DSC (sigmoide, Eq. 8) e calibrar FCI₀/k_FCI — **abandonado, ver seção 9**.
+- [x] Validar: comparar SY_sim com SY_obs (NSE, WIA, PBIAS, erro %) — feito via o baseline (seção 9).
+- [x] Mapas finais de produção de sedimentos (hot spots) — `Scripts/calcular_sy_final.py`,
+      ver seção 9.
 - [x] ~~Simulação de cenários (alterar C/P localmente)~~ — **cortado do escopo do TCC em
       14/09/2026** (decisão do usuário, dado o prazo de 6 semanas). Não é mais um item pendente.
+
+## 9. Decisão final (17/09/2026): FCI/DSC abandonado, adotado baseline de escala linear
+
+**Contexto:** retomando o trabalho pausado em 14/09 (ver README.md), a tentativa de recalibrar
+FCI₀/k_FCI trocando o objetivo de log-NSE para NSE bruto **não resolveu** o problema original —
+NSE continuou negativo (-0,60), pior que o baseline trivial (escala constante de E_unit,
+NSE=0,37/0,65).
+
+**Bug real encontrado e corrigido (mas que não resolveu o problema todo):** o pixel imediatamente
+a montante do exutório tinha `E_unit=0` exato nos 17 eventos (é área de água/urbana, `C=0` — 14,3%
+da bacia tem `C=0`). Como esse valor é usado como peso de impedância `W_i` no denominador `Ddn`
+(soma de `d_i/(W_i·S_i)` ao longo do caminho de fluxo D8), e **praticamente todo caminho de fluxo
+da bacia passa perto desse ponto antes de sair**, um piso de W próximo de zero (1e-6, valor
+original do script) inflava o `Ddn` — e por consequência achatava o `FCI` — da bacia inteira em
+dezenas de ordens de grandeza (FCI variando de -59 a -7, muito mais largo que a Tabela 4 do
+artigo: FCI₀ entre -2,33 e -4,79, k_FCI entre 0,96 e 2,99 nas três bacias de Hao et al.).
+Corrigido em `Scripts/calcular_fci_por_evento.py`: o piso de W passou a ser a **mediana** da
+própria distribuição de E_unit do evento (não um valor arbitrário), já que testar o percentil 5
+não resolveu (ainda caía dentro da cauda contaminada por pixels de água/urbano). Isso melhorou a
+extremidade bem-conectada do FCI (máximo de -7 para -1,8, mais perto da escala do artigo), mas
+**não resolveu a calibração — na verdade piorou** (NSE=-0,91 após a correção, contra -0,60 antes).
+
+**Nota lateral (sem impacto direto, registrado para referência futura):** durante a investigação,
+notou-se que a Eq. 6 do artigo define `W_i` **sem** o fator LS, enquanto o código usava
+`E_unit` (que **inclui** LS) como `W_i`. Não foi a causa raiz (testado isoladamente: `Ddn` variou
+menos de 2% removendo o LS), mas é uma divergência real em relação ao artigo que ficaria pendente
+se a abordagem FCI/DSC fosse retomada no futuro.
+
+**Hipótese não testada (falta de tempo):** a área da bacia do Alto Jundiaí (137,8 km²) é **10 a
+65× menor** que as três bacias do artigo (Dali 1.310 km², Duhe 8.973 km², Xiangshui 1.749 km²).
+Como o numerador do FCI (`Dup`) usa `sqrt(A_k)` e o denominador (`Ddn`) acumula ao longo de
+caminhos de fluxo proporcionalmente mais curtos numa bacia pequena, é plausível que a escala
+natural do índice não se transfira diretamente entre bacias de tamanhos tão diferentes sem um
+ajuste adicional (ex.: normalização por área da bacia). Não foi investigado a fundo — ver seção
+7/8 se decidir retomar essa linha no futuro.
+
+**Decisão do usuário (17/09/2026):** abandonar a calibração FCI/DSC e adotar o **baseline de
+escala linear constante** como resultado final da Fase 2 espacializada:
+
+$$SY_{sim,k} = c \cdot E_{unit,k}, \quad c = 0{,}109049 \text{ (mínimos quadrados pela origem)}$$
+
+- **NSE = 0,3714** (através da origem) contra os 17 eventos observados.
+- Fisicamente, isso equivale a assumir que a fração de erosão local que efetivamente chega ao
+  exutório é aproximadamente **constante entre pixels** (sem modelar a conectividade espacial
+  como um fator adicional que varia por posição na bacia) — uma simplificação, mas consistente
+  com o teto de precisão baixo que a literatura recente já reporta para MUSLE espacializada
+  mesmo com dados de entrada observados perfeitos (Baert et al., 2026: NSE≈0,66 nesse cenário
+  ideal, caindo a ~0 com entradas modeladas como as nossas).
+- Isso deve ser reportado no texto do TCC como um **achado legítimo**, não como uma limitação
+  escondida: a tentativa de incorporar conectividade espacial (Hao et al., 2022) foi feita e
+  documentada, mas não superou uma escala linear simples nesta bacia — possivelmente por causa
+  da diferença de escala espacial em relação às bacias originais do artigo (ver hipótese acima).
+
+**Mapas finais gerados:** `Scripts/calcular_sy_final.py` — `Evento {n}/SY{n}.tif` (produção de
+sedimentos por pixel, por evento) e `Dados Iniciais/SY_medio_eventos.tif` (média dos 17 eventos,
+mapa principal de hot spots erosivos). Checagem física: os hot spots (top 5% da bacia) têm C
+médio 0,247 (bacia: 0,050) e LS médio 0,791 (bacia: 0,537) — coerente (erosão concentrada em
+áreas de uso do solo mais agressivo combinado com declividade mais alta). Correlação SY×C=0,70,
+SY×LS=0,19.
+
+**Fase 2 considerada concluída** com essa abordagem. Próximo passo é redação/figuras finais do
+TCC (ver README.md).
+
+## 10. Experimento (17/09/2026): recalibrar alfa/beta direto na fórmula por pixel
+
+Usuário perguntou se dava pra usar o alfa/beta da própria IC (0,277/0,807) em vez dos fixos de
+Williams/Hao (11,8/0,56). Resposta técnica: não dá pra simplesmente substituir — os parâmetros da
+IC foram calibrados contra `D` e `qp` **agregados da bacia inteira** (um valor por evento), não
+contra valores **locais por pixel**; além disso, por causa do expoente não-linear,
+`Σx_k^β ≠ (Σx_k)^β`, então nem ajustando a escala o mesmo beta reproduziria o resultado agregado
+aplicado pixel a pixel. Testamos mesmo assim, como experimento controlado (recalibrando alfa E
+beta livremente na fórmula por pixel, via `differential_evolution` contra os 17 SY_obs — mesmo
+método usado na tentativa de FCI0/kFCI). Script:
+[Scripts/calibrar_alfa_beta_pixel.py](Scripts/calibrar_alfa_beta_pixel.py).
+
+**Resultado:** alfa=4,2237, beta=0,2793 (bem diferente tanto do 11,8/0,56 de Hao quanto do
+0,277/0,807 da IC — não bate com nenhuma referência física).
+
+| Métrica | Baseline adotado (alfa/beta fixos, só escala `c`) | Este experimento (alfa/beta livres) |
+|---|---|---|
+| NSE | 0,3714 | **0,6121** (melhor) |
+| PBIAS | — | -1,36% (bom) |
+| Erro médio | -19,2% | +29,2% (pior) |
+| Erro absoluto médio | 44,4% | **57,9%** (pior) |
+
+**Por que o NSE melhora mas o erro médio piora:** NSE pesa por magnitude (eventos grandes como
+13/14/15/9 dominam), enquanto erro médio trata todo evento igual. O ajuste livre acerta bem os
+eventos grandes mas gera outliers extremos em eventos pequenos (evento 6: +302%, evento 12:
++154%, evento 3: +91%) — sintoma clássico de mal-condicionamento (2 parâmetros livres, só 17
+observações de nível bacia, sem dado de validação por pixel). Ao contrário da tentativa de
+FCI0/kFCI (que bateu no limite superior de kFCI, um sinal claro de degenerescência), aqui o
+otimizador convergiu num ponto interior dos limites (`beta` entre 0,1 e 2,0, `alfa` entre 1e-6 e
+1000) — ou seja, é um ótimo genuíno dos dados, só que **estatisticamente frágil e sem ancoragem
+física** (beta=0,28 não corresponde a nenhuma referência da literatura de erosão).
+
+**Decisão:** não adotado como resultado final (o baseline com alfa/beta fixos de Williams/Hao
+continua sendo a escolha mais defensável cientificamente), mas vale documentar no texto do TCC
+como um experimento que mostra o teto de ajuste estatístico possível, em contraste com a
+abordagem fisicamente fundamentada.
+
+## 11. Pendência para a próxima sessão (17/09/2026)
+
+Usuário pediu para deixar anotado, sem executar agora:
+
+1. **Testar SY_total com o "outro Qp"**: a Fase 1 (seção 3.10 de
+   [notas_qgis_calibracao_qp.md](notas_qgis_calibracao_qp.md)) deixou pendente a escolha entre o
+   fator de pico calibrado para **menor erro absoluto** (o atual, viés -38,4%, erro absoluto
+   46,0%) ou recalibrado para **viés ~0%** (erro absoluto sobe pra ~55-65%). Gerar o `pr{n}.tif` /
+   `Qp` alternativo (viés zero) e reprocessar `E_unit`, `SY` com ele.
+2. **Testar SY com "minha calibração"**: gerar o mapa espacial completo (não só a comparação
+   agregada da seção 10) usando alfa=4,2237/beta=0,2793 (o experimento acima) em vez dos valores
+   fixos de Hao.
+3. **Ver os gráficos de SY e E_unit (MUSLE) na bacia nos 4 casos** (desenho 2×2): {Qp atual, Qp
+   alternativo (viés zero)} × {alfa/beta fixos de Hao, alfa/beta livres calibrados}. Isso dá 4
+   combinações de mapas (SY e E_unit cada) para comparar visualmente.
+
+Nenhum desses itens foi executado ainda — fica para quando o usuário retomar.
 
 ## 8. Artigos sugeridos pelo orientador (14/09/2026) — comparação com nosso plano
 

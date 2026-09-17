@@ -37,9 +37,16 @@ Este projeto vive em dois canais, por causa do tamanho dos rasters:
 4. Instalar o QGIS 3.44 (mesma versão, se possível) — os scripts chamam caminhos fixos como
    `C:\Program Files\QGIS 3.44.14\bin\python-qgis-ltr.bat` e `qgis_process-qgis-ltr.bat`. Se a
    versão instalada for outra, tem que ajustar esses caminhos nos scripts (`grep -rn "QGIS 3.44"
-   Scripts/` pra achar todas as ocorrências).
-5. Conferir que `python-qgis-ltr.bat` tem `pdfplumber`, `pandas`, `scipy`, `openpyxl` instalados
-   (mesmos pacotes usados nas sessões anteriores).
+   Scripts/` pra achar todas as ocorrências). **Nota (17/09/2026):** num PC com QGIS 3.42.1 (bat
+   quebrado — pega o Python errado de outra instalação) e QGIS 4.2.1 (funciona, mas **não tem o
+   provider `sagang`/SAGA** — só `gdal` e `qgis` nativos), os scripts que dependiam de
+   `sagang:catchmentarea` (`calcular_fci_por_evento.py`) foram adaptados pra calcular a média de
+   montante em Python puro (função `calcula_upslope_mean`, acumulação topológica sobre a mesma
+   rede D8 já usada no resto do script) — não depende mais do SAGA. Os rasters fixos
+   (`K_mean_upslope.tif`, `C_mean_upslope.tif`, `slope_mean_upslope_pct.tif`, calculados
+   originalmente via SAGA MFD) são reaproveitados do disco se já existirem.
+5. Conferir que `python-qgis-ltr.bat` (ou `python-qgis.bat` na versão instalada) tem `pdfplumber`,
+   `pandas`, `scipy`, `openpyxl` instalados (mesmos pacotes usados nas sessões anteriores).
 6. Ler este README e todo o conteúdo de `Notas Claude/` antes de continuar qualquer trabalho — é
    isso que dá o contexto completo do projeto, não alguma sincronização automática de memória
    entre instâncias do Claude Code (essa memória é local a cada máquina).
@@ -49,31 +56,35 @@ Este projeto vive em dois canais, por causa do tamanho dos rasters:
 Ponto de partida pra retomar o trabalho. Detalhes completos em
 [Notas Claude/notas_qgis_calibracao_qp.md](Notas%20Claude/notas_qgis_calibracao_qp.md) (Fase 1 —
 calibração de Q e Qp) e [Notas Claude/notas_musle_espacializada.md](Notas%20Claude/notas_musle_espacializada.md)
-(Fase 2 — MUSLE espacializada, em andamento).
+(Fase 2 — MUSLE espacializada, concluída).
 
-## Onde estamos agora (14/09/2026) — PAUSADO a pedido do usuário
+## Onde estamos agora (17/09/2026) — Fase 2 concluída (FCI/DSC abandonado, baseline adotado)
 
-FCI (17/17 eventos) rodou com sucesso e passou por checagem visual (padrão espacial coerente com a
-declividade). A calibração de FCI₀/k_FCI (`Scripts/calcular_dsc_calibrar_validar.py`) rodou várias
-vezes e **achou um problema real, ainda não resolvido**: calibrando via log-NSE (Eq. 11, o mesmo
-objetivo do artigo), o otimizador converge pra k_FCI≈0 (a conectividade espacial vira irrelevante,
-DSC quase constante) e o NSE bruto resultante fica negativo (-0,72). Mas um teste de baseline
-(escala constante de ΣE_unit, sem FCI/DSC nenhum) já dá **NSE=0,37 (através da origem) ou 0,65 (com
-intercepto)** — melhor que a calibração via FCI! Ou seja: **a forma como está calibrando agora
-(log-NSE) está pior que simplesmente ignorar a conectividade**. Última mudança feita (ainda não
-testada): troquei o objetivo de otimização de log-NSE pra NSE bruto direto, pra ver se a
-conectividade consegue superar o baseline de 0,37/0,65 dessa forma. **Não rodar ainda — usuário
-pediu pra deixar pra depois.**
+Retomando o trabalho pausado em 14/09: a troca do objetivo de calibração pra NSE bruto não
+resolveu (NSE continuou negativo, -0,60). Investigação encontrou um bug real (pixel de água/urbano
+junto ao exutório inflando o denominador Ddn em toda a bacia) e corrigiu — mas mesmo corrigido, a
+calibração **piorou** (NSE=-0,91). Não foi possível fazer o FCI/DSC (Hao et al., 2022) superar o
+baseline trivial de escala linear constante nesta bacia. Decisão do usuário: **adotar o baseline**
+como resultado final da Fase 2 (`SY_sim = c · E_unit`, c=0,109049, NSE=0,37). Ver
+[notas_musle_espacializada.md](Notas%20Claude/notas_musle_espacializada.md) seção 9 pro histórico
+completo (o que foi tentado, o bug encontrado, a hipótese não testada sobre escala de bacia).
 
-Rerun (quando for retomar):
-```bash
-"C:\Program Files\QGIS 3.44.14\bin\python-qgis-ltr.bat" "C:\TCC\Scripts\calcular_dsc_calibrar_validar.py"
-```
-Leva uns 8-10 minutos. Ver [notas_musle_espacializada.md](Notas%20Claude/notas_musle_espacializada.md)
-seção 7/9 pro histórico completo das tentativas e valores encontrados.
+Mapas finais gerados (`Scripts/calcular_sy_final.py`): `Evento {n}/SY{n}.tif` por evento e
+`Dados Iniciais/SY_medio_eventos.tif` (mapa principal de hot spots erosivos, média dos 17 eventos).
+Checagem física OK: hot spots (top 5%) têm C médio 5× maior que a bacia e LS mais alto — coerente.
 
 **Corte de escopo (14/09/2026):** a simulação de cenários de conservação (alterar C/P) foi
 removida do projeto do TCC — decisão do usuário dado o prazo. Não é mais um item pendente.
+
+**Pendência para a próxima sessão (17/09/2026, não executada ainda):** testar SY_total com o
+"outro Qp" (fator de pico recalibrado pra viés zero, alternativa deixada em aberto na seção 3.10
+de `notas_qgis_calibracao_qp.md`) e com "minha calibração" (o experimento de alfa/beta livres,
+seção 10 de `notas_musle_espacializada.md`), e gerar gráficos de SY e E_unit/MUSLE nos 4 casos
+(2×2: Qp atual/alternativo × alfa,beta fixos de Hao/livres). Ver seção 11 de
+`notas_musle_espacializada.md` para os detalhes completos.
+
+**Próximo passo:** resolver a pendência acima, depois redação e figuras finais do TCC (Fase 2
+tecnicamente concluída quanto ao baseline adotado).
 
 ## Fase 1 (concluída): calibração de Q e Qp
 
@@ -91,7 +102,7 @@ Resumo em [Resultados_Calibracao_TCC.xlsx](Resultados_Calibracao_TCC.xlsx) e nas
 - **Exutório real da bacia** (não confundir com o posto de chuva DBT5, que fica fora da bacia):
   X=318980,77, Y=7432307,08 (SIRGAS 2000/UTM 23S).
 
-## Fase 2 (em andamento): espacializar a MUSLE
+## Fase 2 (concluída): espacializar a MUSLE
 
 Objetivo do TCC: gerar um **mapa** de produção de sedimentos (não um valor único por evento como
 na IC), seguindo Hao et al. (2022) — `1-s2.0-S0022169422011490-main.pdf`, já na pasta.
@@ -109,7 +120,8 @@ na IC), seguindo Hao et al. (2022) — `1-s2.0-S0022169422011490-main.pdf`, já 
 | SY_obs (sedimento medido por evento) | coluna `SYY_t` da planilha `eventos_processados_manuais.xlsx` | ✅ localizado, não precisou digitalizar nada |
 | IC genérico (placeholder, W=1) | `Dados Iniciais/qp_spatial/IC_placeholder.tif` | ✅ só teste inicial, não usar pra calibração |
 | IC por evento (Eq. 5 genérica, **desatualizado**) | `Evento {n}/IC{n}.tif` | ⚠️ calculado com fórmula errada (ver abaixo) — não usar |
-| **FCI por evento (Eq. 7 exata, a correta)** | `Evento {n}/FCI{n}.tif` | 🔄 **rodando/precisa rodar** (ver comando acima) |
+| FCI por evento (Eq. 7 exata) | `Evento {n}/FCI{n}.tif` | ✅ pronto, 17 eventos (mas não usado no resultado final — ver seção "Onde estamos agora") |
+| **SY final por evento (baseline linear adotado)** | `Evento {n}/SY{n}.tif` e `Dados Iniciais/SY_medio_eventos.tif` | ✅ **pronto — resultado final da Fase 2** |
 
 ### Correção importante feita nesta sessão
 
@@ -121,21 +133,18 @@ pr, K, C, P, S (não a média do E_unit combinado), e **sem o fator LS**. Corrig
 `Scripts/calcular_fci_por_evento.py` — **é esse que precisa terminar de rodar**, não o
 `calcular_ic_por_evento.py` antigo.
 
-## Próximos passos (depois que o FCI terminar)
+## Próximos passos
 
-1. **Normalizar FCI em DSC** (probabilidade de conectividade, 0 a 1) via a curva sigmoide:
-   $DSC_{unit,k} = \dfrac{1}{1+\exp(FCI_0 - k_{FCI}\cdot FCI_k)}$ — conferir a forma exata da
-   fórmula (Eq. 8 do artigo) antes de implementar, mesmo cuidado que tivemos com a Eq. 7.
-2. **Calcular SY_sim por evento**: $SY_{sim} = \sum_{pixels} E_{unit} \times DSC$.
-3. **Calibrar FCI₀ e k_FCI** (2 parâmetros, únicos pra toda a bacia — não por evento, conforme
-   Tabela 4 do artigo) contra os 17 valores de `SYY_t` (já localizados, ver tabela na seção 6.1
-   das notas). Usar `scipy.optimize` (já usamos várias vezes nesta sessão pra esse tipo de
-   calibração).
-4. **Validar**: comparar SY_sim×SY_obs (NSE, WIA, erro % — mesmas métricas do artigo, Tabela 4).
-5. **Mapas finais**: produção de sedimentos por pixel/evento — os "hot spots" erosivos, resultado
-   central do TCC.
-6. **Simulação de cenários**: alterar C e/ou P localmente pra simular intervenções de conservação
-   (mantas biotêxteis, gabiões, bacias de sedimentos) e quantificar a redução de sedimentos.
+Fase 2 tecnicamente concluída (ver "Onde estamos agora"). O que falta é redação:
+
+1. **Atualizar o texto do TCC** com o resultado final (baseline linear, NSE=0,37) e a discussão
+   honesta de por que a conectividade espacial (Hao et al., 2022) não superou essa escala simples
+   nesta bacia — ver `Notas Claude/notas_musle_espacializada.md` seção 9 pros detalhes e possíveis
+   referências de apoio (Baert et al., 2026, já mostra tetos de precisão baixos pra MUSLE
+   espacializada mesmo com dados observados perfeitos).
+2. **Figuras finais**: mapa de `SY_medio_eventos.tif` (hot spots) com contexto (uso do solo,
+   declividade) pra composição visual no TCC.
+3. ~~Simulação de cenários~~ — cortado do escopo em 14/09/2026, não é mais um item pendente.
 
 ## Prazo
 
