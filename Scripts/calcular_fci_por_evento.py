@@ -24,7 +24,6 @@ Diferencas-chave em relacao a versao anterior:
 
 import os
 import time
-import subprocess
 import numpy as np
 from osgeo import gdal
 
@@ -33,7 +32,6 @@ gdal.UseExceptions()
 BASE = r"C:\TCC"
 PASTA_DADOS = os.path.join(BASE, "Dados Iniciais")
 PASTA_QP = os.path.join(PASTA_DADOS, "qp_spatial")
-QGIS_PROCESS = r"C:\Program Files\QGIS 4.2.1\bin\qgis_process-qgis.bat"
 DEM_FILLED = os.path.join(PASTA_QP, "carvedDEM_corrigido_filled.tif")
 
 OUTLET_X, OUTLET_Y = 318980.7663669552, 7432307.0820886735
@@ -129,27 +127,15 @@ def calcula_ddn(W):
     return Ddn_2d, pendentes.sum()
 
 
-def roda_saga_val_mean(val_input_path, saida_path):
-    subprocess.run([
-        QGIS_PROCESS, "run", "sagang:catchmentarea",
-        f"--ELEVATION={DEM_FILLED}",
-        "--METHOD=4", "--FLOW_UNIT=1",
-        f"--FLOW={PASTA_QP}\\_flowacc_tmp_fci.tif",
-        f"--VAL_INPUT={val_input_path}",
-        f"--VAL_MEAN={saida_path}",
-        f"--ACCU_TARGET={DEM_FILLED}",
-    ], capture_output=True, text=True)
-
-
-# Em maquinas sem o provider sagang disponivel no QGIS (ex.: QGIS 4.x sem plugin
-# SAGA instalado), a media de montante (VAL_MEAN do sagang:catchmentarea) e
-# recalculada aqui em Python puro, via acumulacao topologica (Kahn) sobre a MESMA
-# rede D8 ja usada no Ddn (downstream_row/downstream_col) - evita a dependencia do
-# SAGA para Q-barra/pr-barra por evento. Nota: o pipeline original usava METHOD=4
-# (Multiple Flow Direction) do SAGA para Dup e D8 puro para Ddn - inconsistencia
-# preexistente entre numerador e denominador. Esta funcao usa D8 nos dois, o que e
-# mais consistente internamente, mas os valores de Dup podem diferir ligeiramente
-# dos calculados antes com MFD.
+# A media de montante (equivalente ao VAL_MEAN do sagang:catchmentarea do SAGA,
+# que dependia de um provider nem sempre disponivel no QGIS - ver historico no
+# git) e calculada aqui em Python puro, via acumulacao topologica (Kahn) sobre a
+# MESMA rede D8 ja usada no Ddn (downstream_row/downstream_col) - sem depender do
+# SAGA nem de nenhum caminho de instalacao especifico de maquina. Nota: o
+# pipeline original usava METHOD=4 (Multiple Flow Direction) do SAGA para Dup e
+# D8 puro para Ddn - inconsistencia preexistente entre numerador e denominador.
+# Esta funcao usa D8 nos dois, o que e mais consistente internamente, mas os
+# valores de Dup podem diferir ligeiramente dos calculados antes com MFD.
 _in_degree_base = np.bincount(
     np.ravel_multi_index((dest_r, dest_c), (nrows, ncols)),
     minlength=nrows * ncols,
