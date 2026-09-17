@@ -1,0 +1,26 @@
+# Dados pesados (rasters, grades intermediarias) - sincronizar via Google Drive,
+# nao pelo git. Ver README.md secao "Sincronizacao entre dispositivos".
+*.tif
+*.tiff
+*.sdat
+*.sgrd
+*.sdat.aux.xml
+*.tif.aux.xml
+*.tfw
+
+# Arquivos temporarios gerados pelos scripts (prefixo "_", normalmente
+# apagados sozinhos ao final, mas por seguranca)
+_*.tif
+_*.sdat
+
+# Python
+__pycache__/
+*.pyc
+
+# QGIS
+*.qgz~
+*.gpkg-wal
+*.gpkg-shm
+
+# Estado local do Claude Code (nao faz sentido sincronizar entre maquinas)
+.claude/
