@@ -1,0 +1,23 @@
+# Marca explicitamente os formatos binarios, para o git NAO aplicar conversao
+# de fim de linha (LF<->CRLF) neles - isso corromperia os arquivos. O PDF
+# gerado pelo reportlab, em particular, era detectado como texto pelo git.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.xlsx  binary
+*.xls   binary
+*.docx  binary
+*.tif   binary
+*.tiff  binary
+*.sdat  binary
+*.shp   binary
+*.shx   binary
+*.dbf   binary
+
+# Texto: normaliza para LF no repositorio
+*.py    text eol=lf
+*.md    text eol=lf
+*.csv   text eol=lf
+*.prj   text
+*.qmd   text

@@ -58,7 +58,35 @@ Ponto de partida pra retomar o trabalho. Detalhes completos em
 calibração de Q e Qp) e [Notas Claude/notas_musle_espacializada.md](Notas%20Claude/notas_musle_espacializada.md)
 (Fase 2 — MUSLE espacializada, concluída).
 
-## Onde estamos agora (17/09/2026) — Fase 2 concluída (FCI/DSC abandonado, baseline adotado)
+## Onde estamos agora (21/09/2026) — versão com volume observado como restrição
+
+Diagnóstico completo das fontes de erro (seção 12 das notas) mostrou que o erro do SY é quase
+todo herdado do volume do CN-SCS, não da estrutura espacial nem da MUSLE. Três tentativas de
+melhorar o volume de forma preditiva falharam com evidência (λ por evento: 5 de 17 eventos são
+impossíveis; λ(chuva): piora em validação cruzada; classificação AMC padrão: piora muito).
+
+**Implementado (seção 13 das notas):** versão com o volume medido usado como restrição do raster
+de Q — `Scripts/calcular_sy_volume_restrito.py`, saídas com sufixo `_obs`.
+
+| Métrica | Previsão pura | **Volume restrito** |
+|---|---|---|
+| NSE (leave-one-out) | 0,2816 | **0,7759** |
+| WIA | 0,8683 | **0,9462** |
+| PBIAS | -21,3% | **-1,0%** |
+| Erro absoluto médio | 46,1% | **27,8%** |
+
+Supera o patamar de Hao et al. (2022) (NSE > 0,70, WIA > 0,89). O mapa de hot spots praticamente
+não muda entre as duas versões (r=0,994; 96,9% dos hot spots coincidem) — resultado de robustez.
+
+Figura: `Figuras/comparacao_previsao_vs_volume_restrito.png`.
+
+**Pendências de texto:** reportar o NSE leave-one-out (não só in-sample); deixar claro que a
+calibração de Qp da Fase 1 é validação do modelo hidrológico e **não** alimenta o mapa (o `pr` da
+MUSLE espacializada é o local de Hao et al.); mencionar os 0,48% de pixels limitados à chuva.
+
+**Não executar a pendência da seção 11** (grade 2×2 com "outro Qp") — é inócua, ver seção 12.4.
+
+## Histórico (17/09/2026) — Fase 2, FCI/DSC abandonado, baseline adotado
 
 Retomando o trabalho pausado em 14/09: a troca do objetivo de calibração pra NSE bruto não
 resolveu (NSE continuou negativo, -0,60). Investigação encontrou um bug real (pixel de água/urbano

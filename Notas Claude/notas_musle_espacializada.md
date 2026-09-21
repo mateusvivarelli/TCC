@@ -466,3 +466,131 @@ pequena e com monitoramento muito mais denso (83,84 ha, 154 eventos, dados a cad
 - Ação recomendada: seguir rodando o FCI (Hao et al.) como planejado; se o orientador confirmar
   amanhã uma técnica de distribuição por dado observado, avaliar se é complementar (ex.: usar
   como cross-check do pr_pixel) ou alternativa ao que já foi feito.
+
+## 12. Diagnóstico de fontes de erro (21/09/2026) — onde o erro realmente está
+
+Antes de partir pra redação, foi feita uma decomposição do erro do modelo adotado
+(`SY = c·E_unit`, NSE=0,37). Scripts: `Scripts/_diagnostico_limites_modelo.py`,
+`_diagnostico_parte2.py`, `_diagnostico_parte3_lambda_variavel.py`, `_diagnostico_parte4_amc.py`.
+**Todos são diagnósticos, não resultado final.**
+
+### 12.1. Métricas honestas (leave-one-out)
+
+O NSE=0,3714 é **in-sample** (o `c` foi ajustado nos mesmos 17 eventos). Em validação cruzada
+leave-one-out (metodologia do próprio Hao et al., seção 3.3), o valor honesto é **NSE=0,2816**
+(erro absoluto médio 46,1%). É esse par que deve ser reportado no TCC.
+
+### 12.2. O achado central: o erro é hidrológico, não do modelo de erosão
+
+Reescalando o Q de cada evento para bater o volume **medido** (`T_R_m3`) — o que equivale a
+multiplicar Σ E_unit por f^1,12, já que E_unit ∝ Q^1,12 na nossa formulação:
+
+| Configuração | NSE (in-sample) | NSE (leave-one-out) | erro abs. médio |
+|---|---|---|---|
+| Q do modelo CN-SCS (atual) | 0,3714 | 0,2816 | 46,1% |
+| **Q com volume medido** | **0,8009** | **0,7703** | **28,2%** |
+| MUSLE concentrada, D e qp medidos (só escala calibrada) | 0,8476 | — | 28,6% |
+| MUSLE concentrada, D e qp do modelo | 0,4412 | — | 44,5% |
+
+**Interpretação:** a estrutura espacial (E_unit + fatores K/C/LS) está correta — com hidrologia
+boa ela atinge NSE 0,77-0,80, acima do teto de 0,66 que Baert et al. (2026) reportam para MUSLE
+com entradas observadas. Todo o déficit vem do volume de escoamento da Fase 1 (erro abs. 47%).
+A espacialização não degrada o desempenho agregado (0,37 espacial vs 0,44 concentrada, mesma
+qualidade de entrada) — ou seja, ela entrega o mapa "de graça".
+
+### 12.3. Tentativas de melhorar o volume — todas falharam (com evidência)
+
+| Tentativa | Resultado | Conclusão |
+|---|---|---|
+| λ ótimo por evento | **5 dos 17 eventos são impossíveis**: nem com λ→0 o CN-1 gera escoamento suficiente (eventos 1, 2, 4, 7, 10, todos com subestimação de 55-85%) | não é problema de λ, é do próprio CN (S alto demais) |
+| λ(chuva) = a·P^b, com LOO | volume melhora pouco (NSE_vol 0,21→0,34), mas SY **piora** em LOO (0,273→0,258) | sobreajuste com 17 pontos |
+| Classificação AMC por P5 (limiares clássicos do SCS) | **piora muito** (NSE_vol -2,97; NSE_SY -0,70) — concorda com o melhor cenário em 12/17, mas os 5 erros são catastróficos (eventos 14 e 16 saltam para +292% e +176%) | a classificação padrão de umidade antecedente não funciona nesta bacia |
+| Oráculo de cenário (escolher CN-1/2/3 sabendo a resposta) | NSE_vol 0,47, NSE_SY 0,63 | teto do que a escolha de cenário poderia dar — e não é realizável |
+
+Isso reproduz de forma independente o achado central de Baert et al. (2026) (nenhuma
+generalização de λ atinge bom desempenho fora da amostra) e ecoa Valle Junior et al. (2019)
+(CN-SCS estruturalmente inadequado em certas bacias brasileiras). **É um resultado do TCC, não
+uma falha** — mas significa que não há ganho barato restante pelo lado do CN-SCS.
+
+### 12.4. A pendência da seção 11 é inócua (não executar)
+
+- **Item 1 ("outro Qp", fator de pico com viés zero): não muda nada, por dois motivos
+  independentes.** (a) O `pr_pixel` da Fase 2 **não usa** o Qp da Fase 1 — ele é calculado só a
+  partir de `Q{n}_CN1.tif` e da razão `Intensidade_60min / Chuva_evento` da planilha (ver
+  `calcular_pr_pixel.py`); o HU-SCS da Fase 1 não entra no pipeline espacial. (b) Mesmo que
+  entrasse: `FATOR_PICO` é um escalar global, então pr escalaria por k em todos os eventos,
+  Σ E_unit por k^0,56, e o `c` recalibrado absorveria isso **exatamente** — NSE, PBIAS e os mapas
+  seriam idênticos.
+- **Itens 2 e 3 (mapas com α/β livres, grade 2×2):** só o β muda o padrão espacial. E o
+  diagnóstico mostra que baixar o β é um curativo estatístico para o viés do volume: com β=0,2793
+  o erro absoluto piora de 46% para 66% (LOO), e com o volume corrigido o β=0,56 original funciona
+  bem (NSE 0,80). Gerar os mapas só se for para figura ilustrativa de sensibilidade.
+
+### 12.5. Recomendação
+
+Usar o **volume medido como restrição** do raster de Q (reescalar `Q{n}_CN1.tif` por evento para
+que o total bata `T_R_m3`), mantendo o padrão espacial do CN-SCS + interpolação de chuva. Isso
+leva o NSE de 0,28 para 0,77 (LOO) e é metodologicamente defensável — Baert et al. (2026) usam
+exatamente essa configuração (volume e pico observados como entrada da MUSLE) como caso de
+referência. Deve ser descrito com transparência como "volume observado usado como restrição", não
+como previsão pura, e o TCC pode apresentar os dois mapas (previsão pura × restrito pelo
+observado) — a comparação entre eles **é** um resultado, pois quantifica quanto do erro vem da
+hidrologia.
+
+### 12.6. Correção necessária no texto do TCC
+
+A seção 5 do projeto (e o texto futuro) não pode dar a entender que a calibração de Qp da Fase 1
+(HU-SCS, Tc de Giandotti, fator de pico) alimenta o mapa — ela **não alimenta**. Ela é uma
+**validação do modelo hidrológico** da bacia; o `pr` usado na MUSLE espacializada é o local de
+Hao et al. (Q do pixel × razão de intensidade). Isso precisa estar claro para não parecer erro
+metodológico.
+
+## 13. Versão com volume observado como restrição (21/09/2026) — implementada
+
+Implementação da recomendação da seção 12.5. Script:
+[Scripts/calcular_sy_volume_restrito.py](Scripts/calcular_sy_volume_restrito.py).
+
+**O que faz:** reescala `Q{n}_CN1.tif` por um fator único por evento, de modo que o volume total
+da bacia bata exatamente o `T_R_m3` medido. O **padrão espacial** do CN-SCS (que vem do CN e da
+chuva interpolada) é preservado — só o total é restringido pela medição. Depois refaz `pr`,
+`E_unit` e `SY` a partir desse Q. Saídas com sufixo `_obs`, sem sobrescrever os resultados
+anteriores.
+
+### Resultados
+
+| Métrica | Previsão pura (atual) | **Volume restrito** |
+|---|---|---|
+| c calibrado | 0,109049 | **0,140844** |
+| NSE (in-sample) | 0,3714 | **0,8052** |
+| NSE (leave-one-out) | 0,2816 | **0,7759** |
+| WIA | 0,8683 | **0,9462** |
+| PBIAS | -21,28% | **-0,99%** |
+| Erro absoluto médio (LOO) | 46,1% | **27,8%** |
+
+**Comparação com o artigo de referência:** Hao et al. (2022) reportam NSE > 0,70 e WIA > 0,89 nas
+três bacias deles. A versão restrita (NSE 0,78-0,81, WIA 0,95) **atinge e supera** esse patamar —
+e com uma formulação mais simples (escala constante em vez de FCI/DSC).
+
+### Checagens
+
+- **Consistência física (Q ≤ chuva):** o reescalonamento poderia gerar escoamento maior que a
+  chuva do pixel. Aconteceu em **0,48% dos pixels** (12.619 de 2,6 milhões), concentrados nos dois
+  eventos com maior fator de correção (evento 4, fator 4,06; evento 10, fator 6,95). Esses pixels
+  foram limitados à lâmina de chuva. Precisa ser mencionado no texto.
+- **Fatores de correção por evento:** variam de 0,55 (evento 9) a 6,95 (evento 10) — ou seja, a
+  correção é grande em alguns eventos, o que é justamente a medida do erro do CN-SCS.
+- **Robustez do padrão espacial:** correlação entre o mapa médio novo e o anterior **r = 0,9941**,
+  e **96,9%** dos hot spots (top 5%) coincidem. Ou seja, **o mapa de áreas críticas — o produto
+  central do TCC — praticamente não muda**. A correção de volume melhora a magnitude por evento,
+  não a localização dos hot spots. Isso é um resultado de robustez forte pra reportar.
+
+### Como descrever no TCC
+
+Apresentar os **dois mapas lado a lado** (previsão pura × restrito pelo observado). A diferença
+entre eles quantifica a parcela hidrológica do erro. Descrever com transparência como "volume
+observado usado como restrição", **não** como previsão pura. Precedente direto: Baert et al.
+(2026) usam volume e pico observados como entrada da MUSLE no caso de referência deles.
+
+Figura pronta: `Figuras/comparacao_previsao_vs_volume_restrito.png` (dois mapas em escala de cor
+compartilhada + dispersão SY_obs × SY_sim dos dois casos).
+Tabela por evento: `Dados Iniciais/comparacao_SY_previsao_vs_restrito.csv`.
