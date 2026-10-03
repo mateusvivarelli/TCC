@@ -594,3 +594,49 @@ observado usado como restrição", **não** como previsão pura. Precedente dire
 Figura pronta: `Figuras/comparacao_previsao_vs_volume_restrito.png` (dois mapas em escala de cor
 compartilhada + dispersão SY_obs × SY_sim dos dois casos).
 Tabela por evento: `Dados Iniciais/comparacao_SY_previsao_vs_restrito.csv`.
+
+## 14. Verificações e correções de 02/10/2026 (preparação da apostila)
+
+Ao montar a apostila explicativa (`Apostila_TCC_Do_dado_ao_mapa.pdf`, na raiz do repositório) e revisá-la com um
+revisor independente, os itens abaixo foram verificados contra os scripts, a planilha e os artigos. Os que alteram
+afirmações anteriores das notas estão marcados com **(corrige)**.
+
+1. **(corrige) Eq. 8 do DSC.** Hao et al. escrevem `DSC = 1/(1+exp((FCI₀ − FCI)/k))` (k dividindo); o script
+   `calcular_dsc_calibrar_validar.py` usava `exp(FCI₀ − k·FCI)` (k multiplicando). A comparação da seção 9 entre
+   nossos FCI₀/k e a Tabela 4 de Hao ("ordens de grandeza diferentes") **não era válida**. Recalibração com a forma
+   exata (FCI recalculado com piso na mediana, sem leave-one-out): objetivo NSE bruto → FCI₀ = 3,17 (no limite da
+   busca), k = 4,90, NSE = 0,21, PBIAS −27,6%; objetivo log-NSE (Eq. 11) → k = 7,94, NSE = −2,63, PBIAS +47,3%.
+   Baseline (só c): NSE 0,37. A conclusão de descartar o FCI/DSC **se mantém**. O sinal de FCI₀ na Tabela 4 não pôde
+   ser confirmado (o sinal de menos se perdeu na extração do PDF).
+2. **(corrige) Comparação com Hao e Baert.** Hao modela Q e pr pelo SCS-CN (Eqs. 2–4), com 26 postos; os NSE
+   0,70–0,83 são de calibração, e a validação tem NSE > 0,78 (Fig. 6). A versão com volume restrito não é comparável
+   com a previsão de Hao; a frase "atinge e supera" foi corrigida em `base_para_redacao_tcc.md`. Em Baert (Tabela 10),
+   as formulações preditivas têm NSE de validação cruzada ≈ 0 (−0,03 a 0,04); 0,46 usa λ ótimo por evento.
+3. **(corrige) Escala do coeficiente de Williams.** O 11,8 foi obtido em escala de bacia (não de parcela), como diz
+   a seção 7b do `base_para_redacao_tcc.md`. Além disso, seguindo Hao, Q entra em mm e A em m², o que equivale a
+   1.000 × o volume em m³: em unidades de Williams há um fator 1.000^0,56 ≈ 48. Mais um motivo para não ler `c` como
+   razão de entrega.
+4. **Desvios em relação a Hao na etapa de pr.** (a) A Eq. 4 de Hao não tem a divisão por 1.000 que usamos (necessária
+   para m³/s); o pr daqui é 1.000× menor que o de uma leitura literal, o que desloca o FCI em cerca de −3,4 (log10),
+   efeito constante absorvido por FCI₀. (b) RI e R são rasters interpolados em Hao e escalares por evento aqui.
+   (c) RI é o máximo entre os dois postos e R é a chuva ponderada (pesos 0,307/0,693): RI/R passa de 1/h nos eventos
+   1 (1,010) e 12 (1,382; DBT5 = 0 mm), o que é fisicamente impossível para um posto só.
+5. **Hidrograma unitário do Qp (Fase 1).** Parâmetros finais: Tc = 10,652 h; Tp = D/2 + 0,6·Tc = 6,89 h; Tb = 2,67·Tp
+   = 18,40 h (os 4,08 h/10,89 h citados na seção 3.6 são da versão antiga com Kirpich). Com k = 1,1184 o triângulo
+   contém só ~54% do volume unitário (1,1184/2,08): o "fator de pico" é um fator de escala empírico, não um
+   hidrograma conservativo. Não afeta o mapa (o Qp não alimenta a Fase 2).
+6. **r = 0,994 entre os mapas com e sem restrição de volume** é praticamente garantido pela construção (fator f
+   uniforme por evento, mapa de cada evento multiplicado por f^1,12). Mostra insensibilidade ao erro de volume total,
+   não ao erro espacial de chuva ou CN. As correlações SY×C (0,70) e SY×LS (0,19) refletem a própria fórmula
+   (SY ∝ C): são consistência interna, não validação independente.
+7. **Fontes dos fatores (segundo o artigo da IC).** K por classe de solo com autores citados (ex.: Cambissolo 0,0475,
+   Corrêa et al., 2015; Argissolo 0,0351, Silva, 2016); mapas de solo e uso do solo do Plano de Bacias
+   (Consórcio Profill-Rhama, 2020), comparados com referências; LS pelo método de Moore et al. (1991) no SAGA, com MDE do
+   USGS. Os dados de vazão e sedimento vêm do ponto de monitoramento hidrossedimentológico a partir de turbidez
+   (Murillo-Bermúdez et al., 2021; Murillo-Bermúdez e Martim, 2022). **Ainda falta** registrar a origem dos valores de CN.
+8. **Valle Junior et al. (2019):** o λ mediano de 0,045 e a falha do CN (NSE negativo, solos arenosos) são da **mesma**
+   bacia (Guariroba). Autoria correta: VALLE JUNIOR, L. C. G.; RODRIGUES, D. B. B.; OLIVEIRA, P. T. S.
+9. **Pequenas inconsistências a ter em mente:** (a) erro absoluto do baseline: 44,4% in-sample e 46,1% em
+   leave-one-out; (b) WIA e PBIAS reportados são in-sample; (c) λ(chuva) no diagnóstico usa 0,273 como base, contra
+   0,2816 do cálculo principal; (d) a acumulação de fluxo que deu 137,80 km² usou MFD, e o FCI usa D8; (e) o convention
+   de sinal do PBIAS aqui é Σ(S−O)/ΣO (negativo = subestima), oposto ao comum em hidrologia.

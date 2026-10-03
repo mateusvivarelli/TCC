@@ -205,14 +205,21 @@ trabalho é identificar *onde* a erosão se concentra.
 
 ## 6. Por que os resultados são satisfatórios
 
-1. **Superam o artigo de referência.** Hao et al. (2022) reportam NSE > 0,70 e WIA > 0,89 nas três
-   bacias estudadas. A versão com volume restrito atinge NSE 0,78 e WIA 0,95, com formulação mais
-   simples (sem o módulo de conectividade).
+1. **Ficam na faixa do artigo de referência, com ressalvas (texto corrigido em 02/10/2026).** Hao et al.
+   (2022) reportam NSE 0,70–0,83 e WIA 0,89–0,95 na **calibração** (in-sample) nas três bacias, e NSE > 0,78
+   na validação (Fig. 6 do artigo). Mas o escoamento e o pico deles vêm do **próprio SCS-CN** (Eqs. 2–4, sem
+   usar a vazão medida), com 26 postos de chuva e dois parâmetros livres (FCI₀ e k). O par comparável com a
+   nossa **previsão pura** é, portanto, o de Hao (0,70–0,83) contra o nosso 0,37 in-sample (0,28 em
+   validação cruzada), e nesse par ficamos abaixo. A versão com **volume restrito** (0,81 in-sample; 0,78 em
+   validação cruzada; WIA 0,95) usa o volume medido do evento, então **não é comparável** com a previsão de Hao;
+   seu valor cai na faixa dele, mas não se deve escrever que “supera” o artigo.
 
-2. **Superam o benchmark mais recente do problema.** Baert et al. (2026), em 154 eventos, obtiveram
-   NSE = 0,66 para a MUSLE com volume e pico observados, e NSE ≈ 0 com entradas modeladas. Os dois
-   resultados obtidos aqui (0,78 com volume observado; 0,28 com volume modelado) estão acima dos
-   dois casos correspondentes.
+2. **Frente ao benchmark mais recente.** Baert et al. (2026), em 154 eventos (46 com sedimento), obtiveram NSE de
+   validação cruzada = 0,66 para a MUSLE com volume e pico observados, 0,46 com variáveis derivadas de λ ótimo por
+   evento (diagnóstico, usa dado observado) e NSE ≈ 0 (entre −0,03 e 0,04) nas formulações realmente preditivas
+   (Tabela 10 do artigo). Nossa previsão pura (0,28) fica acima das preditivas dele e a versão restrita (0,78)
+   acima do caso de entradas observadas, mas a bacia deles é cerca de 160 vezes menor (0,84 km²), então a
+   comparação é apenas indicativa.
 
 3. **As métricas são honestas.** O valor principal é obtido por validação cruzada *leave-one-out*
    — a mesma metodologia de validação empregada por Hao et al. O valor in-sample é reportado
@@ -279,7 +286,9 @@ Cronograma do projeto atualizado.
 - HAO, R.; et al. Incorporating sediment connectivity index into MUSLE model to explore soil
   erosion and sediment yield relationships at event scale. **Journal of Hydrology**, v. 614, art.
   128579, 2022. DOI: 10.1016/j.jhydrol.2022.128579.
-- VALLE JUNIOR, R. F.; et al. (bacia do Guariroba). **RBRH**, 2019.
+- VALLE JUNIOR, L. C. G.; RODRIGUES, D. B. B.; OLIVEIRA, P. T. S. Initial abstraction ratio and Curve Number
+  estimation using rainfall and runoff data from a tropical watershed (bacia do Guariroba, MS). **RBRH**,
+  Porto Alegre, v. 24, e5, 2019. DOI 10.1590/2318-0331.241920170199. (Autoria corrigida em 02/10/2026.)
 - VIVARELLI, M.; et al. Aplicação da equação universal de perda de solo modificada e calibração
   com dados de campo em uma bacia hidrográfica antropizada. Artigo (Iniciação Científica) —
   Universidade Estadual de Campinas, Campinas, 2025.

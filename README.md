@@ -58,6 +58,13 @@ Ponto de partida pra retomar o trabalho. Detalhes completos em
 calibração de Q e Qp) e [Notas Claude/notas_musle_espacializada.md](Notas%20Claude/notas_musle_espacializada.md)
 (Fase 2 — MUSLE espacializada, concluída).
 
+## Apostila explicativa (02/10/2026)
+
+`Apostila_TCC_Do_dado_ao_mapa.pdf` (raiz do repositório, 42 páginas) explica todos os passos, métodos, fontes e a espacialização,
+para quem não tem formação em hidrologia. A revisão que a acompanhou gerou correções nas notas: ver a seção 14 de
+`Notas Claude/notas_musle_espacializada.md` e os ajustes em `Notas Claude/base_para_redacao_tcc.md` (comparação com Hao e
+Baert, autoria de Valle Junior et al.). Pontos ainda a confirmar estão no Apêndice D da apostila.
+
 ## Onde estamos agora (21/09/2026) — versão com volume observado como restrição
 
 Diagnóstico completo das fontes de erro (seção 12 das notas) mostrou que o erro do SY é quase
