@@ -116,27 +116,28 @@ print(f"{'referencia: SY = c * chuva':<44} {'':<26} {np.median(ape(ref)):7.1f} {
 pd.DataFrame(rows).to_csv(os.path.join(FIG, "escada_gargalo.csv"), index=False, encoding="utf-8")
 
 # ---- figura
-fig, ax = plt.subplots(1, 2, figsize=(12.5, 4.8))
-x = np.arange(len(NIV)); wd = 0.36
+NIV_FIG = [NIV[0], NIV[3]]   # figura do texto: so os dois modelos (N1 = calculado da chuva; N4 = forcado ao medido)
+fig, ax = plt.subplots(1, 2, figsize=(11, 4.8))
+x = np.arange(len(NIV_FIG)); wd = 0.36
 cb, cs = "#1f5fa8", "#b8b8b8"
 for k, (key, tit, fmt) in enumerate((("MedAPE", "Erro percentual mediano (menor é melhor)", "{:.0f}%"), ("fator2", "Eventos dentro de fator 2 (maior é melhor)", "{:.0f}%"))):
     a = ax[k]
-    vb = [np.median(ape(b)) if key == "MedAPE" else f2(b) for _, b, _ in NIV]
-    vs = [np.median(ape(s)) if key == "MedAPE" else f2(s) for _, _, s in NIV]
+    vb = [np.median(ape(b)) if key == "MedAPE" else f2(b) for _, b, _ in NIV_FIG]
+    vs = [np.median(ape(s)) if key == "MedAPE" else f2(s) for _, _, s in NIV_FIG]
     r1 = a.bar(x - wd / 2, vb, wd, color=cb, label="B: MUSLE espacializada (2 componentes)")
     r2 = a.bar(x + wd / 2, vs, wd, color=cs, label="Teste simples com os mesmos insumos")
     for rr in list(r1) + list(r2):
         a.text(rr.get_x() + rr.get_width() / 2, rr.get_height() + 1, fmt.format(rr.get_height()), ha="center", fontsize=9)
     a.axhline(np.median(ape(ref)) if key == "MedAPE" else f2(ref), color="#c0392b", ls="--", lw=1.2, label="Referência: SY = c · chuva")
-    a.set_xticks(x); a.set_xticklabels(["N1\nsó chuva", "N2\nvolume previsto", "N3\nvolume medido", "N4\nvolume e base\nmedidos (teto)"], fontsize=9)
+    a.set_xticks(x); a.set_xticklabels(["Água calculada\nda chuva (previsão)", "Água forçada\nao medido"], fontsize=10)
     a.set_title(tit, fontsize=11)
     a.spines[["top", "right"]].set_visible(False)
     a.set_ylim(0, 112 if key == "fator2" else 50)
 h_, l_ = ax[0].get_legend_handles_labels()
 fig.legend(h_, l_, loc="lower center", ncol=3, frameon=False, fontsize=9, bbox_to_anchor=(0.5, 0.045))
 fig.suptitle("Quanto melhor a estimativa da água, melhor o sedimento: o gargalo é transformar chuva em escoamento", fontsize=12)
-fig.text(0.5, 0.005, "N1: só chuva e vazão antes do evento · N2: volume de escoamento direto previsto por regressão na chuva · N3: volume direto medido · N4: volume direto e vazão de base medidos.\n"
-         "Validação leave-one-out, calibração em log, 17 eventos, λ = 0,20, carga total de sedimentos. N2–N4 usam o volume do evento (previsto ou medido).", ha="center", fontsize=7.5)
+fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN e vazão de base estimada da vazão antes do evento. Forçada ao medido: escoamento direto e vazão de base medidos.\n"
+         "Validação leave-one-out, calibração em log, 17 eventos, λ = 0,20, carga total de sedimentos.", ha="center", fontsize=7.5)
 fig.tight_layout(rect=(0, 0.11, 1, 0.95))
 fig.savefig(os.path.join(FIG, "escada_gargalo.png"), dpi=150)
 print("figura:", os.path.join(FIG, "escada_gargalo.png"))

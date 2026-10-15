@@ -14,6 +14,7 @@ Dados Iniciais/comparacao_SY_previsao_vs_restrito.csv.
 
 Uso: python-qgis.bat md_para_docx.py entrada.md saida.docx
 """
+import os
 import re
 import sys
 
@@ -28,6 +29,8 @@ from docx.shared import Pt, Cm, RGBColor
 sys.stdout.reconfigure(encoding="utf-8")
 src, dst = sys.argv[1], sys.argv[2]
 txt = open(src, encoding="utf-8").read()
+# {{INCLUDE:caminho}} insere o conteudo de um arquivo (relativo a pasta do .md), ex.: tabelas geradas por gerar_tabelas_tcc.py
+txt = re.sub(r"\{\{INCLUDE:(.+?)\}\}", lambda m: open(os.path.join(os.path.dirname(os.path.abspath(src)), m.group(1)), encoding="utf-8").read().strip("\n"), txt)
 
 # ------------------------------------------------------------------ dados
 ptbr = lambda s: s.replace(",", "X").replace(".", ",").replace("X", ".")
@@ -37,6 +40,27 @@ for _, r in cmp_.iterrows():
     lin.append(ptbr(f"| {int(r.evento)} | {r.SY_obs_t:,.1f} | {r.SY_previsao_t:,.1f} | {r['erro_previsao_%']:+.1f} | {r.SY_restrito_t:,.1f} | {r['erro_restrito_%']:+.1f} |"))
 lin.append(ptbr(f"| **Total** | {cmp_.SY_obs_t.sum():,.1f} | {cmp_.SY_previsao_t.sum():,.1f} | | {cmp_.SY_restrito_t.sum():,.1f} | |"))
 fmt = lambda v: ptbr(f"{v:,.1f}")
+# tabela por evento do modelo B (dois componentes) e tabela da escada de informacao (rascunho 02)
+try:
+    b2 = pd.read_csv(r"C:\TCC\Dados Iniciais\comparacao_SY_dois_componentes.csv").sort_values("evento")
+    lb = ["**Tabela 11.** Sedimento por evento (t): medido e simulado pelo modelo B calculado, com a decomposição em encostas e vazão de base.", "",
+          "| Evento | Medido | Encostas | Base | Total simulado | Erro no ajuste (%) | Erro na validação cruzada (%) |", "|---|---|---|---|---|---|---|"]
+    for _, r in b2.iterrows():
+        lb.append(ptbr(f"| {int(r.evento)} | {r.SY_obs_t:,.0f} | {r.SY_encostas_t:,.0f} | {r.SY_base_t:,.0f} | {r.SY_total_sim_t:,.0f} | {r.erro_pct:+.0f} | {r.erro_LOO_pct:+.0f} |"))
+    tab_b = "\n".join(lb)
+    es = pd.read_csv(r"C:\TCC\TCC_Texto\figuras\escada_gargalo.csv")
+    cab = ["| Água | Modelo | Erro mediano (%) | Dentro de fator 2 (%) | NSE em log | Spearman |", "|---|---|---|---|---|---|"]
+    nomes = {"N1": "Calculada da chuva", "N2": "N2: volume previsto por regressão", "N3": "N3: volume direto medido, base estimada", "N4": "Forçada ao medido"}
+    le_ = ["**Tabela 13.** Desempenho do modelo B e do teste simples com os mesmos insumos (validação cruzada; calibração em log).", ""] + cab
+    li_ = [] + cab
+    for _, r in es.iterrows():
+        k = r.nivel.split(":")[0]
+        linha_ = ptbr(f"| {nomes[k]} | {r.modelo} | {r.MedAPE:,.1f} | {r.fator2:,.0f} | {r.NSE_log:,.2f} | {r.Spearman:,.2f} |")
+        (le_ if k in ("N1", "N4") else li_).append(linha_)
+    tab_e = "\n".join(le_); tab_i = "\n".join(li_)
+except Exception as e:
+    tab_b = tab_e = tab_i = f"[PENDENTE: tabela nao gerada: {e}]"
+txt = txt.replace("{{TABELA_B}}", tab_b).replace("{{TABELA_ESCADA}}", tab_e).replace("{{TABELA_INTERM}}", tab_i)
 txt = (txt.replace("{{TABELA_SY}}", "\n".join(lin))
           .replace("{{SY_MEDIA}}", fmt(cmp_.SY_obs_t.mean()))
           .replace("{{SY_MIN}}", fmt(cmp_.SY_obs_t.min()))
@@ -67,6 +91,9 @@ for h in ("Heading 1", "Heading 2", "Heading 3"):
     hs = doc.styles[h]
     hs.font.name = FONTE; hs.font.size = Pt(12); hs.font.bold = True; hs.font.color.rgb = RGBColor(0, 0, 0)
     hs.element.rPr.rFonts.set(qn("w:eastAsia"), FONTE)
+    for _att in ("w:asciiTheme", "w:hAnsiTheme", "w:eastAsiaTheme", "w:cstheme"):
+        hs.element.rPr.rFonts.attrib.pop(qn(_att), None)
+    hs.element.rPr.rFonts.set(qn("w:ascii"), FONTE); hs.element.rPr.rFonts.set(qn("w:hAnsi"), FONTE)
     hs.paragraph_format.space_before = Pt(12); hs.paragraph_format.space_after = Pt(6)
     hs.paragraph_format.keep_with_next = True
 doc.styles["Heading 1"].font.all_caps = True
@@ -252,7 +279,17 @@ def render(lines):
     i = 0
     while i < len(lines):
         ln = lines[i]
-        if ln.startswith("### "):
+        if ln.startswith("!["):
+            mm = re.match(r"!\[(.*?)\]\((.*?)\)", ln)
+            global FIGN
+            FIGN += 1
+            pic = doc.add_paragraph(); pic.alignment = WD_ALIGN_PARAGRAPH.CENTER; pic.paragraph_format.line_spacing = 1.0
+            pic.paragraph_format.keep_with_next = True
+            pic.add_run().add_picture(os.path.join(os.path.dirname(os.path.abspath(src)), mm.group(2)), width=Cm(15.5))
+            cap = doc.add_paragraph(); cap.alignment = WD_ALIGN_PARAGRAPH.CENTER; cap.paragraph_format.line_spacing = 1.0
+            cap.paragraph_format.space_after = Pt(10)
+            runs(cap, f"**Figura {FIGN}.** {mm.group(1)}", size=10)
+        elif ln.startswith("### "):
             doc.add_heading(ln[4:], level=2)
         elif ln.strip() in ("---", ""):
             pass
@@ -266,7 +303,7 @@ def render(lines):
                 for b, c in enumerate(row):
                     cell = t.cell(a, b); cell.text = ""
                     cp = cell.paragraphs[0]; cp.paragraph_format.line_spacing = 1.0
-                    runs(cp, c, bold_all=(a == 0), size=10)
+                    runs(cp, c, bold_all=(a == 0), size=8 if len(row) >= 10 else (9 if len(row) >= 7 else 10))
             doc.add_paragraph().paragraph_format.line_spacing = 1.0
             continue
         elif ln.startswith(">"):
@@ -300,6 +337,7 @@ def render(lines):
         i += 1
 
 
+FIGN = 0
 primeiro = True
 for b in corpo:
     ls = b.split("\n")
