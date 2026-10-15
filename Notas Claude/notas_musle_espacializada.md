@@ -640,3 +640,155 @@ afirmações anteriores das notas estão marcados com **(corrige)**.
    leave-one-out; (b) WIA e PBIAS reportados são in-sample; (c) λ(chuva) no diagnóstico usa 0,273 como base, contra
    0,2816 do cálculo principal; (d) a acumulação de fluxo que deu 137,80 km² usou MFD, e o FCI usa D8; (e) o convention
    de sinal do PBIAS aqui é Σ(S−O)/ΣO (negativo = subestima), oposto ao comum em hidrologia.
+
+---
+
+## 15. Achado de 15/10/2026: `T_R_m3` inclui a vazão de base (conferência do evento 11, estendida aos 17 eventos)
+
+Durante a auditoria do evento 11 (pasta `Evento11_Auditoria/`) reconstruí as variáveis observadas a partir da série
+horária (`Dados_finais_histereses_corrigido.xlsx`, aba Planilha1, colunas Q, CSS, Bt):
+
+- `SYY_t = Σ(Q·CSS·3600/10⁶)` na janela Inicio–Fim (92 leituras no evento 11): reproduz a planilha exatamente
+  (1.821,7535 t); `SSY_Ris` = pontos até o pico (inclusive), `SSY_Fall` = depois do pico. **Carga total**, inclui o
+  sedimento transportado pela vazão de base.
+- `T_R_m3 = Σ(Q)·3600` na mesma janela, nos 17 eventos (diferença < 0,001%). `Ris_R_m3`/`Fall_R_m3` = antes/depois do
+  pico. **É o volume TOTAL escoado no exutório, e não o escoamento direto.** Isso corrige a afirmação da seção 4 de
+  `notas_qgis_calibracao_qp.md` (que estava errada).
+- A coluna `Bt` da série horária (vazão de base, separada pelos autores dos dados; método a confirmar) soma 34–55% do
+  `T_R_m3` por evento (evento 11: 957.727 m³ de 2.436.682 m³; escoamento direto = 1.478.955 m³).
+
+**Consequência.** O SCS-CN calcula escoamento *direto*. A calibração CN-I + λ = 0,05 (erro médio +0,5%, absoluto 47,4%)
+foi feita contra o volume TOTAL. Contra o escoamento direto (T_R − Σ(Bt)·3600) o mesmo `Vol_CN1_calc` tem erro médio
+de **+92%** (absoluto 121%; NSE do volume −6,1 contra 0,18 com o total). Ou seja, os parâmetros "calibrados" (CN seco e
+λ baixo) provavelmente compensam a vazão de base que o SCS-CN não modela. O fator f do volume restrito
+(`V_med/V_calc`) também reescala Q para um alvo que contém vazão de base, e como E ∝ Q^1,12 isso infla `E_unit` nos
+eventos com muita vazão de base.
+
+**O que isso NÃO muda:** a calibração de `c` continua válida como ajuste empírico (c absorve escala), os mapas de padrão
+espacial (hot spots) e o fato de `SY_obs` ser carga total medida. **O que muda:** a narrativa da Fase 1 (o "erro de
++0,5%" não pode ser descrito como acerto do SCS-CN sobre o escoamento direto) e a interpretação de `f`. A decisão
+(manter volume total como alvo, declarando a limitação, ou recalibrar CN/λ contra o escoamento direto com Bt) deve ser
+tomada com o orientador. Para recalibrar é preciso religar o Drive (rasters).
+
+---
+
+## 16. Diagnósticos de 15/10/2026: o que muda com o escoamento direto, e se dá para consertar
+
+Scripts: `Scripts/_diagnostico_escoamento_direto.py`, `_diagnostico_vazao_base_antecedente.py`, `_diagnostico_previsao_com_base.py`.
+Alvo "direto" = `T_R_m3 − Σ(Bt)·3600` (separação Bt do projeto).
+
+1. **Volume x λ (Fase 1).** Contra o total, λ = 0,05 dá erro médio ≈ +0,5%. Contra o direto: +92% (NSE do volume −6,1); o viés zera em λ ≈ 0,15 e, com λ = 0,20, é −27,5%. O NSE do volume contra o direto é negativo para todo λ (melhor: −0,41 em λ = 0,28).
+2. **Volume restrito ao direto:** f mediano 0,50 (contra 1,03 com o total); c = 0,285; NSE 0,767 / LOO 0,715 (com o total: 0,805 / 0,776).
+3. **Triviais:** SY = c·V_direto: NSE 0,783 / LOO 0,733 (c·T_R: 0,809 / 0,765).
+4. **Previsão pura com λ recalibrado ao direto:** λ = 0,14 → NSE 0,103 / LOO −0,280; λ = 0,20 → −0,102 / −0,950.
+5. **Sensibilidade do alvo (separação da base):** direto = 52,8% do total (Bt), 47,0% (Lyne-Hollick 0,925, 3 passadas) ou 75,1% (linha reta em Qb_inicio). Correlação por evento Bt × LH = 0,996 (razão V_LH/V_Bt de 0,74 a 0,95).
+6. **O que explica o erro do SCS-CN no volume direto:** não é a umidade antecedente (r do fator f = V_dir/V_SCS(0,2) com Qb_inicio = +0,03; com chuva antecedente de 5 dias = −0,09), e sim a lâmina de chuva (r = −0,89): a curva chuva-escoamento do SCS-CN tem forma errada para esta bacia (subestima chuvas pequenas e superestima as grandes). Regressões em log com leave-one-out sobre o V_direto: chuva do evento NSE-LOO 0,47; chuva + Qb_inicio + duração 0,50 (erro abs. 31,5%); SCS-CN cru λ = 0,2: −0,72.
+7. **Escoamento direto (SCS-CN) + vazão de base prevista** (V_base = kb·Qb_inicio·duração·3600, kb = 1,93, LOO 1,77–2,00; base prevista x Bt observada: NSE-LOO 0,66): volume total com λ = 0,20: erro médio −7,0%, absoluto 25,5%, NSE 0,58 (contra 47,4% e 0,18 do esquema atual). Previsão pura de SY somando q_base uniforme ao Q de cada pixel: NSE in / LOO / erro abs. LOO = 0,502 / 0,425 / 30,1% (λ = 0,20), 0,523 / 0,469 / 30,7% (λ = 0,15), 0,587 / 0,563 / 35,9% (λ = 0,05, mas volume total péssimo, NSE −0,81). Referência atual: 0,371 / 0,282 / 46,1%.
+   **Ressalvas:** `Duracao_horas` é a janela observada do evento (não é conhecida antes dele); kb tem 1 parâmetro ajustado nos 17 eventos (corrigido por LOO só para o próprio evento); somar base uniforme a cada pixel é um artifício estatístico (base não erode encostas), coerente apenas porque `SY_obs` é carga total (Q·CSS) medida; λ escolhido entre 4 valores olhando o mesmo conjunto; os benchmarks triviais (c·T_R: LOO 0,77) continuam acima.
+
+---
+
+## 17. Modelo com vazão de base implementado (15/10/2026) — `Scripts/calcular_sy_com_base.py`
+
+**Definição.** Q_pixel = Q_dir,k (SCS-CN, CN-I, **λ = 0,20 padrão, fixado a priori**) + q_base (mm, uniforme sobre os 154.011 pixels válidos, 138,22 km²), com
+q_base = V_base/A_bacia·1000 e V_base = kb·Qb_inicio·Duracao_horas·3600 (kb = 1,929, mínimos quadrados pela origem contra Σ Bt·3600 nos 17 eventos).
+Depois: pr = Q/1000·A_pix·(RI/R)/3600; E_unit = 11,8·(Q·pr·A_pix)^0,56·K·C·LS; SY = c·E_unit; **c = 0,13238**.
+Validação *leave-one-out* **aninhada** (kb e c refeitos sem o evento retido). Saídas: `Evento N/{Q,pr,E_unit,SY}N_vb.tif`,
+`Dados Iniciais/SY_medio_eventos_vb.tif`, `Dados Iniciais/comparacao_SY_modelo_com_base.csv`.
+
+| Resultado | Antes (λ = 0,05, sem base) | Modelo com base (λ = 0,20) |
+|---|---|---|
+| Volume total x T_R: erro médio / abs. / NSE | +0,5% / 47,4% / 0,18 | −7,7% / 25,5% / 0,58 |
+| SY NSE in-sample | 0,371 | 0,498 |
+| SY NSE LOO (aninhado) | 0,282 | **0,375** |
+| SY erro abs. LOO | 46,1% | 30,2% |
+| WIA / PBIAS | 0,868 / −21,3% | 0,892 / −16,5% |
+| NSE em log / Spearman (in-sample) | — | 0,561 / 0,600 |
+
+**Sensibilidade a λ (só reportada):** 0,05 → SY NSE-LOO 0,558, mas volume total NSE −0,76; 0,10 → 0,504 / 0,02; 0,15 → 0,437 / 0,42; 0,20 → 0,375 / 0,58. Há troca (trade-off) entre o desempenho do SY e a coerência do volume; adotou-se 0,20 por consistência física.
+
+**Correção do que se afirmou no chat:** o NSE-LOO de 0,43–0,47 do diagnóstico `_diagnostico_previsao_com_base.py` não refazia c com E recalculado sem o evento retido; o valor honesto (aninhado) é 0,375.
+
+**Fragilidades que persistem:** sem o evento 15 (49% da variância) o NSE in-sample cai para 0,07 (LOO −0,01); bootstrap de eventos (4.000 reamostragens, c refeito): IC 95% do NSE [−0,96; 0,88]; benchmarks sem MUSLE: c·T_R LOO 0,765; c·chuva 0,605; c·(V_dir SCS + V_base prevista) 0,383 (≈ o modelo espacial). Eventos 2, 4, 7 e 11 com −43% a −73% (volume total subestimado em 39–64%).
+**Mapa:** inalterado em padrão (r = 0,996 com o mapa anterior; 97,3% de coincidência dos 5% superiores; r com K·C·LS = 0,886).
+**Ressalvas do método:** Duracao_horas é a janela observada; kb ajustado nos mesmos 17 eventos; base uniforme por pixel é artifício estatístico, coerente porque SY_obs é carga total.
+
+---
+
+## 18. Métricas e calibração robustas ao evento 15 (15/10/2026) — `Scripts/_avaliacao_metricas_robustas.py`
+
+Motivo: o evento 15 responde por 48,7% da variância linear do SY e 49,3% do peso no ajuste de `c` por mínimos quadrados.
+**Calibração em log** (ln c = média(ln SY − ln E), erro relativo simétrico) e métricas independentes da variância linear:
+mediana do erro percentual absoluto (MedAPE), fração de eventos dentro de fator 2, Spearman, NSE em log.
+**Atenção:** no log, os 3 menores eventos (6, 12 e 1) respondem por 68% da variância (ev6 26%, ev12 24%, ev1 18%): troca-se um evento dominante por outros; por isso MedAPE/fator 2/Spearman são a leitura principal. O MAPE (média) favorece subestimar: preferir a mediana.
+
+Resultados (LOO aninhado, c em log; MedAPE / fator 2 / NSE-log / Spearman):
+- SY = c·T_R (volume total medido): 17,6% / 94% / 0,86 / 0,875
+- SY = c·chuva do evento: 41,9% / 82% / 0,53 / 0,63
+- Previsão pura antiga (λ 0,05, sem base): 62,6% / 53% / −0,06 / 0,55
+- MUSLE esp. com direto λ 0,20 **sem base**: 97% / 24% / −3,11 / 0,58 (o teste "limpo": o escoamento direto do SCS-CN não prevê a carga)
+- Direto λ 0,20 + base uniforme (usa duração observada): 44,0% / 82% / 0,60 / 0,59
+- 2 componentes (E_dir λ 0,20 + **base observada**): 24,2% / 94% / 0,82 / 0,74 (usa Bt medida; não é previsão)
+- 2 componentes (E_dir λ 0,20 + base prevista, duração observada): 37,7% / 94% / 0,69 / 0,53
+- Volume restrito ao total (usa T_R): 23,4% / 94% / 0,83 / 0,76
+
+Conclusão qualitativa **inalterada**: com as métricas robustas, os modelos que usam volume medido (e os de 2 componentes com a base observada) ficam muito à frente dos que só usam chuva e SCS-CN; o MUSLE espacializado sem volume medido não supera SY = c·chuva. Bootstrap de eventos (NSE-log in-sample, IC 95%): c·T_R [0,43; 0,97]; c·chuva [0,07; 0,76]; previsão pura antiga [−3,00; 0,65].
+**Cuidado de método:** a escolha da métrica muda o ranking de alguns modelos (a previsão pura antiga piora com calibração em log: MedAPE 43,8% → 62,6%, porque a calibração por MQ subestimava de propósito); deve ser fixada antes e descrita no texto, com a justificativa (peso do evento 15), reportando também o NSE linear com e sem o evento 15.
+
+---
+
+## 19. Opção B implementada: modelo de dois componentes (15/10/2026) — `Scripts/calcular_sy_dois_componentes.py`
+
+**Modelo:** SY_evento = c1·Σ_pixels E_unit(Q_direto, SCS-CN CN-I λ = 0,20) + c2·(Qb_inicio·duração da CHUVA·3600). A base é um termo da bacia (não vai para os pixels); a duração é a da chuva (máx. dos dois postos), não a do hidrograma (vazamento). c1 = 0,04790; c2 = 0,012932; calibração em log (mínimos quadrados de ln SY), LOO aninhado. Saídas: `Evento N/{Qdir,pr,E_unit,SY}N_b2.tif`, `SY_medio_eventos_b2.tif`, `comparacao_SY_dois_componentes.csv`. O mapa mostra só a parcela das encostas.
+
+Resultados (LOO; MedAPE / fator 2 / NSE-log / Spearman / NSE linear): 
+- **B (adotado, base com duração da chuva):** 33,1% / 71% / 0,48 / 0,72 / −0,60 (sem o evento 15: −1,56).
+- SY = c·chuva (referência): 41,9% / 82% / 0,53 / 0,63 / 0,58. SY = c·T_R: 17,6% / 94% / 0,86 / 0,88 / 0,78.
+- B' (duração do hidrograma, vaza): 37,7% / 94% / 0,69 / 0,53 / 0,45. B* (base observada, diagnóstico): 24,2% / 94% / 0,82 / 0,74 / 0,60. MUSLE só com direto, sem base: 97% / 24% / −3,11 / 0,58.
+- Contra a previsão pura antiga (calibrada em log): MedAPE 62,6% → 33,1%; fator 2 53% → 71%.
+
+**Leitura honesta:** o ganho sobre SY = c·chuva é pequeno e não distinguível do ruído (mediana da diferença do erro % por evento −2,2 pontos, IC95% [−13,5; +18,8]; melhora em 11 de 17 eventos). A parcela das encostas é pequena na soma simulada (mediana 10%; máx. 37%): o termo de base (Qb·duração) carrega quase todo o SY previsto. Superestima fortemente os eventos 1, 9 e 16 (+103%, +177%, +170%) e subestima 4, 7, 11, 12 (−38% a −57%). NSE linear negativo.
+**Mapa B:** r = 0,96 com o mapa anterior; 89,8% de coincidência dos 5% superiores; correlação com K·C·LS cai de 0,886 para 0,738 (Spearman 0,81): o padrão espacial passa a carregar mais informação de chuva/CN do que antes.
+
+---
+
+## 20. Desenho fisicamente mais coerente (D): escoamento direto MEDIDO ancorando a MUSLE (15/10/2026) — `Scripts/_avaliacao_direto_medido.py`
+
+Ideia: o SCS-CN só dá o PADRÃO espacial; o total de cada evento é ancorado no escoamento direto medido (V_dir = T_R − Σ Bt·3600, f = V_dir/V_calc, Q = min(f·Q, P)); compara-se com a carga associada ao escoamento direto, SY_direto = Σ (Q − Bt)·CSS·3600/10⁶ (assume mesma CSS da hora; é 55–76% da carga total, mediana 65%). c em log, LOO aninhado.
+
+Alvo A (carga do escoamento direto) — MedAPE / fator 2 / NSE-log / Spearman (LOO):
+- MUSLE ancorada no direto medido, λ 0,20: 30,3% / 94% / 0,63 / 0,83; com λ 0,05: 17,2% / 94% / 0,80 / 0,79
+- SY = c·V_dir (sem MUSLE): 17,8% / 94% / 0,83 / 0,85; SY = c·chuva: 32,8% / 76% / 0,53 / 0,61
+- MUSLE só prevista com SCS-CN direto (sem medida): 96,3% / 18% / −3,07 / 0,56
+Alvo B (carga total): MUSLE ancorada λ 0,20: 37,0% / 94% / 0,60 / 0,87; λ 0,05: 18,1% / 94% / 0,80 / 0,83.
+Comparada com SY = c·V_dir (alvo A), a MUSLE ancorada (λ 0,20) melhora em 5 de 17 eventos (mediana +11,5 pontos de erro; IC95% [−0,1; +21,1]).
+**Leitura:** com a água certa (medida), a fórmula de erosão distribui o volume no espaço e reproduz o sedimento (94% dos eventos em fator 2); com a água só prevista pelo SCS-CN, falha. Aqui λ só muda a FORMA espacial (o volume é ancorado): reportar a sensibilidade, não escolher λ pelo resultado. Desenho adequado ao objetivo (mapear onde os 17 eventos observados erodiram), não é previsão.
+
+---
+
+## 21. Escada da informação hidrológica: onde está o gargalo (15/10/2026) — `Scripts/_escada_gargalo_chuva_escoamento.py`, figura `TCC_Texto/figuras/escada_gargalo.png`
+
+Modelo B (2 componentes, λ 0,20, c em log, LOO aninhado, alvo carga total) x teste simples de 2 termos com os MESMOS insumos (sem MUSLE):
+| Nível | B: MedAPE / fator 2 / NSE-log | Simples: MedAPE / fator 2 / NSE-log | B melhor em / mediana da diferença (IC95%) |
+|---|---|---|---|
+| N1 só chuva e Qb inicial | 33,1% / 71% / 0,48 | 37,7% / 71% / 0,53 | 6/17; +3,4 [−4,0; +10,2] pts (B pior em erro) |
+| N2 volume direto previsto (regressão na chuva) | 34,9% / 71% / 0,53 | 35,8% / 71% / 0,55 | 9/17; −0,1 [−3,3; +8,9] |
+| N3 volume direto medido + base prevista | 32,5% / 94% / 0,71 | 24,5% / 94% / 0,83 | 7/17; +4,7 [−4,4; +24,1] (simples melhor) |
+| N4 volume direto e base medidos (teto) | 11,7% / 94% / 0,87 | 19,5% / 94% / 0,85 | 10/17; −6,7 [−10,8; +7,3] (B melhor, IC cruza zero) |
+Referência SY = c·chuva: 41,9% / 82% / 0,53.
+**Leitura:** (1) o gargalo é transformar chuva em escoamento: fator 2 passa de 71% (N1/N2) para 94% (N3/N4) assim que o volume de escoamento direto é medido; o volume previsto por regressão (erro médio de 56%) não melhora nada. (2) **Não se pode afirmar que o B é melhor que um teste simples com os mesmos insumos**: ele é equivalente (diferenças dentro do ruído; no N3 o simples é melhor; só no N4 o B fica à frente, com IC cruzando zero). O que o B entrega a mais é o mapa de onde as encostas contribuem; a parcela das encostas no sedimento simulado sobe de 10% (N1) para 67% (N3).
+
+---
+
+## 22. Comparação com a IC (Vivarelli et al., 2025) — `Scripts/_comparacao_IC_x_B.py` (15/10/2026)
+
+A IC é MUSLE **concentrada**: Y = α·(D·qp)^β·K·LS·C·P com D e qp MEDIDOS, K = 0,031, LS = 0,536, C = 0,267 (médias da bacia), α e β ajustados nos 17 eventos (publicado: 0,277 e 0,807; erro médio −4,15%, faixa −60,01% a +37,14%; originais 11,8 e 0,56: erro médio −29,58%, máx. 57,28%).
+**Reprodução (D = `T_R_m3` em m³, qp = `Q_pico`):** originais → −32,6% (publicado −29,58%); calibrados publicados → +2,6%, faixa −47% a +62% (publicado −4,15%, −60% a +37%). Aproximada, não exata (provável diferença na fonte de D/qp; a IC cita outro sistema para esses dados). Refazer α, β em log dá α = 0,978, β = 0,733.
+Métricas (alvo carga total; MedAPE / fator 2 / NSE-log / Spearman / NSE linear):
+- IC originais de Williams: 42,7% / 88% / 0,54 / 0,93 / 0,18
+- IC calibrada (α, β publicados), in-sample: 16,0% / 100% / 0,89 / 0,93 / 0,75
+- IC refeita em log, **LOO**: 16,3% / 100% / 0,87 / 0,93 / 0,77 (faixa de erro −47% a +97%)
+- B nível N1 (só chuva e Qb; previsão): 33,1% / 71% / 0,48 / 0,72 / −0,60 (LOO)
+- B nível N3 (volume direto medido + base prevista): 32,5% / 94% / 0,71 / 0,81 / 0,61
+- B nível N4 (volume direto e base medidos, mesma informação da IC): 11,7% / 94% / 0,87 / 0,87 / 0,80
+**Leitura:** com informação equivalente (volume total e pico medidos na IC; volume direto e base medidos no B/N4) os dois têm qualidade equivalente. A IC supera o B quando o B só recebe parte da informação medida (N1, N3). A IC usa D e qp extraídos do mesmo hidrograma que gera SY_obs (alta circularidade), não prevê e não gera mapa; α e β foram ajustados in-sample (aqui o LOO confirma a robustez da lei de potência).

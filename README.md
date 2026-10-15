@@ -65,6 +65,14 @@ para quem não tem formação em hidrologia. A revisão que a acompanhou gerou c
 `Notas Claude/notas_musle_espacializada.md` e os ajustes em `Notas Claude/base_para_redacao_tcc.md` (comparação com Hao e
 Baert, autoria de Valle Junior et al.). Pontos ainda a confirmar estão no Apêndice D da apostila.
 
+## Onde estamos agora (15/10/2026) — modelo com vazão de base
+
+- **Achado:** `T_R_m3` = Σ Q·3600 (volume total, inclui vazão de base, 34–55%) e `SYY_t` = Σ Q·CSS·3600 (carga total). O SCS-CN calcula só escoamento direto. Ver seções 15–17 de `Notas Claude/notas_musle_espacializada.md`.
+- **Modelo atual a adotar:** `Scripts/calcular_sy_com_base.py` — Q = Q_direto (SCS-CN, CN-I, λ = 0,20) + vazão de base prevista (kb·Qb_inicio·duração). Saídas `*_vb.tif` e `Dados Iniciais/comparacao_SY_modelo_com_base.csv`. SY previsão pura: NSE 0,50 (in-sample) / 0,375 (LOO aninhado); volume total NSE 0,58.
+- **Revisões independentes:** `Notas Claude/revisao_independente.md` (rodada 1) e `revisao_independente_modelo_com_base.md` (rodada 2, ao ser concluída).
+- **Rascunho do TCC:** `TCC_Texto/TCC_rascunho_01.md/.docx` (formato Informação CCPG 004/2017); gerador `Scripts/md_para_docx.py`.
+- **Auditoria do evento 11:** `Evento11_Auditoria/` (planilha 01 pronta; planilha 02 com erro de abertura no Excel, pendente).
+
 ## Onde estamos agora (21/09/2026) — versão com volume observado como restrição
 
 Diagnóstico completo das fontes de erro (seção 12 das notas) mostrou que o erro do SY é quase

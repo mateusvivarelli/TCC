@@ -24,3 +24,5 @@ __pycache__/
 
 # Estado local do Claude Code (nao faz sentido sincronizar entre maquinas)
 .claude/
+# Arquivos temporarios de bloqueio do Office
+~$*

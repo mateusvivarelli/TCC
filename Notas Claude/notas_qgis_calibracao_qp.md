@@ -59,9 +59,12 @@ cenário de CN acerta bem alguns eventos e erra feio outros. Isso indica que o p
    ponderada entre 2 pontos — pouca informação espacial de fato. Como a fórmula do CN-SCS é
    não linear (quadrática acima do limiar), pequenos erros na lâmina P se amplificam bastante no
    Q calculado. Vale reportar isso como limitação, mas não dá pra resolver sem mais estações.
-4. Vale conferir também se `T_R_m3` (medido) e o volume calculado estão na mesma base — pelo que
-   vi, sim: `T_R_m3 = Ris_R_m3 + Fall_R_m3` já é escoamento direto separado da vazão de base
-   (`Qb_inicio`), compatível com o que o CN-SCS estima (só escoamento direto, não base).
+4. Vale conferir também se `T_R_m3` (medido) e o volume calculado estão na mesma base.
+   **~~CORRIGIDO em 15/10/2026~~ — a afirmação original deste item estava ERRADA.** Eu havia escrito que
+   `T_R_m3 = Ris_R_m3 + Fall_R_m3` já era escoamento direto separado da vazão de base. Conferência com a série
+   horária (`Dados_finais_histereses_corrigido.xlsx`): nos 17 eventos, `T_R_m3 = soma(Q medida) × 3600` na janela do
+   evento (diferença < 0,001%), ou seja, é o volume TOTAL escoado no exutório, **incluindo a vazão de base**
+   (`Ris_R` = até o pico, `Fall_R` = depois do pico). Ver seção 15 de `notas_musle_espacializada.md`.
 
 ### Recomendação concreta de calibração
 
