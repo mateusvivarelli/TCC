@@ -95,9 +95,23 @@ ape = lambda s_: 100 * np.abs(s_ - SY) / SY
 f2 = lambda s_: 100 * np.mean((s_ / SY >= 0.5) & (s_ / SY <= 2.0))
 nlog = lambda s_: 1 - np.sum((np.log(SY) - np.log(np.clip(s_, 1e-6, None))) ** 2) / np.sum((np.log(SY) - np.log(SY).mean()) ** 2)
 
+def loo2_n2():
+    """N2 totalmente aninhado: em cada rodada a regressao do volume na chuva e ajustada SEM o evento retido
+    (os volumes previstos dos 16 eventos de treino e do evento retido vem dessa regressao), depois c1 e c2."""
+    outB = np.zeros(N); outS = np.zeros(N)
+    for i in range(N):
+        m = ids != i
+        bcoef = np.linalg.lstsq(Xm[m], ly[m], rcond=None)[0]; Vp_i = np.exp(Xm @ bcoef)
+        E_i = np.array([esoma(j, LAM, Vp_i[j]) for j in range(N)])
+        pB = fit2(E_i[m], base_ch[m], SY[m]); outB[i] = pB[0] * E_i[i] + pB[1] * base_ch[i]
+        pS = fit2(Vp_i[m], base_ch[m], SY[m]); outS[i] = pS[0] * Vp_i[i] + pS[1] * base_ch[i]
+    return outB, outS
+
+
+_N2B, _N2S = loo2_n2()
 NIV = [
     ("N1: so chuva e vazao inicial", loo2(E1, base_ch), loo2(R, base_ch)),
-    ("N2: volume direto previsto\n(regressao na chuva)", loo2(E2, base_ch), loo2(Vp, base_ch)),
+    ("N2: volume direto previsto\n(regressao na chuva)", _N2B, _N2S),
     ("N3: volume direto medido\n+ base prevista", loo2(E3, base_ch), loo2(VD, base_ch)),
     ("N4: volume direto medido\n+ base observada (teto)", loo2(E3, BTV), loo2(VD, BTV)),
 ]
@@ -108,8 +122,8 @@ print(f"{'nivel':<44} {'modelo':<26} {'MedAPE':>7} {'fator2':>7} {'NSE-log':>8} 
 rows = []
 for nome, b, s in NIV:
     d = ape(b) - ape(s); bs = np.array([np.median(rng.choice(d, N)) for _ in range(4000)])
-    for tag, v in (("B (MUSLE espacializada)", b), ("simples (sem MUSLE)", s)):
-        extra = f"{np.sum(d<0):>2}/17  {np.median(d):+6.1f} [{np.percentile(bs,2.5):+.1f}; {np.percentile(bs,97.5):+.1f}]" if tag.startswith("B") else ""
+    for tag, v in (("Modelo de dois componentes", b), ("simples (sem MUSLE)", s)):
+        extra = f"{np.sum(d<0):>2}/17  {np.median(d):+6.1f} [{np.percentile(bs,2.5):+.1f}; {np.percentile(bs,97.5):+.1f}]" if tag.startswith("Modelo") else ""
         print(f"{nome.replace(chr(10),' '):<44} {tag:<26} {np.median(ape(v)):7.1f} {f2(v):7.0f} {nlog(v):8.3f} {spearmanr(SY, v)[0]:8.3f} | {extra}")
         rows.append(dict(nivel=nome.replace("\n", " "), modelo=tag, MedAPE=np.median(ape(v)), fator2=f2(v), NSE_log=nlog(v), Spearman=spearmanr(SY, v)[0]))
 print(f"{'referencia: SY = c * chuva':<44} {'':<26} {np.median(ape(ref)):7.1f} {f2(ref):7.0f} {nlog(ref):8.3f} {spearmanr(SY, ref)[0]:8.3f}")
@@ -124,7 +138,7 @@ for k, (key, tit, fmt) in enumerate((("MedAPE", "Erro percentual mediano (menor 
     a = ax[k]
     vb = [np.median(ape(b)) if key == "MedAPE" else f2(b) for _, b, _ in NIV_FIG]
     vs = [np.median(ape(s)) if key == "MedAPE" else f2(s) for _, _, s in NIV_FIG]
-    r1 = a.bar(x - wd / 2, vb, wd, color=cb, label="B: MUSLE espacializada (2 componentes)")
+    r1 = a.bar(x - wd / 2, vb, wd, color=cb, label="Modelo de dois componentes (MUSLE espacializada)")
     r2 = a.bar(x + wd / 2, vs, wd, color=cs, label="Teste simples com os mesmos insumos")
     for rr in list(r1) + list(r2):
         a.text(rr.get_x() + rr.get_width() / 2, rr.get_height() + 1, fmt.format(rr.get_height()), ha="center", fontsize=9)

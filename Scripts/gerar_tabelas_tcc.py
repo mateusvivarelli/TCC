@@ -104,11 +104,11 @@ Dq = TR * QPm; ic = np.zeros(N)
 for i in range(N):
     m = ids != i; b, a = np.polyfit(np.log(Dq[m]), np.log(SY[m] / KLSC), 1); ic[i] = np.exp(a) * Dq[i] ** b * KLSC
 p_calc = fit2(Ecalc, base_ch, SY); p_forc = fit2(Eforc, BTV, SY); b_ic, a_ic = np.polyfit(np.log(Dq), np.log(SY / KLSC), 1)
-print(f"B calculado c1={p_calc[0]:.5f} c2={p_calc[1]:.6f} | B forcado c1={p_forc[0]:.5f} c2={p_forc[1]:.6f} | IC alfa={np.exp(a_ic):.4f} beta={b_ic:.4f}")
+print(f"modelo calculado c1={p_calc[0]:.5f} c2={p_calc[1]:.6f} | modelo forcado c1={p_forc[0]:.5f} c2={p_forc[1]:.6f} | IC alfa={np.exp(a_ic):.4f} beta={b_ic:.4f}")
 
 # ================================================================= tabelas
-dt = lambda x: pd.to_datetime(x).strftime("%d/%m/%Y %Hh")
-md(["Evento", "Início", "Fim", "Duração (h)", "Chuva DBT5 (mm)", "Chuva Campo Limpo (mm)", "Chuva ponderada R (mm)", "Intens. 60 min RI (mm/h)", "Q pico (m³/s)", "Q inicial (m³/s)", "Duração da chuva (h)"],
+dt = lambda x: pd.to_datetime(x).strftime("%d/%m/%y %Hh")
+md(["Evento", "Início", "Fim", "Dur. (h)", "P DBT5 (mm)", "P Campo Limpo (mm)", "R (mm)", "RI (mm/h)", "Q pico (m³/s)", "Q inicial (m³/s)", "T chuva (h)"],
    [[str(n + 1), dt(EV[n]["Inicio"]), dt(EV[n]["Fim"]), br(dur[n], 0), br(EV[n]["chuva_p1_mm"]), br(EV[n]["chuva_p2_mm"]), br(R[n]), br(RI[n]), br(QPm[n]), br(Qb0[n], 2), br(durR[n], 0)] for n in range(N)]
    + [["**Média**", "", "", br(dur.mean(), 0), br(np.mean([r["chuva_p1_mm"] for r in EV])), br(np.mean([r["chuva_p2_mm"] for r in EV])), br(R.mean()), br(RI.mean()), br(QPm.mean()), br(Qb0.mean(), 2), br(durR.mean(), 0)]],
    "tab_eventos.md")
@@ -128,7 +128,7 @@ for n in range(N):
     linhas.append(lin)
 linhas.append(["**Erro mediano (%)**", ""] + sum([[ "", br(np.median(ape(s_)), 0)] for s_ in (ch, Bcalc, Bforc, ic)], []))
 linhas.append(["**Dentro de fator 2 (%)**", ""] + sum([["", br(f2(s_), 0)] for s_ in (ch, Bcalc, Bforc, ic)], []))
-md(["Evento", "Medido (t)", "c·chuva (t)", "erro %", "B calculado (t)", "erro %", "B forçado (t)", "erro %", "IC (t)", "erro %"], linhas, "tab_resultados.md")
+md(["Evento", "Medido (t)", "c·chuva (t)", "erro %", "Calculado (t)", "erro %", "Forçado (t)", "erro %", "IC (t)", "erro %"], linhas, "tab_resultados.md")
 
 qp = pd.read_csv(os.path.join(DI, "comparacao_qpico_convolucao_medido_vs_calculado.csv")).sort_values("evento")
 md(["Evento", "Q pico medido (m³/s)", "Q pico calculado, HU-SCS (m³/s)", "Erro (%)"],
@@ -149,7 +149,7 @@ for campo, nome, arq in (("usoc", "uso", "tab_classes_uso.md"), ("solo", "solo",
             continue
         linhas.append([cl, br(100 * m.mean(), 1), br(100 * a_[m].sum() / a_.sum(), 1), br(1000 * a_[m].mean(), 2), br(100 * b_[m].sum() / b_.sum(), 1), br(1000 * b_[m].mean(), 2),
                        br(100 * a_[m].sum() / a_.sum() / (100 * m.mean()) * 100, 0)])
-    md([f"Classe de {nome}", "Área (%)", "Sedimento, B calculado (%)", "kg/pixel, B calculado", "Sedimento, B forçado (%)", "kg/pixel, B forçado", "Contribuição / área, B calculado (%)"], linhas, arq)
+    md([f"Classe de {nome}", "Área (%)", "Sedimento, modelo calculado (%)", "kg/pixel, calculado", "Sedimento, modelo forçado (%)", "kg/pixel, forçado", "Contribuição / área, calculado (%)"], linhas, arq)
 
 tK, tC = D["tab_K"], D["tab_C"]
 solo_v = np.array(D["solo"], dtype=object)[ok]; uso_v = np.array(D["usoc"], dtype=object)[ok]
@@ -161,9 +161,9 @@ md(["Parâmetro", "Valor", "Origem"],
     ["λ (razão de abstração inicial)", "0,20", "valor padrão do SCS-CN (CN tabelado)"],
     ["Peso do posto DBT5 / Campo Limpo na lâmina do evento", "0,307 / 0,693", "mínimos quadrados nos 17 eventos"],
     ["P (práticas conservacionistas)", "1,0", "sem práticas na bacia"],
-    ["B calculado: c₁ (t por unidade de E_unit)", br(p_calc[0], 4), "calibrado em log, 17 eventos"],
-    ["B calculado: c₂ (t por m³ de volume de base de referência)", br(p_calc[1], 5), "calibrado em log, 17 eventos"],
-    ["B forçado: c₁", br(p_forc[0], 4), "calibrado em log, 17 eventos"],
-    ["B forçado: c₂ (t por m³ de vazão de base medida)", br(p_forc[1], 5), "calibrado em log, 17 eventos"],
+    ["Modelo calculado: c₁ (t por unidade de E_unit)", br(p_calc[0], 4), "calibrado em log, 17 eventos"],
+    ["Modelo calculado: c₂ (t por m³ de volume de base de referência)", br(p_calc[1], 5), "calibrado em log, 17 eventos"],
+    ["Modelo forçado: c₁", br(p_forc[0], 4), "calibrado em log, 17 eventos"],
+    ["Modelo forçado: c₂ (t por m³ de vazão de base medida)", br(p_forc[1], 5), "calibrado em log, 17 eventos"],
     ["IC refeita: α e β", f"{br(np.exp(a_ic), 3)} e {br(b_ic, 3)}", "regressão em log, K = 0,031, LS = 0,536, C = 0,267 (IC: 0,277 e 0,807)"]], "tab_parametros.md")
 print("tabelas ok:", sorted(os.listdir(OUT)))

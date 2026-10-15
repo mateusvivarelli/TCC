@@ -40,10 +40,10 @@ for _, r in cmp_.iterrows():
     lin.append(ptbr(f"| {int(r.evento)} | {r.SY_obs_t:,.1f} | {r.SY_previsao_t:,.1f} | {r['erro_previsao_%']:+.1f} | {r.SY_restrito_t:,.1f} | {r['erro_restrito_%']:+.1f} |"))
 lin.append(ptbr(f"| **Total** | {cmp_.SY_obs_t.sum():,.1f} | {cmp_.SY_previsao_t.sum():,.1f} | | {cmp_.SY_restrito_t.sum():,.1f} | |"))
 fmt = lambda v: ptbr(f"{v:,.1f}")
-# tabela por evento do modelo B (dois componentes) e tabela da escada de informacao (rascunho 02)
+# tabela por evento do modelo de dois componentes e tabela da escada de informacao (rascunho 02)
 try:
     b2 = pd.read_csv(r"C:\TCC\Dados Iniciais\comparacao_SY_dois_componentes.csv").sort_values("evento")
-    lb = ["**Tabela 11.** Sedimento por evento (t): medido e simulado pelo modelo B calculado, com a decomposição em encostas e vazão de base.", "",
+    lb = ["**Tabela 11.** Sedimento por evento (t): medido e simulado pelo modelo calculado, com a decomposição em encostas e vazão de base.", "",
           "| Evento | Medido | Encostas | Base | Total simulado | Erro no ajuste (%) | Erro na validação cruzada (%) |", "|---|---|---|---|---|---|---|"]
     for _, r in b2.iterrows():
         lb.append(ptbr(f"| {int(r.evento)} | {r.SY_obs_t:,.0f} | {r.SY_encostas_t:,.0f} | {r.SY_base_t:,.0f} | {r.SY_total_sim_t:,.0f} | {r.erro_pct:+.0f} | {r.erro_LOO_pct:+.0f} |"))
@@ -51,7 +51,7 @@ try:
     es = pd.read_csv(r"C:\TCC\TCC_Texto\figuras\escada_gargalo.csv")
     cab = ["| Água | Modelo | Erro mediano (%) | Dentro de fator 2 (%) | NSE em log | Spearman |", "|---|---|---|---|---|---|"]
     nomes = {"N1": "Calculada da chuva", "N2": "N2: volume previsto por regressão", "N3": "N3: volume direto medido, base estimada", "N4": "Forçada ao medido"}
-    le_ = ["**Tabela 13.** Desempenho do modelo B e do teste simples com os mesmos insumos (validação cruzada; calibração em log).", ""] + cab
+    le_ = ["**Tabela 13.** Desempenho do modelo de dois componentes e do teste simples com os mesmos insumos (validação cruzada; calibração em log).", ""] + cab
     li_ = [] + cab
     for _, r in es.iterrows():
         k = r.nivel.split(":")[0]
@@ -102,26 +102,43 @@ TOKEN = re.compile(r"(\*\*.+?\*\*|\*.+?\*|`.+?`|\[PENDENTE[^\]]*\]|\[conferir[^\
 HL = 7  # amarelo
 
 
+SUBSUP = re.compile(r"(?<=[A-Za-z0-9ΣΔλµ₁₂)])(_[A-Za-z0-9]+(?:,[A-Za-z0-9]+)*|\^[−+-]?[0-9]+(?:,[0-9]+)?)")
+
+
+def _add(par, texto, bold=False, italic=False, hl=False, size=None, bold_all=False):
+    """adiciona texto convertendo X_abc em subscrito e X^0,56 em sobrescrito"""
+    for pedaco in SUBSUP.split(texto):
+        if not pedaco:
+            continue
+        sub = re.fullmatch(r"_[A-Za-z0-9]+(?:,[A-Za-z0-9]+)*", pedaco) is not None
+        sup = re.fullmatch(r"\^[−+-]?[0-9]+(?:,[0-9]+)?", pedaco) is not None
+        r = par.add_run(pedaco[1:] if (sub or sup) else pedaco)
+        if sub:
+            r.font.subscript = True
+        if sup:
+            r.font.superscript = True
+        r.bold = bool(bold or bold_all) or None
+        r.italic = True if italic else None
+        if hl:
+            r.font.highlight_color = HL
+        if size:
+            r.font.size = Pt(size)
+
+
 def runs(par, s, bold_all=False, size=None):
     for part in TOKEN.split(s):
         if not part:
             continue
         if part.startswith("**") and part.endswith("**"):
-            r = par.add_run(part[2:-2]); r.bold = True
-            if "PENDENTE" in part or "conferir" in part:
-                r.font.highlight_color = HL
+            _add(par, part[2:-2], bold=True, hl=("PENDENTE" in part or "conferir" in part), size=size, bold_all=bold_all)
         elif part.startswith("`") and part.endswith("`"):
-            r = par.add_run(part[1:-1]); r.font.name = "Consolas"
+            _add(par, part[1:-1], size=size, bold_all=bold_all)
         elif part.startswith("*") and part.endswith("*") and len(part) > 2:
-            r = par.add_run(part[1:-1]); r.italic = True
+            _add(par, part[1:-1], italic=True, size=size, bold_all=bold_all)
         elif re.match(r"^\[(PENDENTE|conferir|PREENCHER|completar|CIDADE|UNIDADE|CURSO)", part):
-            r = par.add_run(part.replace("`", "")); r.font.highlight_color = HL
+            _add(par, part.replace("`", ""), hl=True, size=size, bold_all=bold_all)
         else:
-            r = par.add_run(part)
-        if bold_all:
-            r.bold = True
-        if size:
-            r.font.size = Pt(size)
+            _add(par, part, size=size, bold_all=bold_all)
 
 
 def centro(texto, negrito=False, tam=12, espaco_depois=0, antes=0, hl=False):
@@ -201,6 +218,8 @@ def bloco_simples(bloco):
             continue
         p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         palavras = ln.startswith("**Palavras") or ln.startswith("**Keywords")
+        if palavras:
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
         p.paragraph_format.line_spacing = 1.5 if palavras else 1.0
         if not ln.startswith("**"):
             p.paragraph_format.first_line_indent = Cm(2.0)
@@ -298,12 +317,40 @@ def render(lines):
             while i < len(lines) and lines[i].startswith("|"):
                 rows.append([c.strip() for c in lines[i].strip().strip("|").split("|")]); i += 1
             rows = [r for r in rows if not all(re.fullmatch(r":?-+:?", c) for c in r)]
-            t = doc.add_table(rows=len(rows), cols=len(rows[0])); t.style = "Table Grid"
+            t = doc.add_table(rows=len(rows), cols=len(rows[0])); t.style = "Table Grid"; t.autofit = False
+            ncol = len(rows[0]); total_cm = 16.0
+            limpa = lambda c: re.sub(r"[*`]", "", c)
+            tam = 8 if ncol >= 10 else (9 if ncol >= 7 else 10)
+            cw = {8: 0.165, 9: 0.185, 10: 0.205}[tam]            # largura media de um caractere (cm)
+            palavra = [max(len(w_) * (1.25 if r is rows[0] else 1.0) for r in rows for w_ in re.split(r"\s+", limpa(r[k])) if w_) for k in range(ncol)]
+            pref = [min(max(len(limpa(r[k])) for r in rows), 34) for k in range(ncol)]
+            minimo = [palavra[k] * cw + 0.3 for k in range(ncol)]
+            if sum(minimo) > total_cm:
+                minimo = [m_ * total_cm / sum(minimo) for m_ in minimo]
+            sobra = total_cm - sum(minimo)
+            extra = [max(pref[k] * cw + 0.3 - minimo[k], 0.0) for k in range(ncol)]
+            larg_cm = [minimo[k] + (sobra * extra[k] / sum(extra) if sum(extra) > 0 else sobra / ncol) for k in range(ncol)]
+            larg = [Cm(v_) for v_ in larg_cm]
+            for k in range(ncol):
+                t.columns[k].width = larg[k]
+            numerico = re.compile(r"^[+−\-]?[0-9.]+(,[0-9]+)?%?( \(.*\))?$|^—$|^[0-9.,]+ (mm|m³|t|h)$")
             for a, row in enumerate(rows):
+                tr = t.rows[a]._tr
+                trPr = tr.get_or_add_trPr()
+                cs = OxmlElement("w:cantSplit"); trPr.append(cs)
+                if a == 0:
+                    th = OxmlElement("w:tblHeader"); trPr.append(th)
                 for b, c in enumerate(row):
-                    cell = t.cell(a, b); cell.text = ""
+                    cell = t.cell(a, b); cell.text = ""; cell.width = larg[b]
                     cp = cell.paragraphs[0]; cp.paragraph_format.line_spacing = 1.0
-                    runs(cp, c, bold_all=(a == 0), size=8 if len(row) >= 10 else (9 if len(row) >= 7 else 10))
+                    cp.paragraph_format.space_before = Pt(1); cp.paragraph_format.space_after = Pt(1)
+                    if a > 0 and numerico.match(limpa(c).strip()):
+                        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    if a == 0:
+                        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                        shd = OxmlElement("w:shd"); shd.set(qn("w:val"), "clear"); shd.set(qn("w:color"), "auto"); shd.set(qn("w:fill"), "D9E2F3")
+                        cell._tc.get_or_add_tcPr().append(shd)
+                    runs(cp, c, bold_all=(a == 0), size=tam)
             doc.add_paragraph().paragraph_format.line_spacing = 1.0
             continue
         elif ln.startswith(">"):
@@ -318,7 +365,7 @@ def render(lines):
                 eq = bool(re.search(r"[=·]", b)) and len(b) < 120 and not b.startswith(("**", "Nota", "[", "Esboço"))
                 if eq:
                     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                    r = p.add_run(b); r.italic = True
+                    _add(p, b, italic=True)
                 else:
                     p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
                     p.paragraph_format.left_indent = Cm(4.0)   # citacao longa / nota: recuo de 4 cm, espaco simples
@@ -330,6 +377,10 @@ def render(lines):
         elif ln.startswith("- "):
             p = doc.add_paragraph(style="List Bullet"); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             runs(p, ln[2:])
+        elif ln.startswith("**Tabela"):
+            p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.LEFT; p.paragraph_format.line_spacing = 1.0
+            p.paragraph_format.space_before = Pt(8); p.paragraph_format.space_after = Pt(4); p.paragraph_format.keep_with_next = True
+            runs(p, ln, size=10)
         else:
             p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             p.paragraph_format.first_line_indent = Cm(2.0)

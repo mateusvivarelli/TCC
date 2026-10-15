@@ -1,4 +1,4 @@
-| Evento | Medido (t) | c·chuva (t) | erro % | B calculado (t) | erro % | B forçado (t) | erro % | IC (t) | erro % |
+| Evento | Medido (t) | c·chuva (t) | erro % | Calculado (t) | erro % | Forçado (t) | erro % | IC (t) | erro % |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | 266 | 477 | +79 | 591 | +122 | 260 | -3 | 326 | +22 |
 | 2 | 2.040 | 1.090 | -47 | 1.365 | -33 | 2.088 | +2 | 2.832 | +39 |

@@ -1,4 +1,4 @@
-| Classe de uso | Área (%) | Sedimento, B calculado (%) | kg/pixel, B calculado | Sedimento, B forçado (%) | kg/pixel, B forçado | Contribuição / área, B calculado (%) |
+| Classe de uso | Área (%) | Sedimento, modelo calculado (%) | kg/pixel, calculado | Sedimento, modelo forçado (%) | kg/pixel, forçado | Contribuição / área, calculado (%) |
 |---|---|---|---|---|---|---|
 | Mata Nativa | 39,6 | 4,9 | 0,17 | 4,0 | 0,38 | 12 |
 | Campo | 29,0 | 36,4 | 1,70 | 35,8 | 4,67 | 125 |

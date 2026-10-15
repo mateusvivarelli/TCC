@@ -6,8 +6,8 @@ MAPAS DO TCC (15/10/2026): todos com titulo, escala grafica, seta do norte, lege
   mapa_03_fatores.png          K, C, LS e CN (AMC I)
   mapa_04_chuva_eventos.png    chuva interpolada (IDW) nos 17 eventos
   mapa_05_escoamento_eventos.png  escoamento direto (SCS-CN, lambda 0,20) nos 17 eventos
-  mapa_06_sedimento_eventos.png   sedimento das encostas (modelo B calculado) nos 17 eventos
-  mapa_07_sedimento_medio.png  sedimento medio e areas criticas: modelo B calculado e B forcado ao medido
+  mapa_06_sedimento_eventos.png   sedimento das encostas (modelo calculado) nos 17 eventos
+  mapa_07_sedimento_medio.png  sedimento medio e areas criticas: modelo calculado e forcado ao medido
   mapa_08_evento11.png         cadeia do evento 11 (chuva, S, Q, E_unit, SY)
   fig_fluxograma.png           fluxograma do metodo
 Tambem salva TCC_Texto/tabelas/_rasters_forcado (SY forcado medio) em Dados Iniciais/SY_medio_eventos_forcado.tif
@@ -214,7 +214,7 @@ multiplos([os.path.join(BASE, f"Evento {n}", f"Qdir{n}_b2.tif") for n in range(1
           "Escoamento direto calculado pelo SCS-CN (CN seco, λ = 0,20) em cada evento", "mapa_05_escoamento_eventos.png", vmin=0, gamma=0.5,
           nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados. Escala gráfica de 5 km; norte para cima.")
 multiplos([os.path.join(BASE, f"Evento {n}", f"SY{n}_b2.tif") for n in range(1, N + 1)], "YlOrRd", "Sedimento das encostas (kg por pixel)",
-          "Sedimento produzido nas encostas em cada evento (modelo B calculado)", "mapa_06_sedimento_eventos.png", vmin=0, fator=1000.0, gamma=0.5,
+          "Sedimento produzido nas encostas em cada evento (modelo calculado)", "mapa_06_sedimento_eventos.png", vmin=0, fator=1000.0, gamma=0.5,
           nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados.\nMostra só a parcela das encostas (c₁ · E_unit). Escala gráfica de 5 km; norte para cima.")
 print("mapas 4-6 ok")
 
@@ -256,7 +256,7 @@ for nome, arr in (("SY_medio_eventos_forcado.tif", SYf_mean),):
 
 # ================================================================= MAPA 7: sedimento medio e areas criticas
 fig, axs = plt.subplots(2, 2, figsize=(13, 8))
-for col, (arr, nome) in enumerate(((SYc_mean, "Modelo B calculado (água estimada da chuva)"), (SYf_mean, "Modelo B forçado ao medido (água medida)"))):
+for col, (arr, nome) in enumerate(((SYc_mean, "Modelo calculado (água estimada da chuva)"), (SYf_mean, "Modelo forçado ao medido (água medida)"))):
     v = arr[np.isfinite(arr)]; vmax = np.percentile(v * 1000, 99.5)
     im = mostra(axs[0, col], arr * 1000, "YlOrRd", vmin=0, vmax=vmax); contorno(axs[0, col])
     moldura(axs[0, col], titulo=f"Sedimento médio dos 17 eventos\n{nome}", km=5)
@@ -291,7 +291,7 @@ for ax, (arr, cm, tit, rot, pc) in zip(axs.ravel(), pan):
 axs[1, 2].text(0.02, 0.9, "Evento 11 (04 a 08/07/2019)", fontsize=10, fontweight="bold", transform=axs[1, 2].transAxes, va="top")
 axs[1, 2].text(0.02, 0.8, f"Chuva ponderada: {EV[10]['Chuva_evento_mm']:.1f} mm\nIntensidade máxima em 60 min: {EV[10]['Intensidade_60min_mm/h']:.1f} mm/h\n"
                f"Volume total medido: {EV[10]['T_R_m3']/1e6:.2f} milhões de m³\nSedimento medido: {EV[10]['SYY_t']:,.0f} t\n\n"
-               "Modelo B calculado: 1.131 t\n   encostas 119 t + vazão de base 1.012 t".replace(",", "."), fontsize=9, transform=axs[1, 2].transAxes, va="top", linespacing=1.5)
+               "Modelo calculado: 1.131 t\n   encostas 119 t + vazão de base 1.012 t".replace(",", "."), fontsize=9, transform=axs[1, 2].transAxes, va="top", linespacing=1.5)
 fig.suptitle("Da chuva ao sedimento no evento 11: etapas espaciais do modelo", fontsize=12, y=1.0)
 fig.tight_layout(rect=(0, 0, 1, 0.97)); fig.savefig(os.path.join(OUT, "mapa_08_evento11.png"), dpi=170); plt.close(fig)
 print("mapa 8 ok")
@@ -318,7 +318,7 @@ caixa(C1, 5.2, W, 0.85, "Interpolação IDW\n→ chuva P em cada pixel", pro)
 caixa(C2, 5.2, W, 0.85, "SCS-CN (λ = 0,20)\n→ escoamento direto Q do pixel", pro)
 caixa(C3, 5.2, W, 0.85, "Sedimento medido SY_obs = Σ Q·CSS\nvolume direto e base medidos", obs)
 caixa(C2, 3.8, W + 0.6, 0.85, "pr = Q·(RI/R);  E_unit = 11,8·(Q·pr·A)^0,56·K·LS·C\n(erosão local do pixel, índice relativo)", pro, 8.5)
-caixa(C3, 3.8, W, 0.85, "Termo de base\nB calculado: Qb_inicio × duração da chuva\nB forçado: Σ Bt medida", pro, 8.5)
+caixa(C3, 3.8, W, 0.85, "Termo de base\nModelo calculado: Qb_inicio × duração da chuva\nB forçado: Σ Bt medida", pro, 8.5)
 caixa(C2, 2.4, W, 0.85, "Soma de E_unit sobre os pixels\n(parcela das encostas)", pro)
 caixa(6.4, 0.7, 8.2, 1.0, "SY = c₁ · ΣE_unit  +  c₂ · (termo de base)\nc₁ e c₂ ajustados em escala logarítmica contra SY_obs; validação leave-one-out aninhada", res)
 caixa(3.0, -0.9, 4.6, 0.8, "Mapa de áreas críticas\n(c₁ · E_unit em cada pixel)", res, 8.5)
@@ -331,6 +331,6 @@ for (x0, y0, x1, y1) in ((C1, 6.6, C1, 6.05), (C2, 6.6, C2, 6.05), (C3, 6.6, C3,
 ax.plot([C3 + W / 2, 11.85, 11.85], [5.62, 5.62, 1.2], ls="--", lw=1.3, color="#7a3b16", zorder=2)
 seta(11.85, 1.2, 10.5, 1.2, ls="--")
 ax.text(11.75, 3.6, "alvo da calibração", rotation=90, fontsize=8, color="#7a3b16", ha="right", va="center")
-fig.suptitle("Fluxograma do método (azul: entradas; amarelo: cálculos; laranja: dados medidos usados como alvo ou, no B forçado, como entrada; verde: resultados)", fontsize=9.5, y=0.97)
+fig.suptitle("Fluxograma do método (azul: entradas; amarelo: cálculos; laranja: dados medidos usados como alvo ou, no modelo forçado, como entrada; verde: resultados)", fontsize=9.5, y=0.97)
 fig.savefig(os.path.join(OUT, "fig_fluxograma.png"), dpi=170, bbox_inches="tight"); plt.close(fig)
 print("fluxograma ok")

@@ -792,3 +792,11 @@ Métricas (alvo carga total; MedAPE / fator 2 / NSE-log / Spearman / NSE linear)
 - B nível N3 (volume direto medido + base prevista): 32,5% / 94% / 0,71 / 0,81 / 0,61
 - B nível N4 (volume direto e base medidos, mesma informação da IC): 11,7% / 94% / 0,87 / 0,87 / 0,80
 **Leitura:** com informação equivalente (volume total e pico medidos na IC; volume direto e base medidos no B/N4) os dois têm qualidade equivalente. A IC supera o B quando o B só recebe parte da informação medida (N1, N3). A IC usa D e qp extraídos do mesmo hidrograma que gera SY_obs (alta circularidade), não prevê e não gera mapa; α e β foram ajustados in-sample (aqui o LOO confirma a robustez da lei de potência).
+
+---
+
+## 23. Teste independente do CN calibrado (subagente, 15/10/2026) — `Notas Claude/teste_cn_calibrado.md`
+
+Conclusão: **calibrar a conversão chuva → escoamento (a, λ, S dependente de P, Hawkins, regressões; 11 formas, LOO aninhado) melhora o volume direto (erro mediano 69% → 40–47%; NSE −0,69 → ~0,4), mas NÃO melhora o sedimento do modelo B de forma distinguível** (ΔNSE-log +0,02 a +0,08; IC95% ≈ [−0,15; +0,35]; Wilcoxon p 0,6–0,9) nem supera SY = c·chuva. O coeficiente de escoamento direto medido varia de 0,03 a 0,22 e é praticamente independente da chuva (r = 0,19 em log); o SCS calibrado livremente "se desmonta" (λ → 0, CN-II ≈ 51, ou S ∝ P). O B é insensível à escala do volume (c₁ absorve; E ∝ Q^1,12).
+**Correções ao que eu tinha dito:** (1) o "teto de 12% / 94% em fator 2" exige água medida **e** base observada; só com a água medida e a base prevista o teto é 32,5% / 94% / NSE-log 0,71; (2) o passo "volume previsto por regressão" de `_avaliacao_B_com_Q_bom.py` e `_escada...py` tinha um vazamento pequeno, corrigido na escada (N2: erro mediano do B 34,9% → 39,1%); (3) r = −0,89 com a lâmina só vale em log (−0,63 em linear), e as correlações com Qb_inicio e chuva de 5 dias, refeitas, deram +0,26 e +0,17 (fracas).
+Incorporado ao rascunho 04 (seção 5.2, 5.4, apêndices C e E; limitações k e l).
