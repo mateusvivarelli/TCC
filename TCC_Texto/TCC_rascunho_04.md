@@ -10,13 +10,13 @@
 
 ## RESUMO
 
-A Equação Universal Modificada de Perda de Solo (MUSLE) estima a produção de sedimentos de eventos de chuva, mas, em sua forma concentrada, trata a bacia como uma unidade homogênea e não mostra onde a erosão se origina. Este trabalho espacializa a MUSLE em pixels de 30 m na parte alta da bacia do rio Jundiaí (137,8 km², São Paulo), para 17 eventos monitorados entre 2018 e 2020. O escoamento direto foi calculado pelo método SCS-CN sobre chuva interpolada de dois postos, a erosão local seguiu Hao et al. (2022) e a vazão de base, que compõe parte da carga medida no exutório, entrou como um termo separado da bacia. Os parâmetros foram calibrados em escala logarítmica e validados por *leave-one-out*. Mostra-se que o volume e o sedimento medidos incluem a vazão de base, que o SCS-CN não representa. Com apenas chuva e vazão inicial como entrada, o modelo acertou 71% dos eventos dentro de fator 2 (erro mediano de 33%), desempenho equivalente ao de uma regra simples com a chuva do evento. Com a água forçada ao valor medido (escoamento direto e vazão de base), o acerto sobe a 94% dos eventos e o erro mediano cai a 12%, equivalente à formulação concentrada da Iniciação Científica, que usa volume e pico medidos. O gargalo está, portanto, em transformar chuva em escoamento, e recalibrar o método SCS-CN contra o escoamento direto não o resolveu. A espacialização mantém a qualidade e acrescenta o mapa de áreas críticas.
+A Equação Universal Modificada de Perda de Solo (MUSLE) estima a produção de sedimentos de eventos de chuva, mas, em sua forma concentrada, trata a bacia como uma unidade homogênea e não mostra onde a erosão se origina. Este trabalho espacializa a MUSLE em pixels de 30 m na parte alta da bacia do rio Jundiaí (137,8 km², São Paulo), para 17 eventos monitorados entre 2018 e 2020. O escoamento direto foi calculado pelo método SCS-CN sobre chuva interpolada de dois postos, a erosão local seguiu Hao et al. (2022) e a vazão de base, que compõe parte da carga medida no exutório, entrou como um termo separado da bacia. Os parâmetros foram calibrados em escala logarítmica e validados por *leave-one-out*. Mostra-se que o volume e o sedimento medidos incluem a vazão de base, que o SCS-CN não representa. Com apenas chuva e vazão inicial como entrada, o modelo acertou 71% dos eventos dentro de fator 2 (erro mediano de 33%), desempenho equivalente ao de uma regra simples com a chuva do evento. Com a água forçada ao valor medido (escoamento direto e vazão de base), o acerto sobe a 94% dos eventos e o erro mediano cai a 14%, equivalente à formulação concentrada da Iniciação Científica, que usa volume e pico medidos. O gargalo está, portanto, em transformar chuva em escoamento, e recalibrar o método SCS-CN contra o escoamento direto não o resolveu. A espacialização mantém a qualidade e acrescenta o mapa de áreas críticas.
 
 **Palavras-chave:** MUSLE; produção de sedimentos; SCS-CN; modelagem distribuída; SIG; bacia do rio Jundiaí.
 
 ## ABSTRACT
 
-The Modified Universal Soil Loss Equation (MUSLE) estimates event-scale sediment yield, but in its lumped form it treats the basin as a homogeneous unit and does not show where erosion originates. This work spatializes the MUSLE at a 30 m pixel scale in the upper Jundiaí River basin (137.8 km², São Paulo, Brazil) for 17 rainfall events monitored between 2018 and 2020. Direct runoff was computed with the SCS-CN method over rainfall interpolated from two gauges, local erosion followed Hao et al. (2022), and baseflow, which makes up part of the load measured at the outlet, entered as a separate basin-scale term. Parameters were calibrated on a logarithmic scale and validated by leave-one-out cross-validation. The measured volume and sediment load are shown to include baseflow, which the SCS-CN does not represent. With only rainfall and initial flow as inputs, the model placed 71% of the events within a factor of 2 (median error of 33%), equivalent to a simple rule based on event rainfall. With the water forced to measured values (direct runoff and baseflow) the hit rate rises to 94% and the median error drops to 12%, equivalent to the lumped formulation of the previous undergraduate research project, which uses measured volume and peak discharge. The bottleneck is therefore converting rainfall into runoff, and recalibrating the SCS-CN method against direct runoff did not solve it. Spatialization keeps the quality and adds the map of critical areas.
+The Modified Universal Soil Loss Equation (MUSLE) estimates event-scale sediment yield, but in its lumped form it treats the basin as a homogeneous unit and does not show where erosion originates. This work spatializes the MUSLE at a 30 m pixel scale in the upper Jundiaí River basin (137.8 km², São Paulo, Brazil) for 17 rainfall events monitored between 2018 and 2020. Direct runoff was computed with the SCS-CN method over rainfall interpolated from two gauges, local erosion followed Hao et al. (2022), and baseflow, which makes up part of the load measured at the outlet, entered as a separate basin-scale term. Parameters were calibrated on a logarithmic scale and validated by leave-one-out cross-validation. The measured volume and sediment load are shown to include baseflow, which the SCS-CN does not represent. With only rainfall and initial flow as inputs, the model placed 71% of the events within a factor of 2 (median error of 33%), equivalent to a simple rule based on event rainfall. With the water forced to measured values (direct runoff and baseflow) the hit rate rises to 94% and the median error drops to 14%, equivalent to the lumped formulation of the previous undergraduate research project, which uses measured volume and peak discharge. The bottleneck is therefore converting rainfall into runoff, and recalibrating the SCS-CN method against direct runoff did not solve it. Spatialization keeps the quality and adds the map of critical areas.
 
 **Keywords:** MUSLE; sediment yield; SCS-CN; distributed modelling; GIS; Jundiaí River basin.
 
@@ -96,7 +96,7 @@ Hao et al. (2022) propuseram aplicar a MUSLE **por pixel**: a vazão de pico loc
 
 ### 2.6 Dados espaciais em SIG
 
-Os fatores da MUSLE são espacializados em formato raster, com a mesma grade da chuva e do CN. A **chuva** é interpolada a partir dos postos pelo inverso da distância (IDW), em que o peso de cada posto decresce com o quadrado da distância; com poucos postos, o resultado é um gradiente suave entre eles. O **fator K** e o **fator C** são atribuídos por classe de solo e de uso, a partir de mapas temáticos, e o **fator LS** é derivado do modelo digital de elevação (por exemplo, pelo método de Moore et al., 1991 [conferir], implementado no SAGA). O **número de curva** resulta do cruzamento dos mapas de uso e de solo.
+Os fatores da MUSLE são espacializados em formato raster, com a mesma grade da chuva e do CN. A **chuva** é interpolada a partir dos postos pelo inverso da distância (IDW), em que o peso de cada posto decresce com o quadrado da distância; com poucos postos, o resultado é um gradiente suave entre eles. O **fator K** e o **fator C** são atribuídos por classe de solo e de uso, a partir de mapas temáticos, e o **fator LS** é derivado do modelo digital de elevação (por exemplo, pela formulação de área de contribuição de Moore e Burch, 1986, e Moore et al., 1991). O **número de curva** resulta do cruzamento dos mapas de uso e de solo.
 
 ### 2.7 Avaliação e validação de modelos
 
@@ -162,7 +162,7 @@ Os mapas temáticos de solo e de uso, do Plano de Bacias (CONSÓRCIO PROFILL-RHA
 |---|---|---|
 | K | mapa pedológico (Plano de Bacias 2020), valor de K por classe de solo da IC | 0,039 |
 | C | mapa de uso do solo (Plano de Bacias 2020), valor de C por classe de uso da IC | 0,050 |
-| LS | MDE (USGS) pelo método de Moore et al. (1991) no SAGA [conferir] | 0,536 |
+| LS | MDE (USGS), calculado neste trabalho por Moore e Burch (1986) / Moore et al. (1991) sobre o MDE reprojetado para UTM, com o comprimento de rampa limitado a 200 m (seção 4.2.3) | 7,80 |
 | P | constante | 1,0 |
 | CN | interseção uso × solo, em 3 cenários de umidade | — |
 
@@ -174,7 +174,7 @@ Os mapas temáticos de solo e de uso, do Plano de Bacias (CONSÓRCIO PROFILL-RHA
 
 ![Fatores espacializados: erodibilidade (K), cobertura e manejo (C), fator topográfico (LS) e número de curva para a condição seca (CN, AMC I).](figuras/mapas/mapa_03_fatores.png)
 
-Todos os rasters usam a mesma grade de 884 × 365 pixels de ~30 m (29,992 × 29,925 m; área do pixel de 897,49 m²), em SIRGAS 2000 / UTM 23S. Cerca de 154,7 mil pixels têm número de curva e 154,0 mil têm todos os fatores (K, C, LS e CN), o que corresponde a 138,2 km²; a diferença de cerca de 650 pixels vem de bordas em que os mapas de solo, uso e relevo não coincidem, e esses pixels ficam de fora do cálculo da erosão. Nas áreas urbanizadas e nos corpos d'água, o fator C é zero, e nas áreas sem classe de solo (urbanas), K é zero: esses pixels têm erosão nula no modelo.
+Todos os rasters usam a mesma grade de 884 × 365 pixels de ~30 m (29,992 × 29,925 m; área do pixel de 897,49 m²), em SIRGAS 2000 / UTM 23S. Cerca de 154,7 mil pixels têm número de curva e 153,9 mil têm todos os fatores (K, C, LS e CN), o que corresponde a 138,1 km²; a diferença de cerca de 810 pixels vem de bordas em que os mapas de solo, uso e relevo não coincidem, e esses pixels ficam de fora do cálculo da erosão. Nas áreas urbanizadas e nos corpos d'água, o fator C é zero, e nas áreas sem classe de solo (urbanas), K é zero: esses pixels têm erosão nula no modelo.
 
 > [PENDENTE: origem dos valores de CN por combinação uso × solo (tabela e fonte).]
 
@@ -221,11 +221,17 @@ A carga SY_obs usa a concentração CSS em mg/L (equivalente a g/m³): a vazão 
 
 #### 4.2.2 Grade e pixels de cálculo
 
-Todos os dados espaciais foram colocados na mesma grade, a do raster de chuva (884 × 365 pixels, SIRGAS 2000 / UTM 23S, pixel de 29,992 × 29,925 m = 897,49 m²). O raster de número de curva, que tinha outra grade (973 × 362), foi reamostrado pelo vizinho mais próximo, isto é, cada pixel da grade de cálculo recebe o valor do pixel do raster original que contém o seu centro. O cálculo da erosão só é feito nos pixels em que existem, ao mesmo tempo, número de curva, K, C e LS (154.011 pixels, 138,2 km²); os demais ficam sem valor.
+Todos os dados espaciais foram colocados na mesma grade, a do raster de chuva (884 × 365 pixels, SIRGAS 2000 / UTM 23S, pixel de 29,992 × 29,925 m = 897,49 m²). O raster de número de curva, que tinha outra grade (973 × 362), foi reamostrado pelo vizinho mais próximo, isto é, cada pixel da grade de cálculo recebe o valor do pixel do raster original que contém o seu centro. O cálculo da erosão só é feito nos pixels em que existem, ao mesmo tempo, número de curva, K, C e LS (153.855 pixels, 138,1 km²); os demais ficam sem valor.
 
 #### 4.2.3 Fatores K, C, LS e P
 
-Os fatores K e C foram atribuídos por classe (Tabela 5): cada pixel recebe o valor da classe de solo ou de uso do polígono que contém o seu centro. Essa regra reproduz exatamente os rasters de K e de C usados no trabalho (verificado pixel a pixel). O fator LS vem do modelo digital de elevação, pelo método de Moore et al. (1991) [conferir]. O fator P é igual a 1,0 em toda a bacia, porque não há práticas conservacionistas ativas.
+Os fatores K e C foram atribuídos por classe (Tabela 5): cada pixel recebe o valor da classe de solo ou de uso do polígono que contém o seu centro. Essa regra reproduz exatamente os rasters de K e de C usados no trabalho (verificado pixel a pixel). O fator LS foi calculado neste trabalho a partir do modelo digital de elevação, pela formulação de área de contribuição de Moore e Burch (1986) e Moore et al. (1991):
+
+> LS = (A_s / 22,13)^0,4 · (sen β / 0,0896)^1,3
+
+em que A_s é a área de contribuição específica do pixel (área acumulada a montante dividida pela largura da célula, em m) e β é a declividade local. O cálculo foi feito sobre o MDE já reprojetado para SIRGAS 2000 / UTM 23S (pixel em metros), com a área acumulada da rede de drenagem corrigida (seção 3.1), e usa a declividade da mesma grade de cálculo. Como a USLE descreve erosão de **encosta**, e não de canal, A_s foi limitada a 200 m, o maior comprimento de rampa admitido pela equação: sem esse limite, A_s chega a milhões de metros nos pixels de canal, onde a bacia inteira drena por uma célula, e o LS perde sentido físico. O LS resultante tem média de 7,80 e cresce de 0,14, no terreno plano, a cerca de 25, nas encostas mais íngremes, com correlação de 0,94 com a declividade. O fator P é igual a 1,0 em toda a bacia, porque não há práticas conservacionistas ativas.
+
+> Nota: o fator LS usado na IC e na primeira versão deste trabalho (`LS Alto.tif`) havia sido calculado sobre o MDE em coordenadas geográficas (pixel em graus), o que corrompe os termos de declividade e de área: o resultado era praticamente constante (média de 0,536) e não se correlacionava com a declividade (r = 0,047). Todos os resultados espaciais aqui apresentados usam o LS recalculado.
 
 #### 4.2.4 Número de curva e retenção S
 
@@ -342,15 +348,15 @@ Para acompanhar o cálculo, a Tabela 9 e a Figura 5 mostram o evento 11 (04 a 08
 | Pixel de exemplo | chuva P; CN-II → CN-I; S | 75,4 mm; 81,0 → 64,2; 141,9 mm |
 | | abstração inicial λS; escoamento Q | 28,4 mm; (75,4 − 28,4)² / (75,4 + 0,8 · 141,9) = 11,72 mm |
 | | vazão de pico local pr | 11,72/1000 · 897,49 · 0,159 / 3600 = 4,66 · 10⁻⁴ m³/s |
-| | K; C; LS | 0,0351; 0,212; 0,644 |
-| | índice de erosão E_unit | 11,8 · (11,72 · 4,66 · 10⁻⁴ · 897,49)^0,56 · 0,0351 · 0,212 · 0,644 = 0,1375 |
-| | sedimento do pixel c₁ · E_unit | 0,0479 · 0,1375 = 0,0066 t (6,6 kg) |
-| Evento (modelo calculado) | soma de E_unit sobre os pixels | 2.489 |
-| | termo das encostas c₁ · ΣE | 0,0479 · 2.489 = 119 t |
+| | K; C; LS | 0,0351; 0,212; 4,869 |
+| | índice de erosão E_unit | 11,8 · (11,72 · 4,66 · 10⁻⁴ · 897,49)^0,56 · 0,0351 · 0,212 · 4,869 = 1,038 |
+| | sedimento do pixel c₁ · E_unit | 0,00352 · 1,038 = 0,0037 t (3,7 kg) |
+| Evento (modelo calculado) | soma de E_unit sobre os pixels | 30.003 |
+| | termo das encostas c₁ · ΣE | 0,00352 · 30.003 = 106 t |
 | | volume de referência da base Qb_inicio · T_chuva · 3600 | 0,945 · 23 · 3.600 = 78.226 m³ |
-| | termo de base c₂ · volume | 0,01293 · 78.226 = 1.012 t |
+| | termo de base c₂ · volume | 0,01311 · 78.226 = 1.025 t |
 | | sedimento simulado (ajuste); validação cruzada | 1.131 t (−38%); 1.098 t (−40%) |
-| Evento (modelo forçado) | sedimento simulado, validação cruzada | 1.694 t (−7%) |
+| Evento (modelo forçado) | sedimento simulado, validação cruzada | 1.711 t (−6%) |
 | Medido | SY_obs = Σ Q · CSS | 1.822 t |
 
 ![Etapas espaciais do modelo no evento 11: chuva interpolada, retenção S, escoamento direto, índice de erosão E_unit e sedimento das encostas.](figuras/mapas/mapa_08_evento11.png)
@@ -378,7 +384,7 @@ Para nenhum valor de λ o NSE do volume contra o escoamento direto é positivo. 
 
 ### 5.3 Resultados do modelo calculado
 
-O modelo calculado (só chuva e vazão inicial) obteve c₁ = 0,0479 e c₂ = 0,0129 t por m³ de volume de referência (Tabela 8). Na validação cruzada, o erro percentual mediano foi de 33,1%, e 71% dos eventos (12 de 17) ficaram dentro de fator 2; o NSE em escala logarítmica foi 0,48 e a correlação de Spearman, 0,72. A Tabela 12 mostra o resultado em cada evento, para o modelo calculado, o modelo forçado ao medido, a IC refeita e a referência SY = c · chuva. No ajuste, o modelo calculado superestima os eventos 1, 9 e 16 (+103%, +177% e +170%) e subestima os eventos 4, 7, 11 e 12 (de −38% a −57%) (Tabela 11).
+O modelo calculado (só chuva e vazão inicial) obteve c₁ = 0,0035 e c₂ = 0,0131 t por m³ de volume de referência (Tabela 8). Na validação cruzada, o erro percentual mediano foi de 32,6%, e 71% dos eventos (12 de 17) ficaram dentro de fator 2; o NSE em escala logarítmica foi 0,48 e a correlação de Spearman, 0,72. A Tabela 12 mostra o resultado em cada evento, para o modelo calculado, o modelo forçado ao medido, a IC refeita e a referência SY = c · chuva. No ajuste, o modelo calculado superestima os eventos 1, 9 e 16 (+105%, +178% e +171%) e subestima os eventos 4, 7, 11 e 12 (de −38% a −58%) (Tabela 11).
 
 {{TABELA_B}}
 
@@ -388,7 +394,7 @@ O modelo calculado (só chuva e vazão inicial) obteve c₁ = 0,0479 e c₂ = 0,
 
 ![Sedimento simulado e medido nos 17 eventos, validação *leave-one-out*, para a referência simples (SY = c · chuva), o modelo calculado e a IC. A faixa clara indica fator 2.](figuras/fig_dispersao.png)
 
-**Nas previsões do modelo calculado, a vazão de base carrega a maior parte do sedimento simulado.** Em mediana, as encostas respondem por 10% do sedimento simulado (máximo de 37%) e o termo de base, por 90% (Figura 7). O termo de base (Qb_inicio × T_chuva) funciona como indicador do tamanho e da duração do evento; ele não deve ser lido como processo físico isolado. Esse resultado, e não o desempenho agregado, é o que justifica dizer que, sem volume de escoamento medido, a parte espacial do modelo pouco contribui para a previsão.
+**Nas previsões do modelo calculado, a vazão de base carrega a maior parte do sedimento simulado.** Em mediana, as encostas respondem por 9% do sedimento simulado (máximo de 35%) e o termo de base, por 91% (Figura 7). O termo de base (Qb_inicio × T_chuva) funciona como indicador do tamanho e da duração do evento; ele não deve ser lido como processo físico isolado. Esse resultado, e não o desempenho agregado, é o que justifica dizer que, sem volume de escoamento medido, a parte espacial do modelo pouco contribui para a previsão.
 
 ![Composição do sedimento simulado pelo modelo calculado em cada evento (encostas e vazão de base) e sedimento medido.](figuras/fig_decomposicao.png)
 
@@ -398,11 +404,11 @@ O modelo calculado (só chuva e vazão inicial) obteve c₁ = 0,0479 e c₂ = 0,
 
 {{TABELA_ESCADA}}
 
-Forçando a água ao valor medido, a fração de eventos dentro de fator 2 sobe de 71% para 94%, o erro mediano cai de 33,1% para 11,7% e a parcela das encostas no sedimento simulado passa de 10% para 42% (mediana). O que muda entre as duas versões é só a água; a fórmula de erosão, os fatores do solo, do uso e do relevo e o desenho em dois componentes são os mesmos. A qualidade do sedimento estimado depende, portanto, da qualidade da estimativa do escoamento, e a fórmula de erosão e o desenho em dois componentes não são o limite. O erro mediano de 12% exige, porém, que **tanto a água das encostas quanto a vazão de base** sejam as medidas. As versões intermediárias (Apêndice C) mostram o efeito de cada parte: prever o volume direto por uma regressão simples na chuva (erro de 56% no volume) não melhora o resultado, e medir só o escoamento direto, com a base estimada, leva a 94% dos eventos dentro de fator 2, mas com erro mediano de 32% (NSE em log de 0,71). A diferença entre o modelo forçado e o modelo calculado, no limite da significância (fração dentro de fator 2: +24 pontos percentuais, intervalo de 95% de 0 a +53), mostra um potencial real, mas que não está firmemente estabelecido com 17 eventos.
+Forçando a água ao valor medido, a fração de eventos dentro de fator 2 sobe de 71% para 94%, o erro mediano cai de 32,6% para 13,6% e a parcela das encostas no sedimento simulado passa de 9% para 38% (mediana). O que muda entre as duas versões é só a água; a fórmula de erosão, os fatores do solo, do uso e do relevo e o desenho em dois componentes são os mesmos. A qualidade do sedimento estimado depende, portanto, da qualidade da estimativa do escoamento, e a fórmula de erosão e o desenho em dois componentes não são o limite. O erro mediano de 14% exige, porém, que **tanto a água das encostas quanto a vazão de base** sejam as medidas. As versões intermediárias (Apêndice C) mostram o efeito de cada parte: prever o volume direto por uma regressão simples na chuva (erro de 56% no volume) não melhora o resultado, e medir só o escoamento direto, com a base estimada, leva a 94% dos eventos dentro de fator 2, mas com erro mediano de 34% (NSE em log de 0,69). A diferença entre o modelo forçado e o modelo calculado, no limite da significância (fração dentro de fator 2: +24 pontos percentuais, intervalo de 95% de 0 a +53), mostra um potencial real, mas que não está firmemente estabelecido com 17 eventos.
 
 ### 5.5 O modelo de dois componentes e os testes simples
 
-Com os mesmos insumos, o modelo modelo e o teste simples são equivalentes (Tabela 13). Na versão calculada, o erro mediano do modelo (33%) é próximo ao do simples (38%) e a fração dentro de fator 2 é igual (71%); na versão forçada ao medido, o modelo é um pouco melhor (12% contra 20%), com 94% em ambos. Em nenhuma das versões a diferença é distinguível do ruído: os intervalos de confiança da diferença mediana do erro por evento incluem zero ([−4,0; +10,2] e [−10,8; +7,3] pontos). A espacialização **não perde precisão** em relação a modelos simples com os mesmos insumos, mas também **não ganha** precisão: o que ela entrega a mais é o mapa. O modelo calculado também não supera a referência mais simples: SY = c · chuva do evento tem erro mediano de 41,9% e 82% dos eventos dentro de fator 2 (a diferença com o modelo calculado, 33% e 71%, não é distinguível do ruído).
+Com os mesmos insumos, o modelo modelo e o teste simples são equivalentes (Tabela 13). Na versão calculada, o erro mediano do modelo (33%) é próximo ao do simples (38%) e a fração dentro de fator 2 é igual (71%); na versão forçada ao medido, o modelo é um pouco melhor (14% contra 20%), com 94% em ambos. Em nenhuma das versões a diferença é distinguível do ruído: os intervalos de confiança da diferença mediana do erro por evento incluem zero ([−3,7; +11,6] e [−11,7; +6,6] pontos). A espacialização **não perde precisão** em relação a modelos simples com os mesmos insumos, mas também **não ganha** precisão: o que ela entrega a mais é o mapa. O modelo calculado também não supera a referência mais simples: SY = c · chuva do evento tem erro mediano de 41,9% e 82% dos eventos dentro de fator 2 (a diferença com o modelo calculado, 33% e 71%, não é distinguível do ruído).
 
 ### 5.6 Comparação com a IC
 
@@ -413,9 +419,9 @@ Com os mesmos insumos, o modelo modelo e o teste simples são equivalentes (Tabe
 | SY = c · chuva do evento | chuva | 41,9% | 82% | 0,53 | 0,63 |
 | SY = c · volume total medido | volume total | 17,6% | 94% | 0,86 | 0,88 |
 | Previsão pura anterior (λ = 0,05, sem base) | chuva | 62,6% | 53% | −0,06 | 0,55 |
-| MUSLE só com escoamento direto do SCS-CN (λ = 0,20) | chuva | 97,0% | 24% | −3,11 | 0,58 |
-| **Modelo calculado** | chuva, vazão inicial | 33,1% | 71% | 0,48 | 0,72 |
-| **Modelo forçado ao medido** | volume direto e vazão de base | 11,7% | 94% | 0,87 | 0,87 |
+| MUSLE só com escoamento direto do SCS-CN (λ = 0,20) | chuva | 97,9% | 24% | −3,95 | 0,57 |
+| **Modelo calculado** | chuva, vazão inicial | 32,6% | 71% | 0,48 | 0,72 |
+| **Modelo forçado ao medido** | volume direto e vazão de base | 13,6% | 94% | 0,87 | 0,85 |
 | **IC refeita (concentrada)** | volume total e pico | 16,3% | 100% | 0,87 | 0,93 |
 
 A formulação concentrada da IC, com volume e pico medidos do próprio hidrograma, tem desempenho muito bom (100% dos eventos dentro de fator 2 na validação cruzada), semelhante ao do modelo forçado ao medido, que recebe informação equivalente. O modelo calculado, que só usa a chuva e a vazão inicial, é pior que a IC. A IC, no entanto, não prevê (precisa do hidrograma do evento, que gera também o sedimento medido), não gera mapa e seus coeficientes foram ajustados nos mesmos 17 eventos. Com informação equivalente, a espacialização iguala a qualidade da formulação concentrada e acrescenta o mapa.
@@ -434,11 +440,11 @@ As Figuras 9 a 11 mostram, para os 17 eventos, a chuva interpolada, o escoamento
 
 #### 5.7.2 Sedimento médio e áreas críticas
 
-A Figura 12 mostra o sedimento médio dos 17 eventos e as áreas críticas, definidas como os 5% de pixels de maior contribuição, para o modelo calculado e para o modelo forçado ao medido. Os dois mapas são muito parecidos (correlação de 0,97; 91,8% das áreas críticas coincidem), o que indica que o padrão espacial não depende da forma de estimar a água. Em comparação com o mapa da versão anterior do modelo (previsão pura com λ = 0,05), a correlação é de 0,96 e 89,8% das áreas críticas coincidem. A correlação do mapa com o produto K · LS · C é de 0,74 (Spearman de 0,81), menor que a de 0,89 da versão anterior, o que indica que o padrão espacial carrega mais informação da chuva e do escoamento (CN) do que antes.
+A Figura 12 mostra o sedimento médio dos 17 eventos e as áreas críticas, definidas como os 5% de pixels de maior contribuição, para o modelo calculado e para o modelo forçado ao medido. Os dois mapas são muito parecidos (correlação de 0,97; 90,9% das áreas críticas coincidem), o que indica que o padrão espacial não depende da forma de estimar a água. Em comparação com o mapa da versão anterior do modelo (previsão pura com λ = 0,05, calculada com o fator LS anterior), a correlação é de 0,72 e 58,5% das áreas críticas coincidem: essa diferença vem do fator LS recalculado (seção 4.2.3), e não da estrutura do modelo, porque o LS é o fator que define onde o relevo concentra a erosão. A correlação do mapa com o produto K · LS · C é de 0,69 (Spearman de 0,79), o que indica que o padrão espacial carrega também informação da chuva e do escoamento (CN), e não só dos fatores fixos.
 
 ![Sedimento médio dos 17 eventos e áreas críticas (5% dos pixels de maior contribuição), para o modelo calculado e o modelo forçado ao medido.](figuras/mapas/mapa_07_sedimento_medio.png)
 
-As áreas críticas se concentram em poucas manchas na porção central e oeste da bacia e em algumas manchas pequenas ao sul. A Tabela 15 mostra que a contribuição é muito desigual entre os usos do solo: a lavoura temporária ocupa 3,9% da área e responde por cerca de 29% do sedimento (26% no modelo forçado); o solo exposto ocupa 0,5% e responde por 12% (18% no modelo forçado); a mata nativa ocupa 39,6% e responde por 5% (4%); as áreas urbanizadas, que têm erosão nula no modelo (C = 0), ocupam 14,1%. Em relação aos solos (Tabela 16), 93% do sedimento vem dos Cambissolos, que têm o maior K (0,0475) e ocupam 68,6% da área. Esses resultados dependem dos valores de K e C por classe adotados e não foram validados no espaço, porque só há medição de sedimento no exutório; devem ser lidos como contribuições relativas.
+As áreas críticas se concentram em poucas manchas na porção central e oeste da bacia e em algumas manchas pequenas ao sul. A Tabela 15 mostra que a contribuição é muito desigual entre os usos do solo: a lavoura temporária ocupa 3,9% da área e responde por cerca de 23% do sedimento (21% no modelo forçado); o solo exposto ocupa 0,5% e responde por 9% (13% no modelo forçado); o campo ocupa 29,0% e responde por 39% (40%); a mata nativa ocupa 39,6% e responde por 6% (5%); as áreas urbanizadas, que têm erosão nula no modelo (C = 0), ocupam 14,1%. Em relação aos solos (Tabela 16), 94% do sedimento vem dos Cambissolos, que têm o maior K (0,0475) e ocupam 68,6% da área. Esses resultados dependem dos valores de K e C por classe adotados e não foram validados no espaço, porque só há medição de sedimento no exutório; devem ser lidos como contribuições relativas.
 
 **Tabela 15.** Contribuição de cada classe de uso para o sedimento médio das encostas (modelos calculado e forçado).
 
@@ -454,8 +460,8 @@ A coincidência dos mapas entre as versões do modelo não constitui validação
 
 ## 6. LIMITAÇÕES
 
-a) **Só o modelo calculado é previsão.** O modelo forçado ao medido usa a água do próprio evento (volume direto e vazão de base medidos). O desempenho dele (94% dos eventos em fator 2; erro mediano de 12%) é o que o modelo atingiria com uma boa estimativa do escoamento; não é o desempenho do modelo como ferramenta de previsão.
-b) **A parte espacial do modelo contribui pouco para a previsão sem volume medido** (10% do sedimento simulado em mediana no modelo calculado) e não supera uma regra simples com a chuva do evento.
+a) **Só o modelo calculado é previsão.** O modelo forçado ao medido usa a água do próprio evento (volume direto e vazão de base medidos). O desempenho dele (94% dos eventos em fator 2; erro mediano de 14%) é o que o modelo atingiria com uma boa estimativa do escoamento; não é o desempenho do modelo como ferramenta de previsão.
+b) **A parte espacial do modelo contribui pouco para a previsão sem volume medido** (9% do sedimento simulado em mediana no modelo calculado) e não supera uma regra simples com a chuva do evento.
 c) **Dados escassos:** 17 eventos, com um deles (o evento 15, de 139 mm) respondendo por 48,7% da variância linear da carga. As métricas foram escolhidas para reduzir esse peso, mas os intervalos de confiança são largos (por exemplo, o NSE em log do modelo de dois componentes tem intervalo de 95% de −0,75 a 0,83 por bootstrap dos eventos). O evento 1B, que existe na planilha de eventos, não entrou na análise [PENDENTE: justificar o critério de exclusão ou incluí-lo].
 d) **Chuva de apenas dois postos**, um deles fora da bacia; o padrão espacial da chuva é um gradiente suave entre dois pontos.
 e) **Sem validação espacial:** só há medição de sedimento no exutório.
@@ -464,7 +470,7 @@ g) **E_unit é um índice relativo**, não tonelagem por pixel; c₁ absorve a e
 h) **RI e R:** RI é o máximo entre os dois postos e R é a lâmina ponderada, de modo que RI/R passa de 1/h nos eventos 1 e 12 (fisicamente impossível para um posto só).
 i) **λ e CN:** λ = 0,20 foi fixado antes de avaliar o desempenho, mas depois de uma etapa exploratória com vários valores. A origem dos valores de CN por combinação uso × solo ainda precisa ser documentada [PENDENTE].
 j) **Duração da chuva** é conhecida só ao final da chuva; para uma previsão em tempo real seria preciso outra variável.
-k) **A parcela das encostas depende de hipóteses:** ela vai de 10% a 40% do sedimento simulado conforme a conversão chuva-escoamento adotada e de 67% a 83% com a água medida, conforme o padrão espacial (λ); não é uma estimativa robusta.
+k) **A parcela das encostas depende de hipóteses:** ela vai de 9% a 40% do sedimento simulado conforme a conversão chuva-escoamento adotada e de 62% a 84% com a água medida, conforme o padrão espacial (λ); não é uma estimativa robusta.
 l) **Seleção de modelos com poucos dados:** foram testadas 11 formas de conversão chuva-escoamento sobre os mesmos 17 eventos; o otimismo de seleção (cerca de 0,03 no NSE em log) é do tamanho do ganho sobre a referência trivial.
 
 ---
@@ -474,7 +480,7 @@ l) **Seleção de modelos com poucos dados:** foram testadas 11 formas de conver
 1. O volume escoado `T_R` e a carga de sedimentos `SY_obs` medidos no exutório incluem a vazão de base (34% a 55% do volume). O escoamento direto calculado pelo SCS-CN não é comparável a eles sem uma separação ou um termo de base.
 2. O SCS-CN com λ = 0,20 não prevê o escoamento direto desta bacia (NSE do volume negativo para qualquer λ testado); o erro vem sobretudo da forma da curva chuva-escoamento (o coeficiente de escoamento medido é aproximadamente independente da chuva), e não da umidade antecedente. Recalibrar a conversão melhora o volume, mas não o sedimento.
 3. O modelo de dois componentes (encostas e vazão de base) é fisicamente coerente, mas, só com chuva e vazão inicial, tem desempenho equivalente ao de uma regra simples com a chuva do evento (erro mediano de 33%; 71% dos eventos dentro de fator 2).
-4. O gargalo está em transformar chuva em escoamento: com a água forçada ao valor medido (escoamento direto e vazão de base), 94% dos eventos ficam dentro de fator 2 e o erro mediano cai a 12%.
+4. O gargalo está em transformar chuva em escoamento: com a água forçada ao valor medido (escoamento direto e vazão de base), 94% dos eventos ficam dentro de fator 2 e o erro mediano cai a 14%.
 5. A espacialização não perde precisão em relação a modelos simples com os mesmos insumos, nem à formulação concentrada da IC quando recebe informação equivalente, e acrescenta o mapa de áreas críticas.
 6. Trabalhos futuros: entender por que o coeficiente de escoamento direto varia sete vezes entre eventos (por exemplo, com variáveis de umidade e de estado da bacia que a chuva não traz), mais postos pluviométricos, validação espacial do mapa e a simulação de cenários de conservação, que foi retirada do escopo.
 
@@ -508,7 +514,9 @@ CONSÓRCIO PROFILL-RHAMA. **Plano de Bacias** [conferir título e órgão contra
 
 LYNE, V.; HOLLICK, M. Stochastic time-variable rainfall-runoff modelling. In: HYDROLOGY AND WATER RESOURCES SYMPOSIUM, 1979, Perth. **Proceedings**... Barton: Institution of Engineers Australia, 1979. [conferir]
 
-MOORE, I. D.; GRAYSON, R. B.; LADSON, A. R. Digital terrain modelling: a review of hydrological, geomorphological, and biological applications. **Hydrological Processes**, v. 5, n. 1, p. 3-30, 1991. [conferir se é esta a obra citada na IC]
+MOORE, I. D.; BURCH, G. J. Physical basis of the length-slope factor in the universal soil loss equation. **Soil Science Society of America Journal**, v. 50, n. 5, p. 1294-1298, 1986. [conferir]
+
+MOORE, I. D.; GRAYSON, R. B.; LADSON, A. R. Digital terrain modelling: a review of hydrological, geomorphological, and biological applications. **Hydrological Processes**, v. 5, n. 1, p. 3-30, 1991. [conferir]
 
 MURILLO-BERMÚDEZ, et al. (2021). [completar a referência conforme a IC]
 
@@ -522,7 +530,7 @@ WISCHMEIER, W. H.; SMITH, D. D. **Predicting rainfall erosion losses: a guide to
 
 ## APÊNDICE A — Conferência detalhada do evento 11
 
-[PENDENTE: pacote `Evento11_Auditoria/` (planilhas com fórmulas, shapefiles e rasters) a ser refeito com o modelo de dois componentes; resumir aqui a cadeia completa para o evento 11 (04–08/07/2019; 74,0 mm; 2,44 milhões de m³; SY_obs de 1.821,75 t; o modelo de dois componentes simula 1.130,9 t, erro de −37,9%, com 119 t das encostas e 1.012 t do termo de base).]
+[PENDENTE: pacote `Evento11_Auditoria/` (planilhas com fórmulas, shapefiles e rasters) a ser refeito com o modelo de dois componentes; resumir aqui a cadeia completa para o evento 11 (04–08/07/2019; 74,0 mm; 2,44 milhões de m³; SY_obs de 1.821,75 t; o modelo de dois componentes simula 1.130,9 t, erro de −37,9%, com 106 t das encostas e 1.025 t do termo de base).]
 
 ## APÊNDICE B — Métricas lineares (NSE) com e sem o evento 15
 
@@ -533,8 +541,8 @@ WISCHMEIER, W. H.; SMITH, D. D. **Predicting rainfall erosion losses: a guide to
 | SY = c · chuva do evento | 0,62 | 0,58 | 0,41 |
 | SY = c · volume total medido | 0,80 | 0,78 | 0,61 |
 | Previsão pura anterior (λ = 0,05, sem base) | −0,72 | −1,00 | −1,11 |
-| Modelo calculado | −0,27 | −0,60 | −1,56 |
-| Modelo forçado ao medido | 0,84 | 0,80 | 0,66 |
+| Modelo calculado | −0,29 | −0,64 | −1,58 |
+| Modelo forçado ao medido | 0,82 | 0,78 | 0,63 |
 | IC refeita (concentrada) | 0,82 | 0,77 | 0,65 |
 
 O NSE linear do modelo calculado é negativo porque o critério de calibração (erro relativo) não protege os maiores eventos, e eles dominam a métrica: as superestimativas de cerca de 170% a 180% nos eventos 9 e 16 pesam mais no NSE linear que o acerto dos eventos pequenos. Pelo mesmo motivo, a previsão pura anterior, que obtinha NSE de 0,37 (0,28 na validação cruzada) com calibração por mínimos quadrados lineares, passa a −0,72 com calibração em log: a calibração linear subestimava de propósito os eventos pequenos para acertar o maior. Os modelos que usam o volume do evento (modelo forçado, IC e SY = c · volume) mantêm NSE linear positivo.
@@ -545,13 +553,15 @@ O NSE linear do modelo calculado é negativo porque o critério de calibração 
 
 {{TABELA_INTERM}}
 
-O volume previsto por regressão (erro médio de 56%, com a regressão refeita sem o evento avaliado em cada rodada) não melhora o resultado em relação ao modelo calculado: o erro mediano do modelo vai de 33% para 39%, e o teste simples fica melhor (33%). Medir só o escoamento direto, com a base estimada (N3), leva a 94% dos eventos dentro de fator 2, mas com erro mediano de 32% para o modelo e de 24% para o teste simples; nesse caso o teste simples é melhor, e a diferença também não é distinguível do ruído ([−4,4; +24,1] pontos).
+O volume previsto por regressão (erro médio de 56%, com a regressão refeita sem o evento avaliado em cada rodada) não melhora o resultado em relação ao modelo calculado: o erro mediano do modelo vai de 33% para 39%, e o teste simples fica melhor (33%). Medir só o escoamento direto, com a base estimada (N3), leva a 94% dos eventos dentro de fator 2, mas com erro mediano de 34% para o modelo e de 24% para o teste simples; nesse caso o teste simples é melhor, e a diferença também não é distinguível do ruído ([−4,3; +28,9] pontos).
 
 ## APÊNDICE D — Calibração da conversão chuva-escoamento contra o escoamento direto
 
 Foram testadas formas calibradas da conversão chuva-escoamento, para verificar se um número de curva "melhor" resolveria o gargalo: (i) escala da retenção (S′ = a · S) e λ livres; (ii) retenção dependente da lâmina de chuva, S′ = a · S · (P/P₀)^k, e a forma assintótica de Hawkins, com λ = 0,20 e 0,05; (iii) formas empíricas: ln V = b₀ + b₁ ln P e um coeficiente de escoamento com abstração fixa, V = C_r · (P − I_a) · área (resultado: C_r = 0,114 e I_a = 9 mm, que é plausível e transparente). Todas foram calibradas contra o escoamento direto medido por mínimos quadrados em escala logarítmica, com validação cruzada *leave-one-out* aninhada e, para o sedimento, com o modelo de dois componentes (c₁ e c₂ refeitos sem o evento retido).
 
 **Tabela 19.** Conversão chuva-escoamento calibrada: volume de escoamento direto previsto e sedimento do modelo calculado (validação cruzada aninhada).
+
+> [PENDENTE: as colunas de volume desta tabela não dependem do fator LS, mas as colunas de sedimento (erro mediano, fator 2, NSE em log e parcela das encostas) foram calculadas com o fator LS anterior. Refazê-las exige rodar de novo as formas (i) a (iii), cujos scripts são do revisor independente e não estão no repositório (ver `Notas Claude/teste_cn_calibrado.md`). Com o LS recalculado, a linha de referência (SCS-CN original, λ = 0,20) passa a 32,6% / 71% / 0,48 / 9%, e as linhas "teto" a 34,1% / 94% / 0,69 / 62% (água medida, padrão λ = 0,20) e 13,6% / 94% / 0,87 / 38% (água e base observadas). As conclusões (a) a (e) não mudam.]
 
 | Conversão | Volume: erro mediano | Volume: NSE | Sedimento: erro mediano | Dentro de fator 2 | NSE em log | Parcela das encostas |
 |---|---|---|---|---|---|---|

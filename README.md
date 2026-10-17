@@ -65,10 +65,81 @@ para quem não tem formação em hidrologia. A revisão que a acompanhou gerou c
 `Notas Claude/notas_musle_espacializada.md` e os ajustes em `Notas Claude/base_para_redacao_tcc.md` (comparação com Hao e
 Baert, autoria de Valle Junior et al.). Pontos ainda a confirmar estão no Apêndice D da apostila.
 
+## Onde estamos agora (17/10/2026) — PONTO DE RETOMADA (ler primeiro)
+
+**A fonte da verdade do texto é o Google Doc "TCC arquivo"**
+(id `12xwNDLmeeRB6IcbsprDWuI3XHx_At2RIgsPm6WBKiGo`), não o `TCC_rascunho_04.md` — os dois
+divergiram. Para editar o Doc pelo Claude: conector Google Docs (`read_doc`/`update_doc`); o
+`read_doc` estoura o limite e salva o JSON em `~/.claude/projects/.../tool-results/` — parsear com
+Python. `replaceAllText` só bate dentro de um mesmo trecho de texto; para trechos com comentário
+ancorado ou formatação mista, usar edição por índice (de trás para frente, com
+`writeControl.requiredRevisionId`). Comentários: `insertComment` com o campo `content`.
+
+**Feito nesta sessão (17/10), tudo já aplicado no Doc:**
+- Epígrafe trocada para a versão em português (Flanagan, *Halt em Perigo*, Fundamento, 2011) e
+  formatada (recuo 8 cm, 10 pt, título em itálico). Falta conferir a fala no livro.
+- **Seção 3.3 conferida contra os rasters**: grade, pixel, SRC, K, C e a Tabela 5 inteira batem.
+  Corrigidos os valores que vinham do LS antigo: LS médio 0,536 → **7,80**; pixels de cálculo
+  154,0 mil → **153,9 mil**; 138,2 → **138,1 km²**; bordas ~650 → **~810 pixels**. Célula do LS na
+  Tabela 4 reescrita (o LS não é "no SAGA"; é Python sobre o MDE corrigido, Moore e Burch, 1986).
+- **Origem do CN resolvida**: `CN TCC.tif` = raster **BR_CN-2022 da ANA** (Curva Número na Base
+  Ottocodificada), reprojetado para UTM 23S — 100% idêntico no interior das manchas, mesmos 20
+  valores. Uso do MapBiomas 2022 + solo IBGE + grupos hidrológicos de Sartori et al. (2005).
+  AMC I/III = conversões de Chow et al. (1988), conferidas. Parágrafo de procedência inserido no Doc
+  (no lugar do antigo [PENDENTE]), com a limitação: CN usa MapBiomas 2022, K/C usam Plano de Bacias
+  2020. Ver `notas_musle_espacializada.md` §25.
+- **Referências consolidadas** em ordem alfabética, com DOI: `Notas Claude/referencias_consolidadas.md`
+  (✔ = citada no Doc). Lista de itens a conferir no fim do arquivo.
+- Equação do IDW dada ao usuário na forma de fração única, mais fácil de digitar no editor do Docs:
+  P(x) = (P₁·d₂² + P₂·d₁²) / (d₁² + d₂²). Colar LaTeX no Docs **não funciona**; ou se digita no
+  editor (`\frac` + espaço, `_`, `^`, setas) ou se cola a linha Unicode.
+
+**Pendências abertas (em ordem de prioridade):**
+1. **Perguntar ao orientador** como foi separada a vazão de base (coluna `Bt`) — método não
+   documentado; os filtros de Lyne-Hollick e Eckhardt não reproduzem a série (ver
+   `dados_area_estudo_plano_bacias.md` §9–11). O usuário apagou do Doc a frase que eu tinha escrito
+   sobre isso; não recolocar sem ele pedir.
+2. **§2.4 do Doc**: "(Murillo-Bermúdez et al., 2022)" sobre curvas turbidez→CSS provavelmente deveria
+   ser o artigo do IJRBM (2021 on-line / 2023 fascículo). Não alterado — decisão do usuário.
+3. **§2.6 do Doc** ainda diz "O número de curva resulta do cruzamento dos mapas de uso e de solo" —
+   sugerido trocar por "obtido da base nacional da ANA, que cruza uso da terra e grupo hidrológico".
+4. Falta inserir no Doc a tabela de resultados (`TCC_Texto/tabelas/tab_resultados.md`, já com o LS
+   novo). O usuário começou a escrever a seção 4 (Metodologia) no Doc.
+5. Decisões da migração do LS ainda sem resposta do usuário: (a) aceitar os 156 pixels de borda
+   perdidos; (b) Apêndice D / `teste_cn_calibrado.md` com colunas de sedimento no LS antigo (scripts
+   do revisor fora do repo); (c) linha congelada λ = 0,05 (`SY_medio_eventos.tif`, FCI) ainda no LS
+   antigo, enquanto `E_unit{n}.tif` já foi regenerado.
+6. Conferir a fonte da epígrafe no livro e se a norma da FEC exige a epígrafe nas referências.
+
+**Ambiente (este PC):** o Python padrão não tem GDAL. Rodar scripts com GDAL pelo ambiente do QGIS:
+`call "C:\Program Files\QGIS 3.44.14\bin\o4w_env.bat"` e depois `"%PYTHONHOME%\python.exe" script.py`
+(um `.bat` wrapper resolve). No notebook, conferir o caminho do QGIS.
+
+## Onde estamos agora (16/10/2026) — fator LS recalculado e projeto migrado
+
+O fator LS herdado da IC (`Dados Iniciais/LS_raster.tif`, derivado de `LS Alto.tif`) estava
+**defeituoso**: foi calculado sobre o MDE em WGS 84 **geográfico** (pixel em graus), o que corrompe
+os termos de declividade e de área. Conferência de 16/10/2026: correlação LS × declividade de
+**0,047** (0,148 em log), LS praticamente constante (~0,5) em todas as faixas de declividade, de
+0–2% a 70–200%, e expoentes ajustados de 0,13/0,13 contra os 0,4/1,3 de Moore. A declividade foi
+confirmada correta (recálculo independente a partir do MDE, correlação 1,0000).
+
+**LS adotado: `Dados Iniciais/LS_moore.tif`** — Moore e Burch (1986) / Moore et al. (1991) sobre o
+MDE corrigido em UTM, LS = (As/22,13)^0,4 · (sen β/0,0896)^1,3, com a área de contribuição
+específica As limitada a 200 m (comprimento de rampa máximo). Média 7,80 (o antigo era 0,537),
+correlação com a declividade **0,943**. Script: `Scripts/_recalcular_ls_moore.py`. Existe também
+`LS_moore_sem_limite.tif`, **só referência — não usar**. `LS_raster.tif` foi mantido para comparação.
+
+Todos os scripts de resultado adotado foram migrados para o LS novo e re-executados (ver seção 24
+de `Notas Claude/notas_musle_espacializada.md`). Efeito: **o desempenho agregado quase não muda**
+(o LS entra linearmente e o `c` absorve a escala), mas **o mapa muda muito** — só 56,9% dos hot
+spots coincidem com o mapa anterior e a correlação do mapa com K·C·LS sobe de 0,569 para 0,880.
+A hidrologia (volume, λ = 0,20, CN-I, kb) e os testes sem MUSLE não mudaram.
+
 ## Onde estamos agora (15/10/2026) — modelo com vazão de base
 
 - **Achado:** `T_R_m3` = Σ Q·3600 (volume total, inclui vazão de base, 34–55%) e `SYY_t` = Σ Q·CSS·3600 (carga total). O SCS-CN calcula só escoamento direto. Ver seções 15–17 de `Notas Claude/notas_musle_espacializada.md`.
-- **Modelo atual a adotar:** `Scripts/calcular_sy_com_base.py` — Q = Q_direto (SCS-CN, CN-I, λ = 0,20) + vazão de base prevista (kb·Qb_inicio·duração). Saídas `*_vb.tif` e `Dados Iniciais/comparacao_SY_modelo_com_base.csv`. SY previsão pura: NSE 0,50 (in-sample) / 0,375 (LOO aninhado); volume total NSE 0,58.
+- **Modelo atual a adotar:** `Scripts/calcular_sy_com_base.py` — Q = Q_direto (SCS-CN, CN-I, λ = 0,20) + vazão de base prevista (kb·Qb_inicio·duração). Saídas `*_vb.tif` e `Dados Iniciais/comparacao_SY_modelo_com_base.csv`. SY previsão pura: NSE 0,50 (in-sample) / 0,380 (LOO aninhado); volume total NSE 0,58. (Números já com o LS novo, `c` = 0,010216; ver a seção de 16/10/2026 acima.)
 - **Revisões independentes:** `Notas Claude/revisao_independente.md` (rodada 1) e `revisao_independente_modelo_com_base.md` (rodada 2, ao ser concluída).
 - **Rascunho do TCC:** `TCC_Texto/TCC_rascunho_01.md/.docx` (formato Informação CCPG 004/2017); gerador `Scripts/md_para_docx.py`.
 - **Auditoria do evento 11:** `Evento11_Auditoria/` (planilha 01 pronta; planilha 02 com erro de abertura no Excel, pendente).
@@ -156,7 +227,7 @@ na IC), seguindo Hao et al. (2022) — `1-s2.0-S0022169422011490-main.pdf`, já 
 |---|---|---|
 | pr_pixel (vazão de pico local, por pixel) | `Evento {n}/pr{n}.tif` | ✅ pronto, 17 eventos |
 | K (erodibilidade do solo) | `Dados Iniciais/K_raster.tif` | ✅ pronto (média 0,039) |
-| LS (topográfico) | `Dados Iniciais/LS_raster.tif` | ✅ pronto (média 0,536, bate com a IC) |
+| LS (topográfico) | `Dados Iniciais/LS_moore.tif` | ✅ pronto (média 7,80; Moore e Burch 1986 / Moore et al. 1991 sobre o MDE em UTM, As ≤ 200 m — ver 16/10/2026). O antigo `LS_raster.tif` (média 0,536, herdado da IC) está defeituoso e só é usado para comparação |
 | C (uso do solo) | `Dados Iniciais/C_raster.tif` | ✅ pronto (média 0,05 — **confirmado com você**, diferente dos 0,267 da Tabela 3 da IC, que provavelmente usou outra fonte) |
 | P (práticas conservacionistas) | constante = 1,0 | ✅ (sem áreas de preservação ativa) |
 | E_unit (erosão local por pixel) | `Evento {n}/E_unit{n}.tif` | ✅ pronto, 17 eventos — checado: E_unit sempre > sedimento medido em todos os eventos (faz sentido fisicamente) |

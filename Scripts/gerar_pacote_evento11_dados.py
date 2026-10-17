@@ -140,7 +140,7 @@ print(f"S (formula) x arquivo   : dif max = {np.nanmax(np.abs(S - S_arq)):.2e}")
 # ----------------------------------------------------------------------
 K, _ = le(os.path.join(DI, "K_raster.tif"))
 C, _ = le(os.path.join(DI, "C_raster.tif"))
-LS, _ = le(os.path.join(DI, "LS_raster.tif"))
+LS, _ = le(os.path.join(DI, "LS_moore.tif"))
 
 Q_arq, _ = le(os.path.join(EV, "Q11_CN1.tif"))
 mask_q = np.isfinite(Q_arq)
@@ -216,7 +216,7 @@ for nome, mine in [("Q11_CN1", Q), ("pr11", pr), ("E_unit11", E), ("SY11", SY),
 for nome in ["ChuvaIDW11", "Q11_CN1", "pr11", "E_unit11", "SY11",
              "Q11_CN1_obs", "pr11_obs", "E_unit11_obs", "SY11_obs"]:
     shutil.copy2(os.path.join(EV, nome + ".tif"), os.path.join(RAS, nome + ".tif"))
-for nome in ["K_raster", "C_raster", "LS_raster"]:
+for nome in ["K_raster", "C_raster", "LS_moore"]:
     shutil.copy2(os.path.join(DI, nome + ".tif"), os.path.join(RAS, nome + ".tif"))
 grava(os.path.join(RAS, "CN_II_alinhado.tif"), CN2, ds_ref)
 grava(os.path.join(RAS, "CN_I_alinhado.tif"), CN1, ds_ref)

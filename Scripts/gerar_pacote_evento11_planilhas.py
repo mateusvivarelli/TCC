@@ -530,7 +530,7 @@ nC = len(tabC)
 wb.define_name("Classes_C", f"=Classes!$A${r0+3}:$B${r0+2+nC}")
 rr = r0 + 2 + nC + 1
 ws.write(rr, 0, "LS - fator topografico", G["b"])
-ws.write(rr + 1, 0, "Nao e recalculado nesta planilha: vem de LS_raster.tif (metodo de Moore et al. 1991 no SAGA a partir do MDE, segundo a IC). A coluna LS da aba Pixels e o valor do raster amostrado no centro do pixel.")
+ws.write(rr + 1, 0, "Nao e recalculado nesta planilha: vem de LS_moore.tif, calculado neste trabalho por Moore e Burch (1986) / Moore et al. (1991) sobre o MDE corrigido em UTM (SIRGAS 2000 / 23S): LS = (As/22,13)^0,4*(sen(beta)/0,0896)^1,3, com a area de contribuicao especifica As limitada a 200 m (comprimento de rampa maximo). A coluna LS da aba Pixels e o valor do raster amostrado no centro do pixel.")
 ws.write(rr + 2, 0, "Pixels sem classe de solo/uso/LS (656): coluna 'Valido'=0 -> sem E_unit (so entram no volume 'todos os pixels').")
 
 # ---- Roteiro (colunas da aba Pixels) ---------------------------------
@@ -554,7 +554,7 @@ roteiro = [
     ("M", "K", "=PROCV(classe de solo; tabela Classes_K)", "reproduz K_raster.tif em 100% dos pixels"),
     ("N", "Classe de uso", "ponto-em-poligono em Uso Solo Alto.shp (campo CLASSE)", "idem"),
     ("O", "C", "=PROCV(classe de uso; tabela Classes_C)", "reproduz C_raster.tif em 100% dos pixels"),
-    ("P", "LS", "valor do raster LS_raster.tif", "Moore et al. (1991), SAGA, MDE"),
+    ("P", "LS", "valor do raster LS_moore.tif", "Moore e Burch (1986) / Moore et al. (1991) sobre o MDE em UTM, As limitada a 200 m (calculado neste trabalho)"),
     ("Q", "Valido", "=SE(M, O e P existem; 1; 0)", "1 = pixel entra no calculo de E_unit"),
     ("R", "Q (mm)", "=SE(P<=lambda*S; 0; (P-lambda*S)^2/(P+(1-lambda)*S))", "escoamento SCS-CN do pixel (previsao pura)"),
     ("S", "pr (m3/s)", "=Q/1000*A_pixel*RI/R/3600", "vazao de pico local (Hao et al. 2022, Eq. 3)"),

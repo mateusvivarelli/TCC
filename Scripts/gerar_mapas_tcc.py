@@ -53,7 +53,7 @@ def le(p):
     return np.where(ok, a, np.nan), ds
 
 
-K, ds0 = le(os.path.join(DI, "K_raster.tif")); C, _ = le(os.path.join(DI, "C_raster.tif")); LS, _ = le(os.path.join(DI, "LS_raster.tif"))
+K, ds0 = le(os.path.join(DI, "K_raster.tif")); C, _ = le(os.path.join(DI, "C_raster.tif")); LS, _ = le(os.path.join(DI, "LS_moore.tif"))
 gt = ds0.GetGeoTransform(); ny, nx = K.shape; A = abs(gt[1] * gt[5])
 EXT = (gt[0], gt[0] + nx * gt[1], gt[3] + ny * gt[5], gt[3])            # xmin, xmax, ymin, ymax da grade 884x365
 o = gdal.Warp("", gdal.Open(os.path.join(DI, "S - Seco.tif")), format="MEM", width=nx, height=ny,

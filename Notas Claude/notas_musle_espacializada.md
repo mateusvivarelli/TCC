@@ -117,7 +117,7 @@ pixels, ~30m, origem X=318646,35/Y=7435057,59, SIRGAS 2000/UTM 23S):
 | Fator | Arquivo | Fonte | Média obtida | Média na Tabela 3 da IC |
 |---|---|---|---|---|
 | K | `Dados Iniciais/K_raster.tif` | `Pedologia Alto.shp` (campo `Valor`) | 0,039 | 0,031 |
-| LS | `Dados Iniciais/LS_raster.tif` | `LS Alto.tif` (reprojetado de WGS84) | 0,536 | 0,536 (bate exato) |
+| LS | `Dados Iniciais/LS_raster.tif` | `LS Alto.tif` (reprojetado de WGS84) | 0,536 | 0,536 (bate exato) | **DEFEITUOSO — substituído em 16/10/2026 por `LS_moore.tif` (média 7,80); ver seção 24** |
 | C | `Dados Iniciais/C_raster.tif` | `Uso Solo Alto.shp` (campo `Valor`) | 0,050 | 0,267 |
 | P | (constante = 1,0 em toda a bacia) | — | 1,0 | 1,0 |
 
@@ -690,6 +690,8 @@ Alvo "direto" = `T_R_m3 − Σ(Bt)·3600` (separação Bt do projeto).
 
 ## 17. Modelo com vazão de base implementado (15/10/2026) — `Scripts/calcular_sy_com_base.py`
 
+> **Números refeitos em 16/10/2026 com o fator LS corrigido (seção 24):** c = 0,010216; SY NSE 0,501 (in-sample) / 0,380 (LOO); 153.855 pixels válidos (138,08 km²); r do mapa com K·C·LS = 0,880. O que está abaixo é o registro da implementação com o LS antigo.
+
 **Definição.** Q_pixel = Q_dir,k (SCS-CN, CN-I, **λ = 0,20 padrão, fixado a priori**) + q_base (mm, uniforme sobre os 154.011 pixels válidos, 138,22 km²), com
 q_base = V_base/A_bacia·1000 e V_base = kb·Qb_inicio·Duracao_horas·3600 (kb = 1,929, mínimos quadrados pela origem contra Σ Bt·3600 nos 17 eventos).
 Depois: pr = Q/1000·A_pix·(RI/R)/3600; E_unit = 11,8·(Q·pr·A_pix)^0,56·K·C·LS; SY = c·E_unit; **c = 0,13238**.
@@ -739,6 +741,8 @@ Conclusão qualitativa **inalterada**: com as métricas robustas, os modelos que
 
 ## 19. Opção B implementada: modelo de dois componentes (15/10/2026) — `Scripts/calcular_sy_dois_componentes.py`
 
+> **Números refeitos em 16/10/2026 com o fator LS corrigido (seção 24):** c1 = 0,00352; c2 = 0,013106; MedAPE LOO 32,6%; NSE-log LOO 0,477; parcela das encostas mediana 9% (máx. 35%); mapa: 58,5% de hot spots coincidentes e r = 0,692 com K·C·LS. O que está abaixo é o registro da implementação com o LS antigo.
+
 **Modelo:** SY_evento = c1·Σ_pixels E_unit(Q_direto, SCS-CN CN-I λ = 0,20) + c2·(Qb_inicio·duração da CHUVA·3600). A base é um termo da bacia (não vai para os pixels); a duração é a da chuva (máx. dos dois postos), não a do hidrograma (vazamento). c1 = 0,04790; c2 = 0,012932; calibração em log (mínimos quadrados de ln SY), LOO aninhado. Saídas: `Evento N/{Qdir,pr,E_unit,SY}N_b2.tif`, `SY_medio_eventos_b2.tif`, `comparacao_SY_dois_componentes.csv`. O mapa mostra só a parcela das encostas.
 
 Resultados (LOO; MedAPE / fator 2 / NSE-log / Spearman / NSE linear): 
@@ -767,6 +771,8 @@ Comparada com SY = c·V_dir (alvo A), a MUSLE ancorada (λ 0,20) melhora em 5 de
 ---
 
 ## 21. Escada da informação hidrológica: onde está o gargalo (15/10/2026) — `Scripts/_escada_gargalo_chuva_escoamento.py`, figura `TCC_Texto/figuras/escada_gargalo.png`
+
+> **Números da escada refeitos em 16/10/2026 com o LS corrigido (seção 24):** N1 32,6%/71%/0,477; N2 38,8%/71%/0,527; N3 34,1%/94%/0,689; N4 13,6%/94%/0,868 (as linhas "simples (sem MUSLE)" não mudaram).
 
 Modelo B (2 componentes, λ 0,20, c em log, LOO aninhado, alvo carga total) x teste simples de 2 termos com os MESMOS insumos (sem MUSLE):
 | Nível | B: MedAPE / fator 2 / NSE-log | Simples: MedAPE / fator 2 / NSE-log | B melhor em / mediana da diferença (IC95%) |
@@ -800,3 +806,186 @@ Métricas (alvo carga total; MedAPE / fator 2 / NSE-log / Spearman / NSE linear)
 Conclusão: **calibrar a conversão chuva → escoamento (a, λ, S dependente de P, Hawkins, regressões; 11 formas, LOO aninhado) melhora o volume direto (erro mediano 69% → 40–47%; NSE −0,69 → ~0,4), mas NÃO melhora o sedimento do modelo B de forma distinguível** (ΔNSE-log +0,02 a +0,08; IC95% ≈ [−0,15; +0,35]; Wilcoxon p 0,6–0,9) nem supera SY = c·chuva. O coeficiente de escoamento direto medido varia de 0,03 a 0,22 e é praticamente independente da chuva (r = 0,19 em log); o SCS calibrado livremente "se desmonta" (λ → 0, CN-II ≈ 51, ou S ∝ P). O B é insensível à escala do volume (c₁ absorve; E ∝ Q^1,12).
 **Correções ao que eu tinha dito:** (1) o "teto de 12% / 94% em fator 2" exige água medida **e** base observada; só com a água medida e a base prevista o teto é 32,5% / 94% / NSE-log 0,71; (2) o passo "volume previsto por regressão" de `_avaliacao_B_com_Q_bom.py` e `_escada...py` tinha um vazamento pequeno, corrigido na escada (N2: erro mediano do B 34,9% → 39,1%); (3) r = −0,89 com a lâmina só vale em log (−0,63 em linear), e as correlações com Qb_inicio e chuva de 5 dias, refeitas, deram +0,26 e +0,17 (fracas).
 Incorporado ao rascunho 04 (seção 5.2, 5.4, apêndices C e E; limitações k e l).
+
+---
+
+## 24. Conferência do fator LS e migração do projeto (16/10/2026) — `Scripts/_recalcular_ls_moore.py`, `Scripts/_teste_sy_com_ls_moore.py`
+
+### 24.1. O LS herdado da IC estava defeituoso
+
+`Dados Iniciais/LS_raster.tif` (reprojetado de `LS Alto.tif`, herdado da IC) foi calculado sobre o
+MDE em **WGS 84 geográfico** (pixel em graus), o que corrompe os termos de declividade e de área da
+fórmula. Evidência da conferência:
+
+| Teste | Resultado do LS antigo | Esperado |
+|---|---|---|
+| Correlação LS × declividade | **0,047** (linear); 0,148 (log) | forte e positiva |
+| LS por faixa de declividade (0–2% … 70–200%) | praticamente constante, ~0,5 em todas | cresce com a declividade |
+| Expoentes ajustados (As, sen β) | 0,13 / 0,13 | 0,4 / 1,3 (Moore) |
+| Razão LS_antigo / LS_Moore | ≈ 0,06 | ≈ 1 |
+
+A **declividade** foi confirmada correta: recálculo independente a partir do MDE bate com o raster
+usado no projeto (correlação 1,0000). O defeito está no LS, não na declividade.
+
+### 24.2. LS adotado
+
+`Dados Iniciais/LS_moore.tif`, por Moore e Burch (1986) / Moore et al. (1991) sobre o MDE corrigido
+em UTM (SIRGAS 2000 / 23S):
+
+    LS = (As/22,13)^0,4 · (sen β / 0,0896)^1,3
+
+com As = área de contribuição específica (área acumulada / largura da célula, em m), **limitada a
+200 m** (comprimento de rampa máximo da USLE). O limite é necessário: sem ele, As chega a 4,6
+milhões de m nos pixels de canal (a bacia inteira drenando por uma célula) e o LS perde sentido
+físico — a USLE descreve erosão de encosta, não de canal. `LS_moore_sem_limite.tif` existe só como
+referência e **não deve ser usado**. `LS_raster.tif` foi mantido no disco para comparação.
+
+Resultado: média **7,80** (7,8155 nos pixels de cálculo; o antigo era 0,537), mediana 6,76, máximo
+40,3; correlação com a declividade **0,943**; cresce de 0,14 (terreno plano) a ~25 (encostas
+íngremes). Figura: `Figuras/comparacao_LS_antigo_vs_moore.png` (`Scripts/_figura_ls_antigo_vs_novo.py`).
+
+**Efeito colateral na máscara de cálculo:** o LS novo não tem valor em 156 pixels em que o raster de
+declividade é *nodata* (bordas). Os pixels de cálculo passam de **154.011 (138,22 km²) para 153.855
+(138,08 km²)**. Isso desloca o volume do SCS-CN integrado na bacia em −0,15% (13.475 → 13.455 ×10³ m³
+no total dos 17 eventos) e os erros por evento na quarta casa; as métricas agregadas de volume
+(−7,8% / 25,4% / NSE 0,583) não mudam.
+
+### 24.3. O que mudou no resultado (e o que não mudou)
+
+O LS entra **linearmente** em E_unit, e a escala `c` (ou `c₁`) é calibrada, então o desempenho
+agregado quase não muda; o que muda é o **mapa**.
+
+| | LS antigo | LS novo |
+|---|---|---|
+| Modelo com base (`calcular_sy_com_base.py`): `c` | 0,13238 | **0,010216** |
+| SY NSE in-sample / LOO aninhado | 0,498 / 0,375 | **0,501 / 0,380** |
+| SY erro absoluto LOO | 30,2% | 30,2% |
+| Modelo de 2 componentes (adotado no texto): c₁ / c₂ | 0,04790 / 0,012932 | **0,00352 / 0,013106** |
+| B (N1): MedAPE / fator 2 / NSE-log / Spearman (LOO) | 33,1% / 71% / 0,481 / 0,716 | **32,6% / 71% / 0,477 / 0,716** |
+| B (N3, água medida): MedAPE / NSE-log | 32,5% / 0,712 | **34,1% / 0,689** |
+| B (N4, água e base medidas): MedAPE / NSE-log | 11,7% / 0,874 | **13,6% / 0,868** |
+| Parcela das encostas no SY simulado (mediana / máx.) | 10% / 37% | **9% / 35%** |
+| Mapa: r com K·C·LS (modelo com base) | 0,569 | **0,880** |
+| Mapa: r com K·C·LS (2 componentes) | 0,738 | **0,692** (Spearman 0,789) |
+| Mapa: hot spots coincidentes com o mapa λ=0,05 anterior | 97,3% | **56,9%** (58,5% para o de 2 componentes) |
+| Volume total: erro médio / abs. / NSE | −7,8% / 25,4% / 0,583 | **idêntico** |
+| Benchmarks sem MUSLE (LOO): c·T_R / c·V_direto / c·chuva | 0,765 / 0,733 / 0,605 | **idênticos** |
+| IC refeita (α, β; métricas) | 0,978 / 0,733; 16,3% / 100% / 0,867 | **idênticos** (usa K, LS, C médios publicados da IC) |
+
+Hot spots do mapa adotado com o LS novo: C médio 0,212 (bacia 0,050), LS médio 10,3 (bacia 7,8),
+K médio 0,047 (bacia 0,039) — coerente.
+
+**Leitura:** a conclusão qualitativa do trabalho **não muda** (o gargalo é a hidrologia; o modelo
+espacializado empata com testes simples de mesmos insumos; a IC com dados medidos é melhor), mas o
+**mapa de áreas críticas muda muito** e agora é consistente com o relevo: a correlação do mapa com
+K·C·LS sobe de 0,57 para 0,88 no modelo com base, e a contribuição por classe de uso se redistribui
+(lavoura temporária 29% → 23%; campo 36% → 39%; silvicultura 17% → 22%; solo exposto 12% → 9%).
+
+### 24.4. Scripts migrados e re-executados
+
+`calcular_e_unit.py`, `calcular_sy_com_base.py`, `calcular_sy_dois_componentes.py`,
+`gerar_mapas_tcc.py`, `gerar_tabelas_tcc.py`, `gerar_figuras_tcc.py`, `gerar_planilha_comparacao.py`,
+`_avaliacao_metricas_robustas.py`, `_avaliacao_B_com_Q_bom.py`, `_avaliacao_direto_medido.py`,
+`_escada_gargalo_chuva_escoamento.py`, `_tabela_apendice_B.py`, `_comparacao_IC_x_B.py` (só os
+números do B que estavam embutidos em `print`), `gerar_pacote_evento11_dados.py`,
+`gerar_pacote_evento11_mapas.py`, `gerar_pacote_evento11_planilhas.py`.
+
+**Não migrados de propósito (registro histórico de diagnósticos superados):**
+`calcular_sy_final.py` e `calcular_sy_volume_restrito.py` (linha λ = 0,05, saídas `SY_medio_eventos.tif`
+e `*_obs`, usadas como "versão anterior" nas comparações), `calibrar_alfa_beta_pixel.py`,
+`_diagnostico_parte3_lambda_variavel.py`, `_diagnostico_escoamento_direto.py`,
+`_diagnostico_previsao_com_base.py`, `_calibrar_cn_escoamento_direto.py`.
+
+**Constante que NÃO deve ser trocada:** `KLSC = 0,031 · 0,536 · 0,267` em `gerar_tabelas_tcc.py`,
+`gerar_figuras_tcc.py`, `_tabela_apendice_B.py` e `_comparacao_IC_x_B.py` são as médias **publicadas
+pela IC** (Tabela 3 de Vivarelli et al., 2025); trocá-las deixaria de reproduzir a IC.
+
+**Pendência:** as colunas de sedimento da Tabela 19 do rascunho 04 (Apêndice D, conversões
+chuva-escoamento calibradas) e os números de `teste_cn_calibrado.md` foram calculados com o LS
+antigo. Refazê-los depende de `_calibrar_cn_escoamento_direto.py` (forma (i)) e dos scripts do
+revisor independente, que ficaram fora do repositório. As conclusões não dependem desses valores.
+
+---
+
+## 25. Conferência da seção 3.3 (Dados cartográficos) do Google Doc (17/10/2026)
+
+Conferência de cada número da seção 3.3 contra os rasters do projeto.
+
+### 25.1. Confere
+
+| Afirmação na 3.3 | Valor conferido |
+|---|---|
+| grade 884 × 365 pixels | 884 × 365 ✔ |
+| pixel 29,992 × 29,925 m; área 897,49 m² | exato ✔ |
+| SIRGAS 2000 / UTM 23S | EPSG:31983 ✔ |
+| K médio 0,039 | 0,0388 ✔ |
+| C médio 0,050 | 0,0495 ✔ |
+| ~154,7 mil pixels com CN | 154.667 ✔ |
+| Tabela 5: K e C por classe e % dos pixels | todas as 13 linhas conferem na 1ª decimal ✔ |
+
+### 25.2. Corrigido no documento (valores que mudaram com o LS novo)
+
+| | antes | agora |
+|---|---|---|
+| LS médio (Tabela 4) | 0,536 | **7,80** |
+| pixels com todos os fatores | 154,0 mil | **153,9 mil** (153.855) |
+| área correspondente | 138,2 km² | **138,1 km²** (138,08) |
+| pixels de borda descartados | ~650 | **~810** (812) |
+
+Também corrigida a célula da Tabela 4 que trazia `[conferir]`: dizia "MDE (USGS) pelo método de
+Moore et al. (1991) no SAGA", que é a procedência do LS **da IC** (descartado). O LS adotado foi
+calculado em Python/GDAL (`_recalcular_ls_moore.py`) sobre o MDE corrigido em UTM; SAGA/QGIS
+entrou só no tratamento do MDE e na área acumulada (MFD). Nova redação: "MDE de 30 m (USGS),
+corrigido e com área acumulada no SAGA/QGIS; LS por Moore e Burch (1986), com rampa limitada a
+200 m" — consistente com a seção 2.6 do texto.
+
+### 25.3. O CN **não** vem do cruzamento uso × solo (resolve a pendência do item 7 da seção 11)
+
+Rasterizei `Uso Solo Alto.shp` (campo `CLASSE`) e `Pedologia Alto.shp` (campo `Subordem`) **na
+própria grade do `CN TCC.tif`** (973 × 362, sem reamostrar o CN) e cruzei com os três rasters de CN.
+
+1. **AMC I e III são exatamente as conversões de Chow, Maidment e Mays (1988)** aplicadas ao raster
+   de AMC II — conferido nos 20 valores distintos de CN II, com erro < 0,1. Isso está fechado e pode
+   ser escrito com segurança.
+2. **O raster de AMC II não é reproduzível a partir dos mapas de uso e de solo.** Dentro de uma
+   mesma combinação o CN varia: em "Campo" aparecem 77 (44% dos pixels), 81 (32%), 65 (10%), 64 (4%);
+   em "Mata Nativa", 65 (59%), 77 (18%), 52 (17%). E há valores que não são de tabela de CN
+   (55, 67, 69, 72, 73, 74, 78, 82, 84, 88), típicos de média ponderada por área.
+3. **Valor dominante por classe de uso** (serve para reconstruir a tabela, se a original não
+   aparecer): Mata Nativa 65, Campo 77, Silvicultura 65, Lavoura Temporária 77, Área Urbanizada 85,
+   Solo exposto 85, Mineração 77, Afloramento Rochoso 52, Corpos d'Água 98.
+4. **Médias nos 153.855 pixels de cálculo:** CN I = 52,5; CN II = 71,6; CN III = 84,9.
+
+Conclusão: a frase "o cruzamento entre uso e solo deu o número de curva" é imprecisa. Falta pedir ao
+orientador (a) a tabela de CN com a referência, (b) o grupo hidrológico de cada classe de solo,
+(c) a condição hidrológica por classe de uso. Registrado como comentário no Google Doc.
+
+### 25.4. Vazão de base
+
+A frase inconclusa "A vazão de base (Bt) [continuar mais tarde]" foi completada: Bt já vinha
+calculada na base recebida, entra como dado de entrada e não como resultado, e o método de separação
+será confirmado com o orientador (ver seção 17 e a investigação de procedência em
+`dados_area_estudo_plano_bacias.md` §9–11).
+
+### 25.5. Origem do CN resolvida: ANA, BR_CN-2022 (17/10/2026) — `scratchpad/ana_cmp*.py`
+
+O usuário indicou a fonte: **ANA, "Curva Número na Base Ottocodificada (1985, 2014 e 2022)"**
+(catálogo de metadados SNIRH, registro `d1c36d85-a9d5-4f6a-85f7-71c2dc801a67`). Conferido lendo os
+rasters da ANA por `/vsicurl/` (sem baixar o Brasil inteiro) e reamostrando na grade do `CN TCC.tif`:
+
+| Produto ANA | pixels idênticos | valores únicos | média |
+|---|---|---|---|
+| **BR_CN-2022.tif** | **90,7%** — e **100,00%** no interior das manchas homogêneas (73.558 px) | **20, o mesmo conjunto** | 71,60 (nosso: 71,595) |
+| BR_CN-1985.tif | 55,7% | 17 | 70,60 |
+
+As divergências com o 2022 ficam só nas bordas entre classes (efeito da reprojeção). O pixel de
+27,25 × 30,17 m do `CN TCC.tif` também denuncia a origem geográfica (0,000269495° ≈ 27,6 × 30,0 m
+nessa latitude). **Conclusão: `CN TCC.tif` = BR_CN-2022 reprojetado para SIRGAS 2000 / UTM 23S.**
+
+Isso explica o item 25.3: o CN não bate com os mapas de uso/solo do Plano de Bacias porque vem de
+**outros mapas** — uso do MapBiomas (coleção 2023, ano 2022) e solo do IBGE, com grupos
+hidrológicos de Sartori, Lombardi Neto e Genovez (2005). Inconsistência registrada no texto como
+limitação: CN e K/C usam mapas de uso diferentes.
+
+Aplicado no Google Doc: frase de abertura da 3.3, célula CN da Tabela 4 (fonte + "71,6 (AMC II)")
+e parágrafo de procedência do CN depois de "Todos os rasters..." (substitui o antigo [PENDENTE]).

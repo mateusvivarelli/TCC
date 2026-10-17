@@ -6,7 +6,7 @@ seguindo Hao et al. (2022), Eq. (1):
 
 Q e pr em suas unidades locais (Q em mm, pr em m3/s, Area_unit em m2);
 K, C, LS ja preparados como rasters (Dados Iniciais/K_raster.tif,
-LS_raster.tif, C_raster.tif); P=1,0 constante (sem areas de preservacao
+LS_moore.tif, C_raster.tif); P=1,0 constante (sem areas de preservacao
 ativa na bacia, conforme a IC).
 """
 
@@ -33,7 +33,7 @@ def carrega(caminho):
 
 
 K, K_nodata, gt, proj, xsize, ysize = carrega(os.path.join(PASTA_DADOS, "K_raster.tif"))
-LS, LS_nodata, _, _, _, _ = carrega(os.path.join(PASTA_DADOS, "LS_raster.tif"))
+LS, LS_nodata, _, _, _, _ = carrega(os.path.join(PASTA_DADOS, "LS_moore.tif"))
 C, C_nodata, _, _, _, _ = carrega(os.path.join(PASTA_DADOS, "C_raster.tif"))
 
 pixel_w = abs(gt[1])

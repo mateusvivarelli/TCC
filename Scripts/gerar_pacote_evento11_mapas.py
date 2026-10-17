@@ -65,10 +65,10 @@ proj = QgsProject.instance()
 proj.setCrs(QgsCoordinateReferenceSystem("EPSG:31983"))
 ramp_of = {"ChuvaIDW11": "Blues", "S_CN_I_alinhado": "YlOrBr", "Q11_CN1": "Viridis", "pr11": "Magma",
            "E_unit11": "YlOrRd", "SY11": "YlOrRd", "Q11_CN1_obs": "Viridis", "pr11_obs": "Magma",
-           "E_unit11_obs": "YlOrRd", "SY11_obs": "YlOrRd", "K_raster": "YlOrBr", "C_raster": "YlGn", "LS_raster": "Spectral",
+           "E_unit11_obs": "YlOrRd", "SY11_obs": "YlOrRd", "K_raster": "YlOrBr", "C_raster": "YlGn", "LS_moore": "Spectral",
            "CN_II_alinhado": "Spectral", "CN_I_alinhado": "Spectral"}
 style = QgsStyle.defaultStyle()
-rasters = ["ChuvaIDW11", "CN_II_alinhado", "CN_I_alinhado", "S_CN_I_alinhado", "K_raster", "C_raster", "LS_raster",
+rasters = ["ChuvaIDW11", "CN_II_alinhado", "CN_I_alinhado", "S_CN_I_alinhado", "K_raster", "C_raster", "LS_moore",
            "Q11_CN1", "pr11", "E_unit11", "SY11", "Q11_CN1_obs", "pr11_obs", "E_unit11_obs", "SY11_obs"]
 ordem = []
 for nome in rasters:

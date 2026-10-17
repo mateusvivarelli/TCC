@@ -6,7 +6,9 @@ cronológico completo, com todas as tentativas descartadas, está em
 [notas_qgis_calibracao_qp.md](notas_qgis_calibracao_qp.md) (Fase 1) e
 [notas_musle_espacializada.md](notas_musle_espacializada.md) (Fase 2).
 
-Atualizado em 21/09/2026.
+Atualizado em 21/09/2026; números do fator LS e do mapa revisados em 16/10/2026 (ver seção 24 de
+[notas_musle_espacializada.md](notas_musle_espacializada.md): o LS herdado da IC estava defeituoso e
+foi recalculado por Moore e Burch, 1986 / Moore et al., 1991, sobre o MDE em UTM).
 
 ---
 
@@ -33,12 +35,12 @@ Y=7.432.277,5 (SIRGAS 2000 / UTM 23S).
 |---|---|---|
 | Mapa pedológico (`Pedologia Alto.shp`) | fator **K** (erodibilidade) | 0,039 |
 | Mapa de uso do solo (`Uso Solo Alto.shp`) | fator **C** (cobertura) | 0,050 |
-| MDE + declividade | fator **LS** (topográfico) | 0,536 |
+| MDE + declividade | fator **LS** (topográfico), `LS_moore.tif`: LS = (As/22,13)^0,4 · (sen β/0,0896)^1,3, As ≤ 200 m | 7,80 |
 | — | fator **P** (práticas conservacionistas) | 1,0 (constante) |
 | Interseção pedologia × uso do solo | mapa de **CN** em 3 cenários de umidade | — |
 
 Grade de referência: 884 × 365 pixels de ~30 m (897,49 m² por pixel), ~154 mil pixels válidos
-cobrindo os 137,8 km² da bacia. SIRGAS 2000 / UTM 23S.
+cobrindo os 137,8 km² da bacia (153.855 pixels com todos os fatores, 138,08 km²). SIRGAS 2000 / UTM 23S.
 
 ---
 
@@ -194,8 +196,13 @@ que documentaram inadequação estrutural do SCS-CN em bacia brasileira.
 
 - Correlação espacial entre o mapa médio com e sem restrição de volume: **r = 0,9941**
 - Coincidência dos hot spots (5% superiores): **96,9%**
-- Hot spots têm C médio 0,247 (bacia: 0,050) e LS médio 0,791 (bacia: 0,537)
-- Correlações: SY × C = 0,70; SY × LS = 0,19
+- Hot spots têm C médio 0,247 (bacia: 0,050) e LS médio 0,791 (bacia: 0,537) — *com o LS antigo*
+- Correlações: SY × C = 0,70; SY × LS = 0,19 — *com o LS antigo*
+- **Refeito em 16/10/2026 com o LS corrigido, para o mapa adotado (modelo com vazão de base):** hot
+  spots têm C médio 0,230 (bacia 0,050), LS médio 11,2 (bacia 7,8) e K médio 0,047 (bacia 0,039);
+  SY × C = 0,68; SY × LS = 0,18; SY × K·C·LS = 0,88 (era 0,57). No mapa do modelo de dois
+  componentes: C 0,212, LS 10,3, SY × K·C·LS = 0,69. A coincidência de hot spots entre o mapa novo e
+  o da linha λ = 0,05 cai para 56,9%: o padrão espacial muda muito com o LS corrigido.
 
 **Interpretação:** a localização das áreas críticas é robusta à correção hidrológica. A correção
 afeta a magnitude por evento, não o padrão espacial — propriedade desejável, já que o objetivo do

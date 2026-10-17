@@ -83,7 +83,7 @@ def nse_log(sim):
     return 1 - np.sum((lo - ls) ** 2) / np.sum((lo - lo.mean()) ** 2)
 
 # confere com os valores documentados
-print(f"conf novo: adotado NSE={nse(S_base):.4f} (0,498) LOO={nse(L_base):.4f} (0,375) | c*T_R NSE={nse(s_tr):.4f} (0,809) LOO={nse(l_tr):.4f} (0,765)")
+print(f"conf novo: adotado NSE={nse(S_base):.4f} (0,501) LOO={nse(L_base):.4f} (0,380) | c*T_R NSE={nse(s_tr):.4f} (0,809) LOO={nse(l_tr):.4f} (0,765)")
 print(f"conf: conc.modelo NSE={nse(s_mod):.4f} (0,4412) | conc.medidos NSE={nse(s_med):.4f} (0,8476) | prev NSE={nse(s_prev):.4f} (0,3714) "
       f"LOO={nse(l_prev):.4f} (0,2816) | rest NSE={nse(s_rest):.4f} (0,8052) LOO={nse(l_rest):.4f} (0,7759) | AB NSE={nse(SIM_AB):.4f} (0,6121) | FCI NSE={nse(SIM_FCI):.4f} (0,2056)")
 

@@ -26,3 +26,10 @@ __pycache__/
 .claude/
 # Arquivos temporarios de bloqueio do Office
 ~$*
+
+# grandes demais para o GitHub (17/10/2026)
+RELAT_FINAL_E_ANEXOS.pdf
+# pacote do evento 11: arquivos pesados, regeráveis por Scripts/gerar_pacote_evento11_*.py
+Evento11_Auditoria/dados_evento11.pkl
+Evento11_Auditoria/1_Planilhas/02_Evento11_Pixel_a_Pixel.xlsx
+Evento11_Auditoria/2_Shapefiles_QGIS/Pixels_Evento11.*

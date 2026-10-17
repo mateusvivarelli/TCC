@@ -1,11 +1,11 @@
 | Classe de uso | Área (%) | Sedimento, modelo calculado (%) | kg/pixel, calculado | Sedimento, modelo forçado (%) | kg/pixel, forçado | Contribuição / área, calculado (%) |
 |---|---|---|---|---|---|---|
-| Mata Nativa | 39,6 | 4,9 | 0,17 | 4,0 | 0,38 | 12 |
-| Campo | 29,0 | 36,4 | 1,70 | 35,8 | 4,67 | 125 |
+| Mata Nativa | 39,6 | 6,3 | 0,20 | 5,2 | 0,46 | 16 |
+| Campo | 29,0 | 39,4 | 1,68 | 39,5 | 4,73 | 136 |
 | Área Urbanizada | 14,1 | 0,0 | 0,00 | 0,0 | 0,00 | 0 |
-| Silvicultura | 12,7 | 17,0 | 1,82 | 14,9 | 4,46 | 134 |
-| Lavoura Temporária | 3,9 | 28,7 | 9,91 | 26,1 | 25,09 | 729 |
-| Solo exposto | 0,5 | 11,6 | 34,40 | 17,6 | 145,20 | 2.533 |
+| Silvicultura | 12,7 | 21,6 | 2,11 | 19,3 | 5,29 | 170 |
+| Lavoura Temporária | 3,9 | 22,5 | 7,04 | 20,7 | 18,27 | 570 |
+| Solo exposto | 0,5 | 8,6 | 23,08 | 13,4 | 101,33 | 1.866 |
 | Corpos D'Água | 0,2 | 0,0 | 0,00 | 0,0 | 0,00 | 0 |
-| Mineração | 0,0 | 1,4 | 38,47 | 1,4 | 113,81 | 2.833 |
-| Afloramento Rochoso | 0,0 | 0,0 | 0,19 | 0,0 | 0,24 | 14 |
+| Mineração | 0,0 | 1,7 | 44,24 | 1,9 | 134,72 | 3.578 |
+| Afloramento Rochoso | 0,0 | 0,0 | 0,12 | 0,0 | 0,16 | 10 |
