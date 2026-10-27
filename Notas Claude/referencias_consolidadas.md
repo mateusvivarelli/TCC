@@ -126,3 +126,5 @@ KOSKELO, A. I.; FISHER, T. R.; UTZ, R. M.; JORDAN, T. E. A new precipitation-bas
 MEI, Y.; ANAGNOSTOU, E. N. A hydrograph separation method based on information from rainfall and runoff records. **Journal of Hydrology**, v. 523, p. 636-649, 2015. DOI: https://doi.org/10.1016/j.jhydrol.2015.01.083. [link enviado pelo orientador; dados do Crossref]
 
 Ainda falta: o trabalho em que a IC se baseou (link do Drive; "fazem a separação e não consideram o Q de base") — pedir o nome do arquivo.
+
+WOODWARD, D. E.; HAWKINS, R. H.; JIANG, R.; HJELMFELT JR., A. T.; VAN MULLEM, J. A.; QUAN, Q. D. Runoff curve number method: examination of the initial abstraction ratio. In: WORLD WATER & ENVIRONMENTAL RESOURCES CONGRESS, 2003, Philadelphia. **Proceedings** [...]. Reston: American Society of Civil Engineers, 2003. p. 1-10. DOI: https://doi.org/10.1061/40685(2003)308. [metadados conferidos no Crossref em 27/10/2026; a fórmula de conversão S₀,₀₅ = 1,33·S₀,₂₀^1,15 (S em polegadas) foi citada de memória — conferir no texto do artigo; local do congresso a conferir]

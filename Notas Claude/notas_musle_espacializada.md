@@ -1119,3 +1119,30 @@ multiplicado pelos K·C·LS médios.
 absoluta; a razão pico/volume da chuva já acompanha a medida entre eventos. O problema não é o qp, é onde a água cai.
 Ressalvas: somar picos de pixels não é físico (sem propagação); e K = 0 / C = 0 no urbano é premissa (área urbana com
 solo exposto, obras e vias não pavimentadas produz sedimento).
+
+
+---
+
+## 30. Alternativas ao CN-I + λ 0,20: CN-II e λ 0,05 com retenção convertida (27/10/2026)
+
+Teste (só escoamento direto; c em log; LOO; alvo carga total). Volume contra o escoamento direto medido.
+
+| cenário | vol SCS/medido (mediana) | viés total | NSE vol | MC MedAPE / f2 / NSE-log | MFM MedAPE / f2 / NSE-log |
+|---|---|---|---|---|---|
+| CN-I, λ 0,20 (adotado) | 0,58 | −12% | −0,69 | 97,9 / 24 / −3,95 | 38,7 / 94 / 0,50 |
+| CN-I, λ 0,05 sem converter | 2,01 | +94% | −5,92 | 63,2 / 47 / −0,09 | 18,5 / 94 / 0,81 |
+| **CN-I, λ 0,05, S convertido (Woodward)** | 0,86 | **+3%** | **−0,39** | 81,1 / 35 / −0,69 | **20,6 / 94 / 0,84** |
+| CN-II, λ 0,20 | 2,83 | +173% | −17,5 | 67,5 / 41 / −0,35 | 19,8 / 94 / 0,82 |
+| CN-III, λ 0,20 | 5,15 | — | −64,6 | 50,9 / 59 / 0,25 | 18,4 / 94 / 0,81 |
+| CN-II, λ 0,05, S convertido | 2,96 | +173% | −15,1 | 55,5 / 59 / 0,11 | 18,6 / 94 / 0,81 |
+| ref.: c·chuva / IC | — | — | — | 41,9 / 82 / 0,53 | IC 16,3 / 100 / 0,87 |
+
+Conversão: S₀,₀₅ = 1,33·S₀,₂₀^1,15 (polegadas; Woodward et al., 2003 — metadados no Crossref conferidos, fórmula de
+memória). **Leitura:** CN-I + λ 0,05 com S convertido é a única opção que melhora a água (viés +3%, NSE do volume −0,39,
+melhor de todos) e, ao mesmo tempo, corrige o padrão espacial do MFM (≈ IC), com o mesmo λ e CN nos dois modelos. O MC
+segue abaixo de c·chuva. CN-II e λ 0,05 sem conversão melhoram o sedimento inflando a água (+173% / +94%). **Proposta a
+levar ao orientador; nada foi migrado.** Antes de adotar: conferir a fórmula no original, comparar os mapas de áreas
+críticas e descrever a escolha pelo critério do volume (escolhida após ver os resultados).
+Histórico: a conversão de Woodward já tinha sido testada num rascunho de 16/10 (scratchpad, contra o volume total, nunca
+registrada); a "forma assintótica de Hawkins" do Apêndice D é outra coisa (CN dependente da chuva, do revisor
+independente).
