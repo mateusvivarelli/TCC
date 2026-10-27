@@ -1089,3 +1089,33 @@ DOI 10.1002/hyp.9391), e enviou a série (`Dados Iniciais/serie_Q_Qb_Qquick_Eckh
   (com 0,58: r = 0,982, BFI 0,567 contra 0,659) — **confirmar com o orientador**.
 - Por que os testes de 16/10 falharam: a busca ia só até α = 0,98.
 - Isso fecha a pendência das seções 15–17 e de `dados_area_estudo_plano_bacias.md` §9–11.
+
+---
+
+## 29. Por que o MFM (espacializado) fica abaixo da IC (concentrada) — `Scripts/_diagnostico_espacial_x_concentrado.py` (27/10/2026)
+
+As entradas não são as mesmas: a IC usa o volume total, o pico medido e dois parâmetros (α, β livres). Escada da
+IC ao MFM (LOO, calibração em log; MedAPE / fator 2 / NSE-log / NSE linear):
+
+| passo | MedAPE | f2 | NSE-log | NSE lin |
+|---|---|---|---|---|
+| 1 IC: α·(T_R·qp)^β, β livre | 16,3 | 100 | 0,87 | 0,77 |
+| 2 β fixo 0,56 | 18,9 | 94 | 0,83 | 0,78 |
+| 3 volume direto no lugar do total | 19,1 | 94 | 0,81 | 0,75 |
+| 4 pico estimado da chuva (RI/R) | 22,2 | 94 | 0,80 | 0,70 |
+| 5 espacial, padrão λ 0,05 | 18,5 | 94 | 0,81 | 0,75 |
+| 6 espacial, padrão λ 0,20 (MFM adotado) | 38,7 | 94 | 0,50 | 0,50 |
+
+**Leitura:** as diferenças de formulação custam pouco (passos 1 a 4); espacializar em si não custa nada (passo 5 ≈
+passo 4); **toda a perda está no padrão espacial do SCS-CN com λ = 0,20**. Mecanismo: com Ia = 0,2·S, nos eventos de
+chuva pequena só os pixels de CN mais alto (urbanos, CN 85–89) geram escoamento (60–93% dos pixels sem escoamento nos
+eventos 1, 4, 6, 7, 10 e 12). Esses pixels têm C = 0 / K = 0 (18,7% da bacia). Forçado o volume medido, 90% dele cai
+em pixel sem erosão no evento 1 (75% no 12, 72% no 10, 65% no 4), contra 26–35% nos eventos grandes; com λ 0,05,
+23–41% em todos. Correlação entre essa fração e log(MFM/medido): −0,65. Resultado: subestima os pequenos (−49%, −80%,
+−36%), a calibração em log sobe c e superestima os grandes (+25% a +90%). Na IC não existe "onde": o volume é
+multiplicado pelos K·C·LS médios.
+**Forçar também o pico** (pr_k = Q_k·A/1000·qp_med/V_dir, de modo que Σpr = qp medido): não melhora (λ 0,20: 41,1% /
+82% com pico direto, 42,2% com pico total, contra 38,7% / 94%; λ 0,05: 19–20,5% contra 18,5%). O c absorve a escala
+absoluta; a razão pico/volume da chuva já acompanha a medida entre eventos. O problema não é o qp, é onde a água cai.
+Ressalvas: somar picos de pixels não é físico (sem propagação); e K = 0 / C = 0 no urbano é premissa (área urbana com
+solo exposto, obras e vias não pavimentadas produz sedimento).
