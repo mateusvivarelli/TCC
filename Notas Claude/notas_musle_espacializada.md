@@ -989,3 +989,39 @@ limitação: CN e K/C usam mapas de uso diferentes.
 
 Aplicado no Google Doc: frase de abertura da 3.3, célula CN da Tabela 4 (fonte + "71,6 (AMC II)")
 e parágrafo de procedência do CN depois de "Todos os rasters..." (substitui o antigo [PENDENTE]).
+
+---
+
+## 26. Dúvidas do orientador e respostas (26/10/2026)
+
+O orientador revisou o material e não entendeu dois pontos. Respostas dadas ao usuário (base para o texto):
+
+1. **De onde veio a vazão de base:** coluna `Bt` de `Dados_finais_histereses_corrigido.xlsx` (Planilha1,
+   col. G), a mesma série horária de Q e CSS do Murillo-Bermúdez — **não foi calculada por nós**; método
+   não documentado (Lyne-Hollick e Eckhardt não reproduzem). Como a planilha é do próprio orientador,
+   devolver a pergunta: quem gerou `Bt` e como. O modelo de previsão **não lê `Bt`**: o termo de base
+   usa Qb_inicio × duração da chuva; `Bt` só serve para (a) mostrar que T_R é volume total e (b) o
+   diagnóstico "água e base observadas".
+2. **Por que a "base" carrega a maior parte do sedimento no modelo de dois componentes:** o termo
+   c₂·Qb_inicio·T_chuva fica com 65–100% do SY previsto (mediana 91%). **Não é partição física**: mesmo
+   com CSS igual, a base levaria no máximo sua fração do volume (34–55%). É estatístico: a MUSLE das
+   encostas depende do escoamento direto do SCS-CN, que prevê mal (sozinha: 24% em fator 2), e
+   Qb_inicio × duração mede o tamanho/umidade do evento. Sugestão de texto: chamar de **"termo de escala
+   do evento"**, declarar que a partição é de ajuste; alternativa física (só se o orientador quiser):
+   sedimento da base = Bt × CSS pré-evento, sem calibrar.
+3. **Por que o modelo forçado melhora:** recebe a água medida — o SCS-CN erra o volume direto em 69%
+   (mediana) e E ∝ Q^1,12; a carga medida é Σ Q·CSS (circularidade parcial). Parcela das encostas sobe de
+   9% para ~38%. Não é previsão, é teto. A MUSLE acrescenta pouco sobre SY = c·volume medido (14% × 17,6%).
+4. **Por que separar a base (o modelo antigo "funcionava"?):** o antigo (CN-I, λ = 0,05, alvo T_R)
+   acertava só a média (+0,5%) por compensação — contra o escoamento direto errava +92%; volume abs. 47% /
+   NSE 0,18 contra 25,5% / 0,58; sedimento MedAPE 62,6% → 33%, fator 2 53% → 71%, NSE-LOO 0,28 → 0,38; e
+   o mapa erodia encostas com água subterrânea. Trade-off: λ = 0,05 no modelo com base dá NSE-LOO 0,56 mas
+   volume NSE −0,76 — adotado 0,20 por coerência física.
+5. **SY = c·chuva:** forma linear pela origem, c = **19,7 t/mm**, calibrado em log (média geométrica de
+   SY/R; por MQ linear seria 22,3, puxado pelo evento 15), refeito a cada rodada do LOO.
+6. **Comparações justas (mesma informação):** só chuva → c·chuva (42% / 82%) × calculado (33% / 71%):
+   empate. Água medida → IC concentrada (16% / 100% / NSE-log 0,87) × forçado (14% / 94% / 0,87): empate.
+   Leitura: espacializar não custa precisão; o limite é chuva → escoamento. Não comparar calculado × IC.
+
+Obs.: em 26/10 os três CSVs de `Dados Iniciais/` apareciam modificados (gravados em 17/10 21h), mas os
+valores são idênticos aos do commit — só formatação. O progresso do notebook não tinha sido enviado ao GitHub.

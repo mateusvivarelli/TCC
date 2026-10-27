@@ -94,6 +94,8 @@ ancorado ou formatação mista, usar edição por índice (de trás para frente,
   P(x) = (P₁·d₂² + P₂·d₁²) / (d₁² + d₂²). Colar LaTeX no Docs **não funciona**; ou se digita no
   editor (`\frac` + espaço, `_`, `^`, setas) ou se cola a linha Unicode.
 
+**Atualização 26/10/2026:** o orientador revisou e teve dúvidas sobre (1) a origem da vazão de base e (2) por que o termo de base carrega ~91% do sedimento no modelo de dois componentes. Respostas e sugestão de reformulação do texto ("termo de escala do evento") em `notas_musle_espacializada.md` §26.
+
 **Pendências abertas (em ordem de prioridade):**
 1. **Perguntar ao orientador** como foi separada a vazão de base (coluna `Bt`) — método não
    documentado; os filtros de Lyne-Hollick e Eckhardt não reproduzem a série (ver
