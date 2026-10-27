@@ -107,3 +107,20 @@ ZANCHIN, M. **Perda e aporte de sedimentos estimados pelos modelos RUSLE e SEDD 
 - Se adotar 2023 para o artigo do IJRBM (ano do fascículo), atualizar as chamadas "(MURILLO-BERMÚDEZ
   et al., 2021)" no texto.
 - Moore et al. (1991) não é mais citado no texto (o LS agora é atribuído a Moore e Burch, 1986).
+
+
+---
+
+## Acrescentadas em 27/10/2026 (mensagens do orientador sobre vazão de base e fundamentação)
+
+ARNOLD, J. G.; SRINIVASAN, R.; MUTTIAH, R. S.; WILLIAMS, J. R. Large area hydrologic modeling and assessment part I: model development. **Journal of the American Water Resources Association**, v. 34, n. 1, p. 73-89, 1998. DOI: https://doi.org/10.1111/j.1752-1688.1998.tb05961.x. [SWAT; conferir]
+
+BEDIENT, P. B.; HUBER, W. C. **Hydrology and floodplain analysis**. 2. ed. Reading: Addison-Wesley, 1992. [a frase "more of an art than a science" veio citada em outro artigo; usar apud se não consultar o livro]
+
+COLLISCHONN, W.; FAN, F. M. Defining parameters for Eckhardt's digital baseflow filter. **Hydrological Processes**, v. 27, n. 18, p. 2614-2622, 2013. DOI: https://doi.org/10.1002/hyp.9391. [DOI enviado pelo orientador; título, autores e páginas de memória — conferir]
+
+Links enviados pelo orientador, ainda não identificados (abrir e completar):
+- https://www.sciencedirect.com/science/article/pii/S0022169412003551 (Journal of Hydrology, 2012; provável fonte da frase de Bedient e Huber)
+- https://www.sciencedirect.com/science/article/pii/S2589915520300213 (Journal of Hydrology X, 2020)
+- https://www.sciencedirect.com/science/article/pii/S002216941500102X — "A hydrograph separation method based on information from rainfall and runoff records" (Journal of Hydrology, 2015; autores a conferir)
+- Trabalho em que a IC se baseou (link do Drive; "fazem a separação e não consideram o Q de base") — pedir o nome do arquivo.

@@ -212,3 +212,41 @@ Novo título: **"5.4 A MUSLE espacializada e os testes simples"**. Texto sugerid
 | Figura 7 (nova: escoamento SCS-CN × medido) | `TCC_Texto/figuras/fig_volume_direto.png` |
 | Figuras 8–11 | `TCC_Texto/figuras/mapas/mapa_04` a `mapa_07` |
 | Escada do gargalo (se usar) | `TCC_Texto/figuras/escada_gargalo.png` |
+
+
+---
+
+# Atualização de 27/10/2026 — origem da vazão de base resolvida + sugestões do orientador
+
+## A. Vazão de base: o método agora é conhecido
+
+O orientador confirmou: **filtro digital recursivo de Eckhardt (2005)**, com os coeficientes calibrados com base em Collischonn e Fan (2013), DOI 10.1002/hyp.9391. A série que ele enviou está salva em `Dados Iniciais/serie_Q_Qb_Qquick_Eckhardt_orientador.xlsx`.
+
+- **É a mesma série que usamos** (coluna Bt): correlação de 0,99999, e as somas por evento diferem de 0,1% a 0,4%. Nenhum resultado muda.
+- **Ela é reproduzida exatamente** pelo filtro com **α = 0,995 e BFImax = 0,70** (diferença de 10⁻¹⁵; `Scripts/_conferir_filtro_eckhardt.py`).
+  - ⚠️ O cabeçalho da planilha diz "alpha=0.995, BFImax=0.58", mas com 0,58 a série não bate (correlação de 0,982). **Confirmar com o orientador qual é o valor calibrado.** Pelos dados, é 0,70.
+  - BFI da série inteira (nov/2018 a mar/2021): 0,66. Dentro das janelas dos eventos, a base é 34% a 55% do volume.
+  - Possível pergunta da banca: Eckhardt (2005) sugere BFImax de cerca de 0,25 para rios perenes sobre aquífero em rocha cristalina, e a bacia é 86% embasamento cristalino fraturado. O 0,70 calibrado precisa da justificativa de Collischonn e Fan (2013). Conferir os valores-guia no artigo de Eckhardt antes de citar.
+
+**No Doc:**
+- **§2.4, última frase.** "Neste trabalho, a série de vazão de base foi fornecida junto com os dados de monitoramento, sem que o método de separação esteja documentado na fonte."
+  → "Neste trabalho, a vazão de base foi separada pelo filtro de Eckhardt (2005), aplicado à série horária de vazão da seção de controle, com os parâmetros calibrados conforme Collischonn e Fan (2013): α = 0,995 e BFImax = 0,70."
+- **§2.4, equação do filtro** (opcional, mas recomendada):
+  bₜ = [(1 − BFImax) · α · bₜ₋₁ + (1 − α) · BFImax · Qₜ] / (1 − α · BFImax), com bₜ ≤ Qₜ,
+  em que bₜ é a vazão de base, Qₜ a vazão total na hora t, α o parâmetro de recessão e BFImax o índice de vazão de base máximo.
+- **§2.4, frase sugerida pelo orientador** sobre a dificuldade da separação: a ideia é de Bedient e Huber (1992), "a separação da vazão de base é uma simplificação de processos complexos, considerada mais arte que ciência". Ele mandou a frase em inglês, citada dentro de outro artigo (provavelmente o do link S0022169412003551). Se for citar, usar "(BEDIENT; HUBER, 1992 apud AUTOR, ANO)" com o artigo de onde foi tirada, ou consultar o livro.
+- **Tabela 1, linha Bt.** "Separada da série de vazão pela fonte dos dados; método não documentado" → "Filtro de Eckhardt (2005) aplicado à vazão horária (α = 0,995; BFImax = 0,70)".
+- **§3.2, parágrafo "O volume e a carga medidos…"** acrescentar "(separada pelo filtro de Eckhardt, seção 2.4)" depois de "A vazão de base (coluna Bt da série)".
+- **Reforço para a decisão de tirar a base:** o orientador lembrou que o trabalho em que a IC se baseou "faz a separação e não considera o Q de base". Vale citar esse trabalho na §4.5 como precedente. O link do Drive que ele mandou não abriu com o ID lido na imagem; pedir o nome do arquivo.
+
+## B. Sugestões de redação do orientador (mensagens de 27/10)
+
+1. **Introdução:** escrever mais e citar mais trabalhos. Falar dos tipos de abordagem para avaliar erosão em bacias (medição direta, modelos empíricos como USLE/RUSLE/MUSLE, modelos de base física), de por que é importante avaliar a erosão e de por que é importante espacializar.
+2. **Justificativa:** mais técnica, sem falar dos prazos do TCC. Reescrever o parágrafo "Passar de uma pesquisa de calibração técnica…". Sugestão:
+   > A gestão da erosão em uma bacia depende de saber onde o sedimento é produzido, e não apenas quanto chega ao exutório. Modelos concentrados, calibrados no exutório, reproduzem a carga total, mas atribuem à bacia inteira valores médios de solo, uso e relevo, o que impede identificar as áreas que mais contribuem. O monitoramento hidrossedimentológico distribuído, com várias seções de medição, é caro e depende da coincidência entre eventos de chuva significativos e campanhas de campo. A espacialização da MUSLE em células, alimentada por dados cartográficos disponíveis e calibrada com o monitoramento já existente no exutório, permite estimar a distribuição espacial da produção de sedimentos e direcionar medidas de conservação às áreas críticas.
+3. **Fundamentação teórica:**
+   - citar mais trabalhos que usam a MUSLE e dizer que é uma das abordagens mais usadas, inclusive dentro de modelos como o SWAT (ARNOLD et al., 1998; a documentação teórica do SWAT descreve a MUSLE como o método de erosão do modelo);
+   - em "2.1 Erosão hídrica em escala de evento": por que a escala de evento importa (os eventos de chuva intensa respondem pela maior parte do sedimento movimentado), sempre com citação;
+   - trabalhos com a MUSLE no Brasil. Já temos na lista: Avanzi et al. (2008), o artigo da RBCS de 2011 (autores a conferir pelo DOI), Hoppen, Salvador e Michel (2019) e Sadeghi et al. (2014, revisão mundial);
+   - pode reaproveitar texto do relatório da IC (`Relatório Final PIBIC 24_25.pdf`).
+4. **Tabela 5 separada em K e C:** já feito. `TCC_Texto/tabelas/tab_fator_K.md` e `tab_fator_C.md`, com a fonte de cada valor tirada do artigo da IC. Três valores de C (área urbanizada = 0, mineração = 1, afloramento rochoso = 1) e o K = 0 da área urbana não têm fonte na IC; estão marcados para conferir.

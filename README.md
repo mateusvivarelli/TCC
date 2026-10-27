@@ -65,6 +65,15 @@ para quem não tem formação em hidrologia. A revisão que a acompanhou gerou c
 `Notas Claude/notas_musle_espacializada.md` e os ajustes em `Notas Claude/base_para_redacao_tcc.md` (comparação com Hao e
 Baert, autoria de Valle Junior et al.). Pontos ainda a confirmar estão no Apêndice D da apostila.
 
+## Atualização 27/10/2026
+
+- **Vazão de base: método confirmado** — filtro de Eckhardt (2005), α = 0,995 e BFImax = 0,70, calibrado segundo
+  Collischonn e Fan (2013). A série do orientador é a mesma Bt que usamos; nada muda nos resultados. O cabeçalho da
+  planilha diz BFImax = 0,58, mas a série só bate com 0,70: confirmar com o orientador. Ver notas §28.
+- **Sugestões de redação do orientador** (introdução, justificativa, fundamentação, MUSLE no SWAT e no Brasil) e textos
+  sugeridos: `Notas Claude/mudancas_docs_sem_base_26-10.md`, parte "Atualização de 27/10/2026".
+- Tabela 5 separada em K e C: `TCC_Texto/tabelas/tab_fator_K.md` e `tab_fator_C.md`.
+
 ## Onde estamos agora (26/10/2026) — VAZÃO DE BASE REMOVIDA (ler primeiro)
 
 **Decisão com o orientador:** λ = 0,20 e **sem termo de vazão de base**. A MUSLE usa só o escoamento direto
@@ -110,7 +119,7 @@ ancorado ou formatação mista, usar edição por índice (de trás para frente,
 **Atualização 26/10/2026:** o orientador revisou e teve dúvidas sobre (1) a origem da vazão de base e (2) por que o termo de base carrega ~91% do sedimento no modelo de dois componentes. Respostas e sugestão de reformulação do texto ("termo de escala do evento") em `notas_musle_espacializada.md` §26.
 
 **Pendências abertas (em ordem de prioridade):**
-1. **Perguntar ao orientador** como foi separada a vazão de base (coluna `Bt`) — método não
+1. ~~**Perguntar ao orientador** como foi separada a vazão de base~~ (RESOLVIDO em 27/10: Eckhardt) (coluna `Bt`) — método não
    documentado; os filtros de Lyne-Hollick e Eckhardt não reproduzem a série (ver
    `dados_area_estudo_plano_bacias.md` §9–11). O usuário apagou do Doc a frase que eu tinha escrito
    sobre isso; não recolocar sem ele pedir.

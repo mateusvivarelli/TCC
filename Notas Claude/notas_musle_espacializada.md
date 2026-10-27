@@ -1073,3 +1073,19 @@ adotados**: `calcular_sy_dois_componentes.py` (_b2) e `calcular_sy_com_base.py` 
 **Não atualizados (desatualizados, avisar se forem usados):** `Relatorio_Resultados_TCC.pdf` (relatório ao orientador,
 setembro), pacote `Evento11_Auditoria/`, `TCC_rascunho_04.md/.docx` (o Google Doc é a fonte da verdade).
 Mudanças a fazer no texto: `Notas Claude/mudancas_docs_sem_base_26-10.md`.
+
+
+---
+
+## 28. Origem da vazão de base confirmada: filtro de Eckhardt (27/10/2026) — `Scripts/_conferir_filtro_eckhardt.py`
+
+O orientador informou o método: **Eckhardt (2005)**, com os coeficientes calibrados segundo Collischonn e Fan (2013,
+DOI 10.1002/hyp.9391), e enviou a série (`Dados Iniciais/serie_Q_Qb_Qquick_Eckhardt_orientador.xlsx`; CLP, horária,
+14/11/2018 a 31/03/2021, colunas Q, Qb e Qquick = Q − Qb).
+- **Mesma série da coluna Bt** que usamos: r = 0,99999, max |dif| = 0,04 m³/s, somas por evento +0,1% a +0,4%.
+  Nada a recalcular.
+- **Reproduzida exatamente** (max |dif| 8,9e-16) por bₜ = [(1−BFImax)·α·bₜ₋₁ + (1−α)·BFImax·Qₜ]/(1 − α·BFImax), bₜ ≤ Qₜ,
+  b₀ = Q₀, passada única para a frente, com **α = 0,995 e BFImax = 0,70**. O cabeçalho da planilha diz BFImax = 0,58
+  (com 0,58: r = 0,982, BFI 0,567 contra 0,659) — **confirmar com o orientador**.
+- Por que os testes de 16/10 falharam: a busca ia só até α = 0,98.
+- Isso fecha a pendência das seções 15–17 e de `dados_area_estudo_plano_bacias.md` §9–11.
