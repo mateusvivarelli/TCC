@@ -117,10 +117,12 @@ ARNOLD, J. G.; SRINIVASAN, R.; MUTTIAH, R. S.; WILLIAMS, J. R. Large area hydrol
 
 BEDIENT, P. B.; HUBER, W. C. **Hydrology and floodplain analysis**. 2. ed. Reading: Addison-Wesley, 1992. [a frase "more of an art than a science" veio citada em outro artigo; usar apud se não consultar o livro]
 
-COLLISCHONN, W.; FAN, F. M. Defining parameters for Eckhardt's digital baseflow filter. **Hydrological Processes**, v. 27, n. 18, p. 2614-2622, 2013. DOI: https://doi.org/10.1002/hyp.9391. [DOI enviado pelo orientador; título, autores e páginas de memória — conferir]
+COLLISCHONN, W.; FAN, F. M. Defining parameters for Eckhardt's digital baseflow filter. **Hydrological Processes**, v. 27, n. 18, p. 2614-2622, 2013. DOI: https://doi.org/10.1002/hyp.9391. [DOI enviado pelo orientador; dados conferidos no Crossref: v. 27, n. 18, p. 2614-2622; publicado on-line em 2012, fascículo de 2013]
 
-Links enviados pelo orientador, ainda não identificados (abrir e completar):
-- https://www.sciencedirect.com/science/article/pii/S0022169412003551 (Journal of Hydrology, 2012; provável fonte da frase de Bedient e Huber)
-- https://www.sciencedirect.com/science/article/pii/S2589915520300213 (Journal of Hydrology X, 2020)
-- https://www.sciencedirect.com/science/article/pii/S002216941500102X — "A hydrograph separation method based on information from rainfall and runoff records" (Journal of Hydrology, 2015; autores a conferir)
-- Trabalho em que a IC se baseou (link do Drive; "fazem a separação e não consideram o Q de base") — pedir o nome do arquivo.
+FISCHER, S.; SCHUMANN, A.; BÜHLER, P. A statistics-based automated flood event separation. **Journal of Hydrology X**, v. 10, art. 100070, 2021. DOI: https://doi.org/10.1016/j.hydroa.2020.100070. [link enviado pelo orientador; dados do Crossref]
+
+KOSKELO, A. I.; FISHER, T. R.; UTZ, R. M.; JORDAN, T. E. A new precipitation-based method of baseflow separation and event identification for small watersheds (<50 km²). **Journal of Hydrology**, v. 450-451, p. 267-278, 2012. DOI: https://doi.org/10.1016/j.jhydrol.2012.04.055. [link enviado pelo orientador; dados do Crossref; provável fonte da frase de Bedient e Huber (1992) — conferir no texto]
+
+MEI, Y.; ANAGNOSTOU, E. N. A hydrograph separation method based on information from rainfall and runoff records. **Journal of Hydrology**, v. 523, p. 636-649, 2015. DOI: https://doi.org/10.1016/j.jhydrol.2015.01.083. [link enviado pelo orientador; dados do Crossref]
+
+Ainda falta: o trabalho em que a IC se baseou (link do Drive; "fazem a separação e não consideram o Q de base") — pedir o nome do arquivo.
