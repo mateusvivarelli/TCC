@@ -1146,3 +1146,28 @@ críticas e descrever a escolha pelo critério do volume (escolhida após ver os
 Histórico: a conversão de Woodward já tinha sido testada num rascunho de 16/10 (scratchpad, contra o volume total, nunca
 registrada); a "forma assintótica de Hawkins" do Apêndice D é outra coisa (CN dependente da chuva, do revisor
 independente).
+
+
+---
+
+## 31. Respaldo do CN-I: regra de umidade antecedente do NEH-4 (27/10/2026) — `Scripts/_teste_amc_neh4.py`
+
+Origem do CN-I: conversão de Chow, Maidment e Mays (1988) do CN-II da ANA (conferida exatamente, §25); a escolha do
+CN-I veio da calibração do volume da Fase 1. Teste do respaldo físico pelo critério do próprio método (USDA-SCS, 1972,
+NEH-4): chuva dos 5 dias anteriores (P5, ponderada 0,307·DBT5 + 0,693·Campo Limpo).
+
+- Estação de crescimento (AMC I < 35,6 mm; II 35,6–53,3; III > 53,3): **13 eventos AMC I, 1 AMC II (ev 1), 3 AMC III
+  (ev 4, 14, 16)**. Com os limites de estação dormente seriam 3 I / 6 II / 8 III, mas o período chuvoso (nov–mar) é
+  estação de crescimento; o evento 11 (julho) é ambíguo (I ou II).
+- P5 × coeficiente de escoamento direto medido: r = 0,37 (Spearman 0,51); vazão inicial × coeficiente: 0,29; chuva do
+  evento × coeficiente: −0,01.
+- Com λ 0,05 e S convertido (Woodward): **CN-I em todos os eventos**: volume SCS/medido 0,86, viés +3%, NSE do volume
+  −0,39; MC 81,1% / 35%; MFM 20,6% / 94% / 0,84. **AMC de cada evento (NEH-4)**: viés +85%, NSE do volume −12,7
+  (eventos AMC III com volume 1,75 a 6,6 vezes o medido); MC 72,6% / 59%; MFM 18,4% / 94% / 0,81.
+
+**Leitura:** o CN-I tem respaldo como condição representativa do conjunto (13 de 17 eventos AMC I pela regra do
+NEH-4) e é o que melhor reproduz o volume direto medido. Aplicar a AMC evento a evento, como manda o NEH-4, superestima
+muito os eventos úmidos (a conversão para AMC III é forte demais nesta bacia). Texto: "adotou-se a condição seca
+(AMC I) como representativa: pelo critério da chuva antecedente de 5 dias do NEH-4, 13 dos 17 eventos se enquadram
+nela". Limitações: escolha feita nos mesmos 17 eventos; P5 de só dois postos; versões posteriores do manual do NRCS
+reinterpretam a condição antecedente (conferir antes de citar).
