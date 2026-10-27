@@ -22,6 +22,8 @@ nb = pd.read_csv(DI + r"\comparacao_SY_modelo_com_base.csv").sort_values("evento
 S_base = nb["SY_sim_t"].to_numpy(float); L_base = nb["SY_loo_t"].to_numpy(float)
 E_base = nb["soma_E_unit_t"].to_numpy(float); V_dir_obs = nb["V_direto_obs_m3"].to_numpy(float)
 R_chuva = np.array([float(r["Chuva_evento_mm"]) for r in R])
+sd = pd.read_csv(DI + r"\comparacao_SY_so_direto.csv").sort_values("evento")   # modelo adotado em 26/10/2026 (so escoamento direto)
+E_sdc = sd["soma_E_unit_calc_t"].to_numpy(float); E_sdf = sd["soma_E_unit_forc_t"].to_numpy(float)
 
 den = np.sum((SY - SY.mean()) ** 2)
 
@@ -60,12 +62,16 @@ c_rest, s_rest, l_rest = escala(E_rest)
 c_tr, s_tr, l_tr = escala(V_med)
 c_vd, s_vd, l_vd = escala(V_dir_obs)
 c_ch, s_ch, l_ch = escala(R_chuva)
+c_sdc, s_sdc, l_sdc = escala(E_sdc)
+c_sdf, s_sdf, l_sdf = escala(E_sdf)
 c_base = np.sum(E_base * SY) / np.sum(E_base ** 2)
 XS = {"Concentrada — D e qp do modelo (só escala)": (V_calc * QP_calc) ** 0.56,
       "Concentrada — D e qp medidos (só escala)": (V_med * QP_med) ** 0.56,
       "Espacializada — Q do modelo (previsão pura, λ = 0,05, sem vazão de base)": E_prev,
       "Espacializada — Q forçado ao volume medido total (volume restrito)": E_rest,
-      "ADOTADO — Espacializada — Q = escoamento direto (λ = 0,20) + vazão de base prevista": E_base,
+      "ADOTADO — Espacializada — calculado: Q = só escoamento direto do SCS-CN (λ = 0,20)": E_sdc,
+      "ADOTADO — Espacializada — forçado: Q reescalado para o escoamento direto medido": E_sdf,
+      "Não adotado (até 26/10/2026) — Espacializada — Q = escoamento direto (λ = 0,20) + vazão de base prevista": E_base,
       "Sem MUSLE — SY = c · volume total medido (T_R)": V_med,
       "Sem MUSLE — SY = c · escoamento direto medido": V_dir_obs,
       "Sem MUSLE — SY = c · chuva do evento": R_chuva}
@@ -99,7 +105,11 @@ CFG = [
      "SY = c·ΣE_unit, com Q de cada pixel pelo SCS-CN (CN-I, λ = 0,05). Versão anterior (até 14/10/2026): calibrada contra o volume TOTAL, que inclui vazão de base.", "esp"),
     ("Espacializada — Q forçado ao volume medido total (volume restrito)", s_rest, l_rest, 1, "Sim (volume)", "Sim", c_rest,
      "Q de cada pixel multiplicado pelo fator f do evento para o volume total bater T_R_m3 (limite Q ≤ chuva). Não é previsão pura; T_R_m3 inclui vazão de base.", "esp"),
-    ("ADOTADO — Espacializada — Q = escoamento direto (λ = 0,20) + vazão de base prevista", S_base, L_base, 2, "Parcial (Qb inicial e duração)", "Sim", c_base,
+    ("ADOTADO — Espacializada — calculado: Q = só escoamento direto do SCS-CN (λ = 0,20)", s_sdc, l_sdc, 1, "Não", "Sim", c_sdc,
+     "SY = c·ΣE_unit, com Q de cada pixel pelo SCS-CN (CN-I, λ = 0,20), sem termo de vazão de base (decisão de 26/10/2026). Aqui c por mínimos quadrados lineares, como nas demais linhas; no texto do TCC c é calibrado em log (tab_resultados.md).", "esp"),
+    ("ADOTADO — Espacializada — forçado: Q reescalado para o escoamento direto medido", s_sdf, l_sdf, 1, "Sim (volume direto)", "Sim", c_sdf,
+     "Q de cada pixel reescalado para o escoamento direto medido do evento (T_R − ΣBt·3600; limite Q ≤ chuva). Sem termo de base. Não é previsão: usa o volume medido. c por mínimos quadrados lineares nesta planilha.", "esp"),
+    ("Não adotado (até 26/10/2026) — Espacializada — Q = escoamento direto (λ = 0,20) + vazão de base prevista", S_base, L_base, 2, "Parcial (Qb inicial e duração)", "Sim", c_base,
      "Q do pixel = SCS-CN (CN-I, λ = 0,20) + lâmina de base uniforme = kb·Qb_inicio·duração (kb = 1,93). LOO aninhado (kb e c refeitos sem o evento). A duração é a da janela observada.", "esp"),
     ("Sem MUSLE — SY = c · volume total medido (T_R)", s_tr, l_tr, 1, "Sim (volume)", "Não", c_tr,
      "Referência trivial: sedimento proporcional ao volume total medido. Empata ou supera os modelos espacializados.", "bench"),
@@ -204,14 +214,16 @@ w3.freeze_panes = "B4"
 w4 = wb.create_sheet("Leia-me")
 linhas = [
     "Como esta planilha foi feita",
-    "Gerada/atualizada em 15/10/2026 por Scripts/gerar_planilha_comparacao.py a partir de: eventos_processados_manuais.xlsx, comparacao_volumes_medido_vs_calculado.csv,",
-    "comparacao_qpico_convolucao_medido_vs_calculado.csv, comparacao_SY_previsao_vs_restrito.csv e comparacao_SY_modelo_com_base.csv (modelo com vazão de base).",
+    "Gerada/atualizada em 15/10/2026 (modelo adotado trocado em 26/10/2026) por Scripts/gerar_planilha_comparacao.py a partir de: eventos_processados_manuais.xlsx, comparacao_volumes_medido_vs_calculado.csv,",
+    "comparacao_qpico_convolucao_medido_vs_calculado.csv, comparacao_SY_previsao_vs_restrito.csv, comparacao_SY_modelo_com_base.csv (vazão de base, não adotado) e comparacao_SY_so_direto.csv (adotado).",
     "",
     "O que cada modelo é",
     "• Chute da média: prever sempre a média dos sedimentos medidos. Dá NSE = 0 por definição; é a régua mínima.",
     "• Concentrada: um único volume D e um único pico qp por evento para a bacia toda com os expoentes fixos de Williams (0,56). Só a escala c é ajustada.",
     "• Espacializada: a MUSLE é calculada em cada pixel e somada. 'Q do modelo' usa o escoamento do SCS-CN; 'Q forçado' reescala o Q do raster para o volume total bater o volume medido.",
-    "• ADOTADO (15/10/2026): Q = escoamento direto (SCS-CN, λ = 0,20) + lâmina de vazão de base prevista, uniforme (kb·Qb_inicio·duração). Compara-se com a carga TOTAL medida.",
+    "• ADOTADO (26/10/2026): só escoamento direto, sem termo de vazão de base. Calculado: Q do SCS-CN (λ = 0,20); forçado: Q reescalado para o escoamento direto medido. Compara-se com a carga TOTAL medida (todo o sedimento do evento é atribuído ao escoamento superficial).",
+    "• Nesta planilha todas as escalas c são ajustadas por mínimos quadrados lineares; no texto do TCC a calibração adotada é em log (ver TCC_Texto/tabelas/).",
+    "• Não adotado (15 a 26/10/2026): Q = escoamento direto + lâmina de vazão de base prevista, uniforme (kb·Qb_inicio·duração). Removido: a vazão de base não produz erosão nas encostas.",
     "• Sem MUSLE: modelos triviais (SY proporcional ao volume ou à chuva), com um parâmetro c. Servem de régua: um modelo espacializado só se justifica se superar isso.",
     "• α e β livres e FCI/DSC são experimentos que não foram adotados (valores só in-sample).",
     "",

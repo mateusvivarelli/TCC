@@ -1,5 +1,8 @@
 """
-O modelo B funcionaria bem se o Q calculado a partir da chuva fosse bom? (15/10/2026)
+Tabela do Apendice B: NSE linear (calibracao em log) com e sem o evento 15. Atualizada em 26/10/2026 para o modelo
+adotado (so escoamento direto, sem termo de base); grava TCC_Texto/tabelas/tab_nse_linear.md.
+
+Historico - o modelo B funcionaria bem se o Q calculado a partir da chuva fosse bom? (15/10/2026)
 
 'Q bom' = escoamento direto MEDIDO distribuido no espaco pelo padrao do SCS-CN (como no desenho D).
 Modelos (alvo: carga TOTAL SY_obs; c1,c2 em log; LOO aninhado):
@@ -9,6 +12,7 @@ Modelos (alvo: carga TOTAL SY_obs; c1,c2 em log; LOO aninhado):
   D   : c*E(Q 'bom') sem termo de base
 """
 import os
+import re
 import sys
 
 import numpy as np
@@ -115,11 +119,30 @@ def avalia(nome, kind, xs):
     print(f"| {nome} | {nse_lin(SY, sim):.2f} | {nse_lin(SY, loo):.2f} | {nse_lin(SY[m15], s15):.2f} |")
 
 
-print("| Modelo | NSE (ajuste) | NSE (validacao cruzada) | NSE sem o evento 15 |")
+LINHAS = []
+_print = print
+
+
+def print(*a, **k):  # guarda as linhas da tabela para gravar o .md
+    txt = " ".join(str(x) for x in a)
+    if txt.startswith("|"):
+        if not txt.startswith("|---"):
+            txt = re.sub(r"(\d)\.(\d)", r"\1,\2", txt).replace("| -", "| −")
+        LINHAS.append(txt)
+    _print(*a, **k)
+
+
+print("| Modelo | NSE (ajuste) | NSE (validação cruzada) | NSE sem o evento 15 |")
+print("|---|---|---|---|")
 avalia("SY = c · chuva do evento", "scale", [R])
 avalia("SY = c · volume total medido", "scale", [V_])
-avalia("Previsao pura anterior (lambda 0,05, sem base)", "scale", [E_prev05])
-avalia("Modelo B, N1", "two", [E20, base_chuva])
-avalia("Modelo B, N3", "two", [E_bom, base_chuva])
-avalia("Modelo B, N4", "two", [E_bom, BTV])
+avalia("SY = c · escoamento direto medido", "scale", [VD])
+avalia("Modelo calculado (só escoamento direto, λ = 0,20) — adotado", "scale", [E20])
+avalia("Modelo forçado (escoamento direto medido, λ = 0,20) — adotado", "scale", [E_bom])
 avalia("IC refeita (concentrada)", "power", [V_ * QPm])
+avalia("Sensibilidade: calculado com λ = 0,05 (previsão pura anterior)", "scale", [np.array([esoma(i, 0.05) for i in range(N)])])
+avalia("Não adotado: dois componentes, base prevista (até 26/10/2026)", "two", [E20, base_chuva])
+avalia("Não adotado: dois componentes, base observada (até 26/10/2026)", "two", [E_bom, BTV])
+OUT = os.path.join(BASE, "TCC_Texto", "tabelas", "tab_nse_linear.md")
+open(OUT, "w", encoding="utf-8", newline="\n").write("\n".join(LINHAS) + "\n")
+_print("gravado:", OUT)

@@ -1,13 +1,13 @@
 """
-ESCADA DA INFORMACAO HIDROLOGICA (15/10/2026) - onde esta o gargalo e o B x teste simples com a MESMA informacao.
+ESCADA DA INFORMACAO HIDROLOGICA (15/10/2026; refeita em 26/10/2026 SEM termo de vazao de base) - onde esta o gargalo.
 
-Degraus (de menos para mais informacao hidrologica), alvo = carga TOTAL de sedimentos, c em log, LOO aninhado, lambda 0,20:
-  N1  so chuva + Qb_inicio + duracao da chuva  : B (SCS-CN previsto) x teste simples  c1*chuva + c2*base
-  N2  volume direto PREVISTO por regressao(chuva): B (volume previsto distribuido pelo SCS-CN + base) x c1*V_prev + c2*base
-  N3  volume direto MEDIDO ('Q bom') + base prevista: B x c1*V_dir + c2*base
-  N4  volume direto MEDIDO + base OBSERVADA (teto)  : B x c1*V_dir + c2*Bt
-Cada degrau compara o B (MUSLE espacializada) com um modelo linear simples de 2 termos com os MESMOS insumos
-(sem MUSLE, sem mapa). Saidas: figuras/escada_gargalo.png e figuras/escada_gargalo.csv
+Degraus (de menos para mais informacao hidrologica), alvo = carga TOTAL de sedimentos, c em log, LOO, lambda 0,20.
+Modelo adotado desde 26/10/2026: so escoamento direto, um coeficiente (SY = c * soma E_unit).
+  N1  so chuva                                   : MUSLE (SCS-CN previsto)          x  SY = c*chuva
+  N2  volume direto PREVISTO por regressao(chuva): MUSLE (volume previsto, padrao SCS-CN) x SY = c*V_prev
+  N3  volume direto MEDIDO (modelo forcado)       : MUSLE (volume medido, padrao SCS-CN)  x SY = c*V_dir
+Cada degrau compara a MUSLE espacializada com a regra de um coeficiente que usa o MESMO insumo (sem MUSLE, sem mapa).
+Saidas: figuras/escada_gargalo.png e figuras/escada_gargalo.csv
 """
 import os
 import sys
@@ -76,6 +76,13 @@ def fit2(x1, x2, y):
     return best.x
 
 
+fit1 = lambda x, y: np.exp(np.mean(np.log(y) - np.log(x)))
+
+
+def loo1(x):
+    return np.array([fit1(x[ids != i], SY[ids != i]) * x[i] for i in range(N)])
+
+
 def loo2(x1, x2):
     out = np.zeros(N)
     for i in range(N):
@@ -95,42 +102,39 @@ ape = lambda s_: 100 * np.abs(s_ - SY) / SY
 f2 = lambda s_: 100 * np.mean((s_ / SY >= 0.5) & (s_ / SY <= 2.0))
 nlog = lambda s_: 1 - np.sum((np.log(SY) - np.log(np.clip(s_, 1e-6, None))) ** 2) / np.sum((np.log(SY) - np.log(SY).mean()) ** 2)
 
-def loo2_n2():
-    """N2 totalmente aninhado: em cada rodada a regressao do volume na chuva e ajustada SEM o evento retido
-    (os volumes previstos dos 16 eventos de treino e do evento retido vem dessa regressao), depois c1 e c2."""
+def loo1_n2():
+    """N2 totalmente aninhado: em cada rodada a regressao do volume na chuva e refeita SEM o evento retido."""
     outB = np.zeros(N); outS = np.zeros(N)
     for i in range(N):
         m = ids != i
         bcoef = np.linalg.lstsq(Xm[m], ly[m], rcond=None)[0]; Vp_i = np.exp(Xm @ bcoef)
         E_i = np.array([esoma(j, LAM, Vp_i[j]) for j in range(N)])
-        pB = fit2(E_i[m], base_ch[m], SY[m]); outB[i] = pB[0] * E_i[i] + pB[1] * base_ch[i]
-        pS = fit2(Vp_i[m], base_ch[m], SY[m]); outS[i] = pS[0] * Vp_i[i] + pS[1] * base_ch[i]
+        outB[i] = fit1(E_i[m], SY[m]) * E_i[i]; outS[i] = fit1(Vp_i[m], SY[m]) * Vp_i[i]
     return outB, outS
 
 
-_N2B, _N2S = loo2_n2()
+_N2B, _N2S = loo1_n2()
 NIV = [
-    ("N1: so chuva e vazao inicial", loo2(E1, base_ch), loo2(R, base_ch)),
+    ("N1: so chuva\n(modelo calculado)", loo1(E1), loo1(R)),
     ("N2: volume direto previsto\n(regressao na chuva)", _N2B, _N2S),
-    ("N3: volume direto medido\n+ base prevista", loo2(E3, base_ch), loo2(VD, base_ch)),
-    ("N4: volume direto medido\n+ base observada (teto)", loo2(E3, BTV), loo2(VD, BTV)),
+    ("N3: volume direto medido\n(modelo forcado)", loo1(E3), loo1(VD)),
 ]
 ref = np.array([np.exp(np.mean(np.log(SY[ids != i]) - np.log(R[ids != i]))) * R[i] for i in range(N)])
 print("=" * 118)
-print("ESCADA (alvo carga total, c em log, LOO aninhado, lambda 0,20)")
+print("ESCADA (alvo carga total, c em log, LOO, lambda 0,20, sem termo de base)")
 print(f"{'nivel':<44} {'modelo':<26} {'MedAPE':>7} {'fator2':>7} {'NSE-log':>8} {'Spearman':>8} | melhora de B vs simples: n eventos / mediana (IC95%)")
 rows = []
 for nome, b, s in NIV:
     d = ape(b) - ape(s); bs = np.array([np.median(rng.choice(d, N)) for _ in range(4000)])
-    for tag, v in (("Modelo de dois componentes", b), ("simples (sem MUSLE)", s)):
-        extra = f"{np.sum(d<0):>2}/17  {np.median(d):+6.1f} [{np.percentile(bs,2.5):+.1f}; {np.percentile(bs,97.5):+.1f}]" if tag.startswith("Modelo") else ""
+    for tag, v in (("MUSLE espacializada", b), ("simples (sem MUSLE)", s)):
+        extra = f"{np.sum(d<0):>2}/17  {np.median(d):+6.1f} [{np.percentile(bs,2.5):+.1f}; {np.percentile(bs,97.5):+.1f}]" if tag.startswith("MUSLE") else ""
         print(f"{nome.replace(chr(10),' '):<44} {tag:<26} {np.median(ape(v)):7.1f} {f2(v):7.0f} {nlog(v):8.3f} {spearmanr(SY, v)[0]:8.3f} | {extra}")
         rows.append(dict(nivel=nome.replace("\n", " "), modelo=tag, MedAPE=np.median(ape(v)), fator2=f2(v), NSE_log=nlog(v), Spearman=spearmanr(SY, v)[0]))
 print(f"{'referencia: SY = c * chuva':<44} {'':<26} {np.median(ape(ref)):7.1f} {f2(ref):7.0f} {nlog(ref):8.3f} {spearmanr(SY, ref)[0]:8.3f}")
 pd.DataFrame(rows).to_csv(os.path.join(FIG, "escada_gargalo.csv"), index=False, encoding="utf-8")
 
 # ---- figura
-NIV_FIG = [NIV[0], NIV[3]]   # figura do texto: so os dois modelos (N1 = calculado da chuva; N4 = forcado ao medido)
+NIV_FIG = [NIV[0], NIV[2]]   # figura do texto: so os dois modelos (N1 = calculado da chuva; N4 = forcado ao medido)
 fig, ax = plt.subplots(1, 2, figsize=(11, 4.8))
 x = np.arange(len(NIV_FIG)); wd = 0.36
 cb, cs = "#1f5fa8", "#b8b8b8"
@@ -138,20 +142,20 @@ for k, (key, tit, fmt) in enumerate((("MedAPE", "Erro percentual mediano (menor 
     a = ax[k]
     vb = [np.median(ape(b)) if key == "MedAPE" else f2(b) for _, b, _ in NIV_FIG]
     vs = [np.median(ape(s)) if key == "MedAPE" else f2(s) for _, _, s in NIV_FIG]
-    r1 = a.bar(x - wd / 2, vb, wd, color=cb, label="Modelo de dois componentes (MUSLE espacializada)")
-    r2 = a.bar(x + wd / 2, vs, wd, color=cs, label="Teste simples com os mesmos insumos")
+    r1 = a.bar(x - wd / 2, vb, wd, color=cb, label="MUSLE espacializada (só escoamento direto)")
+    r2 = a.bar(x + wd / 2, vs, wd, color=cs, label="Regra simples com o mesmo insumo (c · chuva ou c · volume direto)")
     for rr in list(r1) + list(r2):
         a.text(rr.get_x() + rr.get_width() / 2, rr.get_height() + 1, fmt.format(rr.get_height()), ha="center", fontsize=9)
     a.axhline(np.median(ape(ref)) if key == "MedAPE" else f2(ref), color="#c0392b", ls="--", lw=1.2, label="Referência: SY = c · chuva")
     a.set_xticks(x); a.set_xticklabels(["Água calculada\nda chuva (previsão)", "Água forçada\nao medido"], fontsize=10)
     a.set_title(tit, fontsize=11)
     a.spines[["top", "right"]].set_visible(False)
-    a.set_ylim(0, 112 if key == "fator2" else 50)
+    a.set_ylim(0, 112)
 h_, l_ = ax[0].get_legend_handles_labels()
 fig.legend(h_, l_, loc="lower center", ncol=3, frameon=False, fontsize=9, bbox_to_anchor=(0.5, 0.045))
 fig.suptitle("Quanto melhor a estimativa da água, melhor o sedimento: o gargalo é transformar chuva em escoamento", fontsize=12)
-fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN e vazão de base estimada da vazão antes do evento. Forçada ao medido: escoamento direto e vazão de base medidos.\n"
-         "Validação leave-one-out, calibração em log, 17 eventos, λ = 0,20, carga total de sedimentos.", ha="center", fontsize=7.5)
+fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN. Forçada ao medido: escoamento direto medido (volume total menos a vazão de base). Sem termo de vazão de base.\n"
+         "Validação leave-one-out, calibração em log (um coeficiente), 17 eventos, λ = 0,20, carga total de sedimentos.", ha="center", fontsize=7.5)
 fig.tight_layout(rect=(0, 0.11, 1, 0.95))
 fig.savefig(os.path.join(FIG, "escada_gargalo.png"), dpi=150)
 print("figura:", os.path.join(FIG, "escada_gargalo.png"))

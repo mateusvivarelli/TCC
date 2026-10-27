@@ -1025,3 +1025,51 @@ O orientador revisou o material e não entendeu dois pontos. Respostas dadas ao 
 
 Obs.: em 26/10 os três CSVs de `Dados Iniciais/` apareciam modificados (gravados em 17/10 21h), mas os
 valores são idênticos aos do commit — só formatação. O progresso do notebook não tinha sido enviado ao GitHub.
+
+---
+
+## 27. Vazão de base removida do modelo — modelo adotado só com escoamento direto (26/10/2026) — `Scripts/calcular_sy_so_direto.py`
+
+**Decisão (usuário + orientador, 26/10/2026):** λ = 0,20 e **sem termo de vazão de base**. Argumento do orientador: a
+MUSLE descreve erosão por escoamento superficial; a base não entrega sedimento das encostas, e a banca questionaria um
+termo empírico de base carregando ~91% do sedimento. O alvo continua sendo a carga TOTAL medida (todo o sedimento do
+evento é atribuído ao escoamento superficial; a base só transporta). `Bt` só serve para o escoamento direto medido.
+
+- **MC:** SY = c·ΣE_unit(Q SCS-CN, CN-I, λ 0,20); **c = 0,0784**.
+- **MFM:** SY = c·ΣE_unit(Q reescalado a V_dir = T_R − ΣBt); **c = 0,0302**. c em log, LOO.
+
+| (LOO, carga total) | MedAPE | fator 2 | NSE-log | Spearman | NSE lin (in / LOO / s/ev15) |
+|---|---|---|---|---|---|
+| **MC** (adotado) | 97,9% | 24% | −3,95 | 0,57 | −49,8 / −65,3 / −30,9 |
+| **MFM** (adotado) | 38,7% | 94% | 0,50 | 0,86 | 0,56 / 0,50 / 0,17 |
+| sens. MC λ 0,05 | 63,2% | 47% | −0,09 | 0,55 | −0,86 / −1,17 / −1,22 |
+| sens. MFM padrão λ 0,05 | 18,5% | 94% | 0,81 | 0,84 | 0,78 / 0,75 / 0,59 |
+| SY = c·chuva | 41,9% | 82% | 0,53 | 0,63 | 0,62 / 0,58 / 0,41 |
+| SY = c·V_dir medido | 15,9% | 94% | 0,85 | 0,90 | 0,77 / 0,74 / 0,56 |
+| SY = c·T_R | 17,6% | 94% | 0,86 | 0,88 | 0,80 / 0,78 / 0,61 |
+| IC concentrada | 16,3% | 100% | 0,87 | 0,93 | 0,82 / 0,77 / 0,65 |
+
+Calibração linear (sensibilidade): MC NSE −0,14 / −1,11; MFM 0,80 / 0,79; c·chuva 0,67 / 0,61.
+Escoamento direto SCS-CN/medido: mediana 0,58 (0,02 a 1,95); erro mediano 69%; NSE do volume −0,69.
+Comparações por evento (erro % LOO): MC × c·chuva melhora em 3/17, +63 pontos [IC95% +15; +309];
+MFM × c·V_dir 3/17, +14 [+3; +39]; MFM × IC 5/17, +21 [−2; +27].
+**Mapas:** o padrão do MC é idêntico ao da parcela das encostas do modelo de dois componentes (r = 1,0000; só a
+escala muda); MC × MFM r = 0,966, 90,9% das áreas críticas coincidentes; r com K·C·LS 0,692 (MC) e 0,633 (MFM).
+As porcentagens por classe (Tabelas 12–13) não mudam; o kg/pixel muda.
+
+**Leitura:** (1) o MC fica bem abaixo da regra da chuva — o termo de base mascarava a falha do SCS-CN; (2) com a água
+medida, a MUSLE acerta a ordem de grandeza (94% em fator 2), mas fica abaixo da IC e de c·V_dir na régua em log
+(empata no NSE linear); (3) no MFM, λ só muda o padrão espacial, e o padrão λ 0,05 é bem melhor (18,5%): o SCS-CN com
+λ 0,20 concentra o escoamento em poucos pixels — reportar como sensibilidade. A conclusão "a espacialização mantém a
+qualidade da formulação concentrada" deixa de valer na régua em log; o ganho passa a ser só o mapa.
+
+**Arquivos:** novos — `calcular_sy_so_direto.py`, `Evento n/{Qdir,pr,E_unit,SY}{n}_sd.tif`,
+`SY_medio_eventos_sd.tif`, `SY_medio_eventos_forcado_sd.tif`, `comparacao_SY_so_direto.csv`,
+`tab_mc_mfm_eventos.md`, `tab_nse_linear.md`, `fig_volume_direto.png`. Atualizados — `gerar_tabelas_tcc.py`,
+`gerar_figuras_tcc.py` (dispersão com 4 painéis; `fig_decomposicao.png` removida), `gerar_mapas_tcc.py` (mapas 5–8 e
+fluxograma), `_escada_gargalo_chuva_escoamento.py` (3 degraus, sem base), `_tabela_apendice_B.py`,
+`gerar_planilha_comparacao.py` (`Comparacao_Modelos_TCC.xlsx`, escalas por MQ linear). Mantidos como registro, **não
+adotados**: `calcular_sy_dois_componentes.py` (_b2) e `calcular_sy_com_base.py` (_vb).
+**Não atualizados (desatualizados, avisar se forem usados):** `Relatorio_Resultados_TCC.pdf` (relatório ao orientador,
+setembro), pacote `Evento11_Auditoria/`, `TCC_rascunho_04.md/.docx` (o Google Doc é a fonte da verdade).
+Mudanças a fazer no texto: `Notas Claude/mudancas_docs_sem_base_26-10.md`.

@@ -1,5 +1,5 @@
 """
-TABELAS DO TCC com os dados de TODOS os eventos (15/10/2026). Grava arquivos Markdown em TCC_Texto/tabelas/:
+TABELAS DO TCC com os dados de TODOS os eventos (15/10/2026; modelo so com escoamento direto desde 26/10/2026). Grava arquivos Markdown em TCC_Texto/tabelas/:
 
   tab_eventos.md          caracteristicas dos 17 eventos (datas, duracao, chuva, intensidade, pico, vazao inicial)
   tab_volumes.md          volume total, vazao de base, escoamento direto medido x SCS-CN, sedimento medido
@@ -98,13 +98,16 @@ def loo2(x1, x2):
     return out
 
 
-Bcalc = loo2(Ecalc, base_ch); Bforc = loo2(Eforc, BTV)
+# modelo adotado em 26/10/2026: so escoamento direto, um coeficiente c em log (sem termo de vazao de base)
+fit1 = lambda x, y: np.exp(np.mean(np.log(y) - np.log(x)))
+loo1 = lambda x: np.array([fit1(x[ids != i], SY[ids != i]) * x[i] for i in range(N)])
+Bcalc = loo1(Ecalc); Bforc = loo1(Eforc)
 ch = np.array([np.exp(np.mean(np.log(SY[ids != i]) - np.log(R[ids != i]))) * R[i] for i in range(N)])
 Dq = TR * QPm; ic = np.zeros(N)
 for i in range(N):
     m = ids != i; b, a = np.polyfit(np.log(Dq[m]), np.log(SY[m] / KLSC), 1); ic[i] = np.exp(a) * Dq[i] ** b * KLSC
-p_calc = fit2(Ecalc, base_ch, SY); p_forc = fit2(Eforc, BTV, SY); b_ic, a_ic = np.polyfit(np.log(Dq), np.log(SY / KLSC), 1)
-print(f"modelo calculado c1={p_calc[0]:.5f} c2={p_calc[1]:.6f} | modelo forcado c1={p_forc[0]:.5f} c2={p_forc[1]:.6f} | IC alfa={np.exp(a_ic):.4f} beta={b_ic:.4f}")
+c_calc = fit1(Ecalc, SY); c_forc = fit1(Eforc, SY); b_ic, a_ic = np.polyfit(np.log(Dq), np.log(SY / KLSC), 1)
+print(f"modelo calculado c={c_calc:.5f} | modelo forcado c={c_forc:.5f} | IC alfa={np.exp(a_ic):.4f} beta={b_ic:.4f}")
 
 # ================================================================= tabelas
 dt = lambda x: pd.to_datetime(x).strftime("%d/%m/%y %Hh")
@@ -139,7 +142,7 @@ md(["Evento", "Q pico medido (m³/s)", "Q pico calculado, HU-SCS (m³/s)", "Erro
 with open(os.path.join(BASE, "Evento11_Auditoria", "dados_evento11.pkl"), "rb") as fh:
     D = pickle.load(fh)
 iy, ix = D["iy"], D["ix"]
-mc, _ = le(os.path.join(DI, "SY_medio_eventos_b2.tif")); mf, _ = le(os.path.join(DI, "SY_medio_eventos_forcado.tif"))
+mc, _ = le(os.path.join(DI, "SY_medio_eventos_sd.tif")); mf, _ = le(os.path.join(DI, "SY_medio_eventos_forcado_sd.tif"))
 sc, sf = mc[iy, ix], mf[iy, ix]; ok = np.isfinite(sc) & np.isfinite(sf)
 for campo, nome, arq in (("usoc", "uso", "tab_classes_uso.md"), ("solo", "solo", "tab_classes_solo.md")):
     cls = np.array(D[campo], dtype=object)[ok]; a_ = sc[ok]; b_ = sf[ok]; linhas = []
@@ -161,9 +164,7 @@ md(["Parâmetro", "Valor", "Origem"],
     ["λ (razão de abstração inicial)", "0,20", "valor padrão do SCS-CN (CN tabelado)"],
     ["Peso do posto DBT5 / Campo Limpo na lâmina do evento", "0,307 / 0,693", "mínimos quadrados nos 17 eventos"],
     ["P (práticas conservacionistas)", "1,0", "sem práticas na bacia"],
-    ["Modelo calculado: c₁ (t por unidade de E_unit)", br(p_calc[0], 4), "calibrado em log, 17 eventos"],
-    ["Modelo calculado: c₂ (t por m³ de volume de base de referência)", br(p_calc[1], 5), "calibrado em log, 17 eventos"],
-    ["Modelo forçado: c₁", br(p_forc[0], 4), "calibrado em log, 17 eventos"],
-    ["Modelo forçado: c₂ (t por m³ de vazão de base medida)", br(p_forc[1], 5), "calibrado em log, 17 eventos"],
+    ["Modelo calculado: c (t por unidade de E_unit)", br(c_calc, 4), "calibrado em log, 17 eventos; só escoamento direto"],
+    ["Modelo forçado: c (t por unidade de E_unit)", br(c_forc, 4), "calibrado em log, 17 eventos; escoamento direto medido"],
     ["IC refeita: α e β", f"{br(np.exp(a_ic), 3)} e {br(b_ic, 3)}", "regressão em log, K = 0,031, LS = 0,536, C = 0,267 (IC: 0,277 e 0,807)"]], "tab_parametros.md")
 print("tabelas ok:", sorted(os.listdir(OUT)))

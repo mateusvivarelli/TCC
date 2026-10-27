@@ -65,6 +65,19 @@ para quem não tem formação em hidrologia. A revisão que a acompanhou gerou c
 `Notas Claude/notas_musle_espacializada.md` e os ajustes em `Notas Claude/base_para_redacao_tcc.md` (comparação com Hao e
 Baert, autoria de Valle Junior et al.). Pontos ainda a confirmar estão no Apêndice D da apostila.
 
+## Onde estamos agora (26/10/2026) — VAZÃO DE BASE REMOVIDA (ler primeiro)
+
+**Decisão com o orientador:** λ = 0,20 e **sem termo de vazão de base**. A MUSLE usa só o escoamento direto
+(calculado: SCS-CN; forçado: escoamento direto medido = T_R − ΣBt). **Modelo adotado: `Scripts/calcular_sy_so_direto.py`**
+(saídas `*_sd.tif`, `comparacao_SY_so_direto.csv`). Dados, tabelas, figuras, mapas e planilha já foram refeitos.
+
+**Resultados (LOO, carga total):** MC 98% de erro mediano / 24% em fator 2 (abaixo de SY = c·chuva: 42% / 82%);
+MFM 39% / 94% (abaixo da IC: 16% / 100%; empata no NSE linear). Detalhes em `notas_musle_espacializada.md` §27.
+
+**PENDENTE (o usuário faz no Google Doc):** reescrever resumo, §4.1, §4.5–4.7, §4.9, §5.2–5.5, tabelas 8–13 e conclusões
+— lista completa, seção por seção, com textos sugeridos em **`Notas Claude/mudancas_docs_sem_base_26-10.md`**.
+Atenção: duas conclusões mudam (o MC fica abaixo da regra da chuva; o MFM deixa de empatar com a IC na régua em log).
+
 ## Onde estamos agora (17/10/2026) — PONTO DE RETOMADA (ler primeiro)
 
 **A fonte da verdade do texto é o Google Doc "TCC arquivo"**
