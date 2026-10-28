@@ -1171,3 +1171,26 @@ muito os eventos úmidos (a conversão para AMC III é forte demais nesta bacia)
 (AMC I) como representativa: pelo critério da chuva antecedente de 5 dias do NEH-4, 13 dos 17 eventos se enquadram
 nela". Limitações: escolha feita nos mesmos 17 eventos; P5 de só dois postos; versões posteriores do manual do NRCS
 reinterpretam a condição antecedente (conferir antes de citar).
+
+
+---
+
+## 32. Modelo candidato rodado: CN-I + λ 0,05 + S convertido (Woodward) — `Scripts/calcular_sy_lambda005_woodward.py` (27/10/2026)
+
+Saídas com sufixo `_l05w` (não sobrescrevem o adotado `_sd`): `Evento n/{Qdir,pr,E_unit,SY}{n}_l05w.tif`,
+`SY_medio_eventos_l05w.tif`, `SY_medio_eventos_forcado_l05w.tif`, `comparacao_SY_lambda005_woodward.csv`.
+**c:** MC 0,0344; MFM 0,0222.
+
+| (LOO, log) | MedAPE | f2 | NSE-log | Spearman | NSE lin in / LOO / s/ev15 |
+|---|---|---|---|---|---|
+| MC candidato | 81,1 | 35 | −0,69 | 0,59 | −4,35 / −5,43 / −3,52 |
+| MFM candidato | 20,6 | 94 | 0,84 | 0,83 | 0,80 / 0,78 / 0,62 |
+
+Calibração linear (sensibilidade): MC NSE 0,19 / −0,10, MedAPE 44,8%, f2 59%; MFM 0,80 / 0,77, 20,4%, 94%.
+Comparações (erro % por evento, LOO): MC × c·chuva +32,6 pontos [IC95% +3,1; +117,5] (pior); MFM × c·V_dir +1,6
+[−5,5; +10,4]; **MFM × IC +6,1 [−8,6; +7,9] — não distinguível**.
+**Mapas:** MC × MFM r = 0,984, 94,2% das áreas críticas coincidentes; candidato × adotado: MC r = 0,992 (94,9%),
+MFM r = 0,977 (90,7%); r com K·C·LS 0,77 (MC) e 0,76 (MFM).
+Volume SCS-CN/medido: mediana 0,86 (0,10 a 2,15); erro mediano 46%; NSE −0,39.
+Figuras ilustrativas (não são do TCC): `Figuras/ilustrativas_27-10/` (`Scripts/_figuras_ilustrativas_candidato.py`).
+Resumo completo do modelo para a redação: `Notas Claude/resumo_modelo_completo.md`.

@@ -65,6 +65,17 @@ para quem não tem formação em hidrologia. A revisão que a acompanhou gerou c
 `Notas Claude/notas_musle_espacializada.md` e os ajustes em `Notas Claude/base_para_redacao_tcc.md` (comparação com Hao e
 Baert, autoria de Valle Junior et al.). Pontos ainda a confirmar estão no Apêndice D da apostila.
 
+## Onde estamos (27/10/2026, noite) — MODELO CANDIDATO em avaliação
+
+- **Resumo completo do modelo para escrever** (dados, passos, métodos, referências, justificativas, resultados):
+  `Notas Claude/resumo_modelo_completo.md`. Comece por ele.
+- **Candidato:** CN-I + λ = 0,05 com a retenção convertida por Woodward et al. (2003), nos dois modelos
+  (`Scripts/calcular_sy_lambda005_woodward.py`, sufixo `_l05w`). MFM 20,6% / 94% / NSE-log 0,84, empatado com a IC;
+  MC 81% / 35%, abaixo de c·chuva; volume do SCS-CN com viés de +3%; áreas críticas 91–95% iguais às do adotado.
+  **Ainda não adotado:** tabelas, figuras e mapas do TCC continuam no modelo `_sd` (λ 0,20). Se o orientador aprovar,
+  migrar como em 26/10 e refazer a lista de mudanças do Doc.
+- Figuras ilustrativas da comparação: `Figuras/ilustrativas_27-10/`.
+
 ## Atualização 27/10/2026
 
 - **Vazão de base: método confirmado** — filtro de Eckhardt (2005), α = 0,995 e BFImax = 0,70, calibrado segundo
