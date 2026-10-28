@@ -1194,3 +1194,26 @@ MFM r = 0,977 (90,7%); r com K·C·LS 0,77 (MC) e 0,76 (MFM).
 Volume SCS-CN/medido: mediana 0,86 (0,10 a 2,15); erro mediano 46%; NSE −0,39.
 Figuras ilustrativas (não são do TCC): `Figuras/ilustrativas_27-10/` (`Scripts/_figuras_ilustrativas_candidato.py`).
 Resumo completo do modelo para a redação: `Notas Claude/resumo_modelo_completo.md`.
+
+
+---
+
+## 33. De onde vem o erro do candidato e como melhorar — `Scripts/_diagnostico_erros_candidato.py` (27/10/2026)
+
+**MC (só chuva):** o erro é a água. r = 0,96 entre log(erro do sedimento) e log(volume SCS/medido); inclinação 1,07
+(≈ 1,12 esperado pela potência de Q); **91% da variância do erro é explicada pelo erro do volume**. O SCS-CN erra o
+escoamento direto de 0,10 a 2,15 vezes; o coeficiente de escoamento medido não depende da lâmina de chuva (r = −0,01),
+o que é incompatível com a forma da curva do SCS-CN (escoamento cresce mais que proporcionalmente com a chuva).
+**MFM (água medida):** o que sobra é a variação, entre eventos, da concentração de sedimento por m³ de escoamento direto
+(SY/V_dir de 1.085 a 3.806 mg/L, 3,5 vezes). O erro do MFM correlaciona 0,67 com o de SY = c·V_dir (mesma água, sem
+MUSLE); variâncias do log(erro) 0,107 e 0,099. Associações (Spearman, 17 eventos, fracas): concentração × intensidade
+máxima RI +0,49; nenhuma relação com P5, chuva de 30 dias, vazão inicial ou dias desde o evento anterior. Erro do MFM ×
+meses desde outubro −0,69 e × RI/R +0,61: superestima os eventos de 2018/19 (ev 1–6: +18% a +84%) e subestima os de
+2019/20 (ev 14–17: −10% a −55%); a concentração média sobe de ~1.480 para ~2.040 mg/L entre as duas estações chuvosas —
+**hipótese a checar com o orientador: mudança na curva turbidez→CSS, no sensor ou na fonte de sedimento entre 2019 e
+2020.** Evento 17 (3.806 mg/L, −55%) é atípico: conferir dados.
+**Melhorias possíveis:** (MC) mais postos ou chuva por radar/satélite; modelo de geração de escoamento com áreas de
+contribuição variável ou contínuo (o SCS-CN tem a forma errada aqui; as conversões calibradas do Apêndice D melhoraram o
+volume mas não o sedimento); na prática, usar a vazão medida onde houver posto. (MFM) entender a variação da concentração
+(curva de turbidez, estações, intensidade da chuva); K e C locais; incluir erosão de canal e conectividade; mais eventos.
+O erro de c·V_dir (15,9%) é perto do piso dado pela própria variação da concentração com estes dados.
