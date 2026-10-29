@@ -40,7 +40,7 @@ B = b2.SY_total_LOO_t.to_numpy()
 fig, ax = plt.subplots(1, 3, figsize=(13, 4.6), sharex=True, sharey=True)
 lim = np.array([150, 6000])
 for a_, (tit, sim, cor) in zip(ax, (("SY = c · chuva do evento\n(referência simples)", ch, CINZA),
-                                    ("Modelo calculado (MUSLE espacializada +\nvazão de base), só chuva e vazão inicial", B, AZUL),
+                                    ("Modelo Calculado (MC): MUSLE espacializada +\nvazão de base, só chuva e vazão inicial", B, AZUL),
                                     ("IC (concentrada), com volume e\npico medidos", ic, LARANJA))):
     a_.fill_between(lim, lim / 2, lim * 2, color="#e8eef6", label="faixa de fator 2")
     a_.plot(lim, lim, color="k", lw=0.8)
@@ -67,7 +67,7 @@ ax.bar(x, b2.SY_encostas_t, bottom=b2.SY_base_t, color=AZUL, label="parcela das 
 ax.scatter(x, b2.SY_obs_t, marker="D", color=VERM, zorder=4, s=34, label="sedimento medido")
 ax.set_xticks(x); ax.set_xlabel("Evento"); ax.set_ylabel("Sedimento (t)")
 ax.legend(frameon=False, fontsize=9, loc="upper left")
-ax.set_title("Previsão do modelo calculado, sem hidrograma medido: o termo de base carrega a maior parte do sedimento simulado", fontsize=10)
+ax.set_title("Previsão do MC, sem hidrograma medido: o termo de base carrega a maior parte do sedimento simulado", fontsize=10)
 fig.tight_layout(); fig.savefig(os.path.join(FIG, "fig_decomposicao.png"), dpi=150); plt.close(fig)
 
 # ---- Figura 3: mapa medio do sedimento das encostas (modelo calculado)

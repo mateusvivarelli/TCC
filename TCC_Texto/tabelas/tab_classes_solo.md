@@ -1,4 +1,4 @@
-| Classe de solo | Área (%) | Sedimento, modelo calculado (%) | kg/pixel, calculado | Sedimento, modelo forçado (%) | kg/pixel, forçado | Contribuição / área, calculado (%) |
+| Classe de solo | Área (%) | Sedimento, MC (%) | kg/pixel, MC | Sedimento, MFM (%) | kg/pixel, MFM | Contribuição / área, MC (%) |
 |---|---|---|---|---|---|---|
 | Cambissolos Háplicos | 68,6 | 93,7 | 1,69 | 93,8 | 4,75 | 137 |
 | Argissolos Vermelho-Amarelos | 17,6 | 6,3 | 0,44 | 6,2 | 1,22 | 36 |

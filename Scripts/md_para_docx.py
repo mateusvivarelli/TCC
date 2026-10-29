@@ -43,14 +43,14 @@ fmt = lambda v: ptbr(f"{v:,.1f}")
 # tabela por evento do modelo de dois componentes e tabela da escada de informacao (rascunho 02)
 try:
     b2 = pd.read_csv(r"C:\TCC\Dados Iniciais\comparacao_SY_dois_componentes.csv").sort_values("evento")
-    lb = ["**Tabela 11.** Sedimento por evento (t): medido e simulado pelo modelo calculado, com a decomposição em encostas e vazão de base.", "",
+    lb = ["**Tabela 11.** Sedimento por evento (t): medido e simulado pelo MC, com a decomposição em encostas e vazão de base.", "",
           "| Evento | Medido | Encostas | Base | Total simulado | Erro no ajuste (%) | Erro na validação cruzada (%) |", "|---|---|---|---|---|---|---|"]
     for _, r in b2.iterrows():
         lb.append(ptbr(f"| {int(r.evento)} | {r.SY_obs_t:,.0f} | {r.SY_encostas_t:,.0f} | {r.SY_base_t:,.0f} | {r.SY_total_sim_t:,.0f} | {r.erro_pct:+.0f} | {r.erro_LOO_pct:+.0f} |"))
     tab_b = "\n".join(lb)
     es = pd.read_csv(r"C:\TCC\TCC_Texto\figuras\escada_gargalo.csv")
     cab = ["| Água | Modelo | Erro mediano (%) | Dentro de fator 2 (%) | NSE em log | Spearman |", "|---|---|---|---|---|---|"]
-    nomes = {"N1": "Calculada da chuva", "N2": "N2: volume previsto por regressão", "N3": "N3: volume direto medido, base estimada", "N4": "Forçada ao medido"}
+    nomes = {"N1": "MC: água calculada da chuva", "N2": "N2: volume previsto por regressão", "N3": "N3: volume direto medido, base estimada", "N4": "MFM: água forçada ao medido"}
     le_ = ["**Tabela 13.** Desempenho do modelo de dois componentes e do teste simples com os mesmos insumos (validação cruzada; calibração em log).", ""] + cab
     li_ = [] + cab
     for _, r in es.iterrows():
@@ -97,6 +97,29 @@ for h in ("Heading 1", "Heading 2", "Heading 3"):
     hs.paragraph_format.space_before = Pt(12); hs.paragraph_format.space_after = Pt(6)
     hs.paragraph_format.keep_with_next = True
 doc.styles["Heading 1"].font.all_caps = True
+from docx.enum.style import WD_STYLE_TYPE
+_eq_st = doc.styles.add_style("Equacao", WD_STYLE_TYPE.PARAGRAPH); _eq_st.base_style = doc.styles["Normal"]
+
+
+# equacoes em UnicodeMath (formato linear); o Word as constroi com BuildUp (atualizar_sumario_word.ps1)
+LINEAR = {
+    "Y = 11,8 · (Q · qp)^0,56 · K · LS · C · P": "Y=11,8·(Q·qp)^(0,56)·K·LS·C·P",
+    "S = 25,4 · (1000 / CN − 10)": "S=25,4·(1000/CN−10)",
+    "Q = (P − λS)² / (P + (1 − λ)S),  para P > λS": 'Q=((P−λS)^2)/(P+(1−λ)S)," para "P>λS',
+    "Q = 0,  para P ≤ λS": 'Q=0," para "P≤λS',
+    "CN_I = 4,2 · CN_II / (10 − 0,058 · CN_II)": "CN_I=(4,2·CN_II)/(10−0,058·CN_II)",
+    "S = 25,4 · (1000 / CN_I − 10)": "S=25,4·(1000/CN_I−10)",
+    "SY_obs = Σ (Q · CSS · 3600 / 10⁶)  (t)": 'SY_(obs)=∑▒((Q·CSS·3600)/10^6)" (t)"',
+    "b(t) = [ (1 − BFImax) · a · b(t − 1) + (1 − a) · BFImax · Q(t) ] / (1 − a · BFImax),  com b(t) ≤ Q(t)":
+        'b(t)=((1−BFI_(max))·a·b(t−1)+(1−a)·BFI_(max)·Q(t))/(1−a·BFI_(max))," com "b(t)≤Q(t)',
+    "LS = (A_s / 22,13)^0,4 · (sen β / 0,0896)^1,3": 'LS=(A_s/22,13)^(0,4)·("sen" β/0,0896)^(1,3)',
+    "P(x) = (P₁/d₁² + P₂/d₂²) / (1/d₁² + 1/d₂²)": "P(x)=(P_1/d_1^2+P_2/d_2^2)/(1/d_1^2+1/d_2^2)",
+    "pr_k = (Q_k / 1000) · A_pix · (RI / R) / 3600   (m³/s)": 'pr_k=((Q_k/1000)·A_(pix)·(RI/R))/3600',
+    "E_unit,k = 11,8 · (Q_k · pr_k · A_pix)^0,56 · K_k · LS_k · C_k · P_k": "E_(unit,k)=11,8·(Q_k·pr_k·A_(pix))^(0,56)·K_k·LS_k·C_k·P_k",
+    "SY = c₁ · Σₖ E_unit,k  +  c₂ · (Qb_inicio · T_chuva · 3600)": "SY=c_1·∑_(k)▒E_(unit,k)+c_2·(Qb_(inicio)·T_(chuva)·3600)",
+    "mínimo de Σₙ [ ln(SY_obs,n) − ln(c₁ · Σ E_unit,n + c₂ · V_ref,n) ]²,  com c₁ ≥ 0 e c₂ ≥ 0":
+        '"mín" ∑_(n)▒[ln(SY_(obs,n))−ln(c_1·E_(unit,n)+c_2·V_(ref,n))]^2," com "c_1≥0" e "c_2≥0',
+}
 
 TOKEN = re.compile(r"(\*\*.+?\*\*|\*.+?\*|`.+?`|\[PENDENTE[^\]]*\]|\[conferir[^\]]*\]|\[PREENCHER[^\]]*\]|\[completar[^\]]*\]|\[CIDADE\]|\[UNIDADE\]|\[CURSO\])")
 HL = 7  # amarelo
@@ -175,24 +198,24 @@ def campo(par, instr):
 
 # ---------------- 1. Primeira folha (capa)
 centro("UNIVERSIDADE ESTADUAL DE CAMPINAS", True, 12)
-centro("[UNIDADE]", False, 12, 150, hl=True)
-centro("MATEUS VIVARELLI", True, 12, 120)
+centro("FACULDADE DE ENGENHARIA CIVIL, ARQUITETURA E URBANISMO", True, 12)
+centro("DEPARTAMENTO DE RECURSOS HÍDRICOS", True, 12, 150)
+centro("MATEUS GUILHERME VIVARELLI", True, 12, 120)
 centro(TITULO.upper(), True, 14, 180)
-centro("[CIDADE]", False, 12)
+centro("CAMPINAS", False, 12)
 centro("2026", False, 12)
-centro("Rascunho 01 — 15/10/2026", False, 9, 0, 24, hl=True)
+centro("Rascunho 04 — 17/10/2026", False, 9, 0, 24, hl=True)
 quebra()
 
 # ---------------- 2. Folha de rosto
-centro("MATEUS VIVARELLI", True, 12, 90)
+centro("MATEUS GUILHERME VIVARELLI", True, 12, 90)
 centro(TITULO.upper(), True, 14, 60)
 p = doc.add_paragraph(); p.paragraph_format.left_indent = Cm(8.0); p.paragraph_format.line_spacing = 1.0
 p.paragraph_format.space_after = Pt(36)
-runs(p, "Trabalho de conclusão de curso apresentado à [UNIDADE] da Universidade Estadual de Campinas como parte dos requisitos exigidos para a obtenção do título de [CURSO].", size=11)
+runs(p, "Trabalho final de curso apresentado à Faculdade de Engenharia Civil, Arquitetura e Urbanismo da Universidade Estadual de Campinas como requisito para a obtenção do título de Engenheiro Civil. Feito sob a orientação do Me. Luis Fernando Murillo-Bermúdez e co-orientação do Prof. Dr. André Luís Sotero Salustiano Martim.", size=11)
 p = doc.add_paragraph(); p.paragraph_format.line_spacing = 1.0; p.paragraph_format.space_after = Pt(60)
-r = p.add_run("ESTE EXEMPLAR CORRESPONDE À VERSÃO FINAL DO TRABALHO APRESENTADO PELO ALUNO MATEUS VIVARELLI E ORIENTADO PELO(A) PROF(A). DR(A). "); r.font.size = Pt(10)
-r = p.add_run("[PREENCHER: nome do orientador]"); r.font.size = Pt(10); r.font.highlight_color = HL
-centro("[CIDADE]", False, 12)
+r = p.add_run("ESTE EXEMPLAR CORRESPONDE À VERSÃO FINAL DO TRABALHO APRESENTADO PELO ALUNO MATEUS GUILHERME VIVARELLI E ORIENTADO PELO ME. LUIS FERNANDO MURILLO-BERMÚDEZ."); r.font.size = Pt(10)
+centro("CAMPINAS", False, 12)
 centro("2026", False, 12)
 quebra()
 
@@ -362,6 +385,11 @@ def render(lines):
                     continue
                 p = doc.add_paragraph(); p.paragraph_format.line_spacing = 1.0
                 p.paragraph_format.space_after = Pt(6)
+                if b in LINEAR:
+                    p.style = doc.styles["Equacao"]; p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    p.paragraph_format.space_before = Pt(6); p.paragraph_format.space_after = Pt(6)
+                    p.add_run(LINEAR[b])
+                    continue
                 eq = bool(re.search(r"[=·]", b)) and len(b) < 120 and not b.startswith(("**", "Nota", "[", "Esboço"))
                 if eq:
                     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -372,8 +400,12 @@ def render(lines):
                     runs(p, b, size=10)
             continue
         elif re.match(r"^\d+\. ", ln):
-            p = doc.add_paragraph(style="List Number"); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            runs(p, re.sub(r"^\d+\. ", "", ln))
+            # numeracao manual: o estilo 'List Number' do Word continua a contagem entre listas (7, 8, ... na metodologia)
+            num, resto = re.match(r"^(\d+)\. (.*)$", ln).groups()
+            p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            p.paragraph_format.left_indent = Cm(1.25); p.paragraph_format.first_line_indent = Cm(-0.75)
+            p.paragraph_format.tab_stops.add_tab_stop(Cm(1.25))
+            runs(p, f"{num}.	{resto}")
         elif ln.startswith("- "):
             p = doc.add_paragraph(style="List Bullet"); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             runs(p, ln[2:])

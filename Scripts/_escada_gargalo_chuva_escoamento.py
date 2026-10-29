@@ -143,14 +143,14 @@ for k, (key, tit, fmt) in enumerate((("MedAPE", "Erro percentual mediano (menor 
     for rr in list(r1) + list(r2):
         a.text(rr.get_x() + rr.get_width() / 2, rr.get_height() + 1, fmt.format(rr.get_height()), ha="center", fontsize=9)
     a.axhline(np.median(ape(ref)) if key == "MedAPE" else f2(ref), color="#c0392b", ls="--", lw=1.2, label="Referência: SY = c · chuva")
-    a.set_xticks(x); a.set_xticklabels(["Água calculada\nda chuva (previsão)", "Água forçada\nao medido"], fontsize=10)
+    a.set_xticks(x); a.set_xticklabels(["MC: água calculada\nda chuva (previsão)", "MFM: água forçada\nao medido"], fontsize=10)
     a.set_title(tit, fontsize=11)
     a.spines[["top", "right"]].set_visible(False)
     a.set_ylim(0, 112 if key == "fator2" else 50)
 h_, l_ = ax[0].get_legend_handles_labels()
 fig.legend(h_, l_, loc="lower center", ncol=3, frameon=False, fontsize=9, bbox_to_anchor=(0.5, 0.045))
 fig.suptitle("Quanto melhor a estimativa da água, melhor o sedimento: o gargalo é transformar chuva em escoamento", fontsize=12)
-fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN e vazão de base estimada da vazão antes do evento. Forçada ao medido: escoamento direto e vazão de base medidos.\n"
+fig.text(0.5, 0.005, "MC (calculado da chuva): escoamento direto pelo SCS-CN e vazão de base estimada da vazão antes do evento. MFM (forçado ao medido): escoamento direto e vazão de base medidos.\n"
          "Validação leave-one-out, calibração em log, 17 eventos, λ = 0,20, carga total de sedimentos.", ha="center", fontsize=7.5)
 fig.tight_layout(rect=(0, 0.11, 1, 0.95))
 fig.savefig(os.path.join(FIG, "escada_gargalo.png"), dpi=150)
