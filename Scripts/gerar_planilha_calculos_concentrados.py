@@ -1,8 +1,10 @@
-"""Gera Planilhas/planilha_calculos_concentrados.xlsx: calculos fora dos rasters, so com formulas vivas, sem estilo.
+"""Gera Planilhas/planilha_calculos_concentrados.xlsx: os calculos feitos fora dos rasters, para a bacia toda,
+com formulas vivas e formatacao minima (cabecalhos claros, linha "como e calculado", larguras, numeros).
 Entradas: Dados Iniciais/Dados_finais_histereses_corrigido.xlsx, comparacao_SY_lambda005_woodward.csv,
 eventos_processados_manuais.xlsx (Q_pico) e TCC_Texto/tabelas/tab_eventos.md."""
 import re, datetime as dt, pandas as pd, openpyxl
 from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter as L
 
 N = 17
@@ -22,156 +24,367 @@ for l in open("TCC_Texto/tabelas/tab_eventos.md", encoding="utf-8").read().split
     c = [x.strip() for x in l.strip("|").split("|")]
     tab.append((int(c[0]), dtp(c[1]), dtp(c[2]), *[float(x.replace(",", ".")) for x in c[4:8]]))
 
+# ---------------- estilo minimo ----------------
+B = Font(bold=True)
+TIT = Font(bold=True, size=13)
+NOTA = Font(italic=True, color="666666")
+CAB_FILL = PatternFill("solid", fgColor="DDEBF7")
+RASTER_FILL = PatternFill("solid", fgColor="FFF2CC")
+RES_FILL = PatternFill("solid", fgColor="E2EFDA")
+WRAP = Alignment(wrap_text=True, vertical="top")
+FMT = {"t": "#,##0", "t1": "#,##0.0", "m3": "#,##0", "mm": "0.0", "pct": "0.0", "r": "0.00",
+       "ln": "0.000", "c": "0.000000", "q": "0.000"}
+
+def header(ws, row, cols, widths=None):
+    """cols: lista de (cabecalho, como e calculado)."""
+    for j, (h, como) in enumerate(cols, start=1):
+        a = ws.cell(row, j, h); a.font = B; a.fill = CAB_FILL; a.alignment = WRAP
+        b = ws.cell(row + 1, j, como); b.font = NOTA; b.alignment = WRAP
+        b.data_type = "s"  # texto que comeca com "=" nao e formula
+        if widths:
+            ws.column_dimensions[L(j)].width = widths[j - 1] if isinstance(widths, list) else widths
+    ws.row_dimensions[row].height = 45
+    ws.row_dimensions[row + 1].height = 45
+
+def titulo(ws, texto, explica):
+    ws["A1"] = texto; ws["A1"].font = TIT
+    ws["A2"] = explica; ws["A2"].font = NOTA
+    ws["A2"].alignment = Alignment(wrap_text=False)
+
+def fmt_col(ws, col, r0, r1, f):
+    for r in range(r0, r1 + 1):
+        ws.cell(r, col).number_format = FMT[f]
+
 wb = Workbook()
 
-# ---------- serie ----------
-ws = wb.active; ws.title = "serie"
-ws.append(["Data", "Q_m3s", "CSS_mgL", "Bt_planilha_m3s", "Bt_Eckhardt_m3s", "Q_x_CSS_t_por_h"])
-ws["H1"], ws["I1"] = "alfa", 0.995
-ws["H2"], ws["I2"] = "BFImax", 0.70
-for i, (d, p1, p2, pt, q, css, bt) in enumerate(serie):
-    r = i + 2
-    ws.cell(r, 1, d); ws.cell(r, 2, q); ws.cell(r, 3, css); ws.cell(r, 4, bt)
-    if i == 0:
-        ws.cell(r, 5, f"=D{r}")
-    else:
-        ws.cell(r, 5, f"=MIN(B{r},((1-$I$2)*$I$1*E{r-1}+(1-$I$1)*$I$2*B{r})/(1-$I$1*$I$2))")
-    ws.cell(r, 6, f"=B{r}*C{r}*3.6/1000")
-last = len(serie) + 1
-S = lambda col: f"serie!${col}$2:${col}${last}"
+# ================= Leia-me =================
+w0 = wb.active; w0.title = "Leia-me"
+w0.column_dimensions["A"].width = 22; w0.column_dimensions["B"].width = 110
+linhas = [
+    ("Planilha dos cálculos concentrados do TCC (bacia inteira, fora dos rasters)", None),
+    ("", None),
+    ("O que é", "Tudo o que o modelo calcula depois que os rasters já deram a soma de E_unit de cada evento: a calibração do coeficiente c, a validação cruzada, as métricas e as comparações. Também refaz, a partir da série horária, o volume, a vazão de base e a carga medida de cada evento."),
+    ("Como ler", "Cada aba tem: linha 1 = título; linha 2 = o que a aba faz; depois, uma linha de cabeçalhos (em azul) e, logo abaixo, uma linha em cinza dizendo como cada coluna é calculada. Clique numa célula para ver a fórmula."),
+    ("Cores", "Azul = cabeçalho. Amarelo = número que vem dos rasters (calculado em Python sobre os mapas; aqui entra como valor). Verde = resultado final da aba."),
+    ("", None),
+    ("Abas, na ordem", None),
+    ("Serie_horaria", "Dados horários da seção de controle (vazão Q e concentração CSS) e a vazão de base: a da planilha original e a recalculada aqui pelo filtro de Eckhardt (alfa = 0,995; BFImax = 0,70)."),
+    ("Eventos", "Uma linha por evento: chuva, volume total, vazão de base, escoamento direto medido (V_dir), carga medida (SY_medido), e os números que vêm dos rasters (volume do SCS-CN e soma de E_unit no MC e no MFM)."),
+    ("Volume", "Compara o escoamento direto calculado pelo SCS-CN com o medido (viés, erro, NSE do volume)."),
+    ("MC", "Modelo Calculado: SY = c * soma(E_unit), com a água do SCS-CN (só chuva). Calibra c, faz a validação cruzada e calcula as métricas."),
+    ("MFM", "Modelo Forçado ao Medido: igual ao MC, mas com o escoamento direto medido distribuído pelo padrão do SCS-CN."),
+    ("Regra_chuva", "Regra simples SY = c * R (R = chuva do evento, mm). Referência para o MC (usa a mesma informação: só chuva)."),
+    ("Regra_Vdir", "Regra simples SY = c * V_dir (escoamento direto medido). Referência para o MFM."),
+    ("Regra_TR", "Regra simples SY = c * TR (volume total medido, com a vazão de base). Só para comparação."),
+    ("IC_refeita", "Formulação concentrada da Iniciação Científica: SY = alfa * (TR * Qpico)^beta * K * LS * C, com alfa e beta ajustados por regressão em log."),
+    ("Resumo", "Tabela final comparando todos os modelos (puxa os resultados das outras abas)."),
+    ("", None),
+    ("Calibração de c", "c é escolhido para minimizar o erro em escala log: ln c = média de [ln(SY_medido) - ln(x)], em que x é a soma de E_unit (MC, MFM) ou a grandeza da regra simples. Na prática, c é a média geométrica de SY_medido / x."),
+    ("Validação cruzada", "Leave-one-out: para prever cada evento, c é recalculado com os outros 16 eventos (sem ele). As métricas principais usam essas 17 previsões."),
+    ("Métricas", "Erro mediano (%): mediana de |simulado - medido| / medido. Fator 2: % de eventos com simulado entre metade e o dobro do medido. NSE em log: 1 - soma[(ln sim - ln med)²] / soma[(ln med - média)²]. NSE linear: o mesmo sem log. Spearman: correlação entre as posições (ranking) do simulado e do medido."),
+    ("Unidades", "Volumes em m³; chuva em mm; vazão em m³/s; CSS em mg/L; sedimento em t. E_unit é um índice sem unidade física; c converte o índice em t."),
+]
+for i, (a, b) in enumerate(linhas, start=1):
+    w0.cell(i, 1, a).font = TIT if i == 1 else B
+    if b:
+        c = w0.cell(i, 2, b); c.alignment = WRAP
+        w0.row_dimensions[i].height = max(15, 15 * (len(b) // 100 + 1))
 
-# ---------- eventos ----------
-we = wb.create_sheet("eventos")
-we.append(["evento", "inicio", "fim", "P_DBT5_mm", "P_CampoLimpo_mm", "R_mm", "RI_mm_h", "Qpico_m3s", "TR_m3",
-           "SomaBt_m3", "SomaBt_Eckhardt_m3", "V_dir_m3", "V_SCS_m3", "V_SCS_sobre_V_dir", "SomaE_MC", "SomaE_MFM", "SY_obs_t"])
+# ================= Serie_horaria =================
+ws = wb.create_sheet("Serie_horaria")
+titulo(ws, "Série horária na seção de controle",
+       "Fonte: Dados_finais_histereses_corrigido.xlsx. A vazão de base é recalculada pelo filtro de Eckhardt com os parâmetros das células J4 e J5.")
+header(ws, 4, [("Data e hora", "dado"), ("Vazão Q (m³/s)", "dado"), ("Concentração de sedimento CSS (mg/L)", "dado"),
+               ("Vazão de base da planilha original (m³/s)", "dado"),
+               ("Vazão de base pelo filtro de Eckhardt (m³/s)", "= MIN(Q; ((1-BFImax)*alfa*base anterior + (1-alfa)*BFImax*Q) / (1-alfa*BFImax))"),
+               ("Carga de sedimento na hora (t)", "= Q * CSS * 3600 s / 1.000.000 (g -> t)")],
+       [18, 12, 16, 18, 22, 18])
+ws["I4"], ws["J4"] = "alfa (parâmetro do filtro)", 0.995
+ws["I5"], ws["J5"] = "BFImax (parâmetro do filtro)", 0.70
+ws["I4"].font = ws["I5"].font = B
+ws.column_dimensions["I"].width = 28
+R0 = 6
+for i, (d, p1, p2, pt, q, css, bt) in enumerate(serie):
+    r = R0 + i
+    ws.cell(r, 1, d).number_format = "dd/mm/yyyy hh:mm"
+    ws.cell(r, 2, q); ws.cell(r, 3, css); ws.cell(r, 4, bt)
+    ws.cell(r, 5, f"=D{r}" if i == 0 else
+            f"=MIN(B{r},((1-$J$5)*$J$4*E{r-1}+(1-$J$4)*$J$5*B{r})/(1-$J$4*$J$5))")
+    ws.cell(r, 6, f"=B{r}*C{r}*3.6/1000")
+last = R0 + len(serie) - 1
+fmt_col(ws, 5, R0, last, "q"); fmt_col(ws, 6, R0, last, "q")
+ws.freeze_panes = "B6"
+S = lambda col: f"Serie_horaria!${col}${R0}:${col}${last}"
+
+# ================= Eventos =================
+we = wb.create_sheet("Eventos")
+titulo(we, "Os 17 eventos: dados medidos e números que vêm dos rasters",
+       "Volumes e carga são somados na Série_horaria entre o início e o fim do evento. As colunas em amarelo vêm dos rasters (Python).")
+cols = [("Evento", ""), ("Início", "dado"), ("Fim", "dado"),
+        ("Chuva no posto DBT5, P1 (mm)", "dado"), ("Chuva no posto Campo Limpo, P2 (mm)", "dado"),
+        ("Chuva do evento R (mm)", "= 0,307*P1 + 0,693*P2"),
+        ("Intensidade máxima em 60 min RI (mm/h)", "dado"), ("Vazão de pico (m³/s)", "dado"),
+        ("Volume total escoado TR (m³)", "= soma de Q * 3600 na janela"),
+        ("Volume da vazão de base (m³)", "= soma da base da planilha * 3600 na janela"),
+        ("Volume da vazão de base, Eckhardt recalculado (m³)", "= soma da base recalculada * 3600 (só para conferência)"),
+        ("Escoamento direto medido V_dir (m³)", "= TR - volume da base"),
+        ("Escoamento direto calculado pelo SCS-CN V_SCS (m³)", "RASTERS: soma de Q de todos os pixels"),
+        ("Razão SCS-CN / medido", "= V_SCS / V_dir"),
+        ("Soma de E_unit no MC (índice)", "RASTERS: soma do índice de erosão, água do SCS-CN"),
+        ("Soma de E_unit no MFM (índice)", "RASTERS: soma do índice de erosão, água medida"),
+        ("Sedimento medido SY_medido (t)", "= soma da carga horária na janela")]
+header(we, 4, cols, [8, 15, 15, 11, 11, 11, 12, 11, 14, 14, 15, 14, 15, 11, 13, 13, 13])
+E0 = 6
 for i, (ev, ini, fim, p1, p2, r_, ri) in enumerate(tab):
-    r = i + 2
-    we.cell(r, 1, ev); we.cell(r, 2, ini); we.cell(r, 3, fim); we.cell(r, 4, p1); we.cell(r, 5, p2)
+    r = E0 + i
+    we.cell(r, 1, ev)
+    we.cell(r, 2, ini).number_format = "dd/mm/yyyy hh:mm"
+    we.cell(r, 3, fim).number_format = "dd/mm/yyyy hh:mm"
+    we.cell(r, 4, p1); we.cell(r, 5, p2)
     we.cell(r, 6, f"=0.307*D{r}+0.693*E{r}"); we.cell(r, 7, ri); we.cell(r, 8, qpico[i])
     win = f'{S("A")},">="&B{r},{S("A")},"<="&C{r}'
     we.cell(r, 9, f'=SUMIFS({S("B")},{win})*3600')
     we.cell(r, 10, f'=SUMIFS({S("D")},{win})*3600')
     we.cell(r, 11, f'=SUMIFS({S("E")},{win})*3600')
     we.cell(r, 12, f"=I{r}-J{r}")
-    we.cell(r, 13, float(csv.V_dir_SCS_m3[i])); we.cell(r, 14, f"=M{r}/L{r}")
+    we.cell(r, 13, float(csv.V_dir_SCS_m3[i]))
+    we.cell(r, 14, f"=M{r}/L{r}")
     we.cell(r, 15, float(csv.soma_E_unit_calc_t[i])); we.cell(r, 16, float(csv.soma_E_unit_forc_t[i]))
     we.cell(r, 17, f'=SUMIFS({S("F")},{win})')
-R0, R1 = 2, N + 1
+    for col in (13, 15, 16):
+        we.cell(r, col).fill = RASTER_FILL
+E1 = E0 + N - 1
+for col, f in [(6, "mm"), (8, "r"), (9, "m3"), (10, "m3"), (11, "m3"), (12, "m3"), (13, "m3"), (14, "r"),
+               (15, "t"), (16, "t"), (17, "t")]:
+    fmt_col(we, col, E0, E1, f)
+we.cell(E1 + 1, 1, "Total").font = B
+for col in (9, 10, 12, 13, 17):
+    c = we.cell(E1 + 1, col, f"=SUM({L(col)}{E0}:{L(col)}{E1})"); c.font = B; c.number_format = FMT["m3"]
+we.freeze_panes = "B6"
+EV = lambda col, r: f"Eventos!{col}{r}"
+RNG = lambda col: f"Eventos!${col}${E0}:${col}${E1}"
 
-# ---------- calibracao ----------
-wc = wb.create_sheet("calibracao")
-# modelos: (nome, coluna de x em eventos)
-models = [("MC", "O"), ("MFM", "P"), ("chuva", "F"), ("Vdir", "L"), ("TR", "I")]
-hdr = ["evento", "ln_SY_obs"]
-for m, _ in models:
-    hdr += [f"ln_x_{m}", f"SY_ajuste_{m}", f"c_LOO_{m}", f"SY_LOO_{m}"]
-wc.append(hdr)
+# ================= Volume =================
+wv = wb.create_sheet("Volume")
+titulo(wv, "Escoamento direto: SCS-CN contra o medido",
+       "Mostra quanto o SCS-CN (CN-I, lambda = 0,05 com S convertido) erra a água de cada evento.")
+header(wv, 4, [("Evento", ""), ("Escoamento direto medido V_dir (m³)", "da aba Eventos"),
+               ("Escoamento direto do SCS-CN V_SCS (m³)", "da aba Eventos (rasters)"),
+               ("Razão V_SCS / V_dir", "= V_SCS / V_dir"),
+               ("Erro (%)", "= (razão - 1) * 100"), ("Erro absoluto (%)", "= |erro|"),
+               ("Dentro de fator 2?", "sim se a razão está entre 0,5 e 2")],
+       [8, 16, 16, 12, 10, 10, 11])
 for i in range(N):
-    r = i + 2
-    wc.cell(r, 1, f"=eventos!A{r}"); wc.cell(r, 2, f"=LN(eventos!Q{r})")
-    for k, (m, col) in enumerate(models):
-        c0 = 3 + 4 * k
-        lx, sa, cl, sl = (L(c0 + j) for j in range(4))
-        wc.cell(r, c0, f"=LN(eventos!{col}{r})")
-        wc.cell(r, c0 + 1, f"=${lx}$21*eventos!{col}{r}")
-        wc.cell(r, c0 + 2, f"=EXP((SUM($B$2:$B$18)-$B{r}-(SUM({lx}$2:{lx}$18)-{lx}{r}))/16)")
-        wc.cell(r, c0 + 3, f"={cl}{r}*eventos!{col}{r}")
-wc.cell(21, 1, "c")
-for k in range(len(models)):
-    lx = L(3 + 4 * k)
-    wc.cell(21, 3 + 4 * k, f"=EXP(AVERAGE($B$2:$B$18)-AVERAGE({lx}2:{lx}18))")
+    r, e = E0 + i, E0 + i
+    wv.cell(r, 1, f"={EV('A', e)}"); wv.cell(r, 2, f"={EV('L', e)}"); wv.cell(r, 3, f"={EV('M', e)}")
+    wv.cell(r, 4, f"=C{r}/B{r}"); wv.cell(r, 5, f"=(D{r}-1)*100"); wv.cell(r, 6, f"=ABS(E{r})")
+    wv.cell(r, 7, f'=IF(AND(D{r}>=0.5,D{r}<=2),"sim","não")')
+fmt_col(wv, 2, E0, E1, "m3"); fmt_col(wv, 3, E0, E1, "m3"); fmt_col(wv, 4, E0, E1, "r")
+fmt_col(wv, 5, E0, E1, "pct"); fmt_col(wv, 6, E0, E1, "pct")
+vres = [("Viés do total (%)", f"=(SUM(C{E0}:C{E1})/SUM(B{E0}:B{E1})-1)*100", "pct"),
+        ("Erro médio absoluto por evento (%)", f"=AVERAGE(F{E0}:F{E1})", "pct"),
+        ("Erro mediano por evento (%)", f"=MEDIAN(F{E0}:F{E1})", "pct"),
+        ("Razão mediana", f"=MEDIAN(D{E0}:D{E1})", "r"),
+        ("Eventos dentro de fator 2 (%)", f'=COUNTIF(G{E0}:G{E1},"sim")/{N}*100', "pct"),
+        ("NSE do volume", f"=1-SUMXMY2(C{E0}:C{E1},B{E0}:B{E1})/DEVSQ(B{E0}:B{E1})", "r")]
+VR = {}
+for k, (lab, f, nf) in enumerate(vres):
+    r = E1 + 3 + k
+    a = wv.cell(r, 1, lab); a.font = B
+    wv.merge_cells(start_row=r, start_column=1, end_row=r, end_column=3)
+    c = wv.cell(r, 4, f); c.fill = RES_FILL; c.font = B; c.number_format = FMT[nf]
+    VR[lab] = f"Volume!$D${r}"
+wv.freeze_panes = "B6"
 
-# ---------- metricas ----------
-wm = wb.create_sheet("metricas")
-hdr = ["evento", "ln_SY_obs", "rank_SY_obs"]
-for m, _ in models + [("IC", None)]:
-    hdr += [f"razao_ajuste_{m}", f"razao_LOO_{m}", f"erro_LOO_pct_{m}", f"abs_erro_LOO_pct_{m}", f"ln_SY_LOO_{m}", f"rank_LOO_{m}"]
-wm.append(hdr)
-# IC (aba propria) precisa existir antes; colunas SY_LOO da IC em ic!M
+# ================= abas dos modelos (mesmo desenho) =================
+RES = {}  # nome da aba -> dict de celulas de resultado
+
+def aba_modelo(nome, titulo_txt, explica, x_nome, x_col, x_fmt, c_unid):
+    w = wb.create_sheet(nome)
+    titulo(w, titulo_txt, explica)
+    cols = [("Evento", ""),
+            ("Sedimento medido (t)", "da aba Eventos"),
+            (x_nome, "da aba Eventos"),
+            ("ln(medido)", "= LN(medido)"),
+            ("ln(x)", "= LN(x)"),
+            ("ln(medido) - ln(x)", "= D - E (o c ótimo é a média desta coluna, em exp)"),
+            ("Simulado no ajuste (t)", "= c (com os 17 eventos) * x"),
+            ("Erro no ajuste (%)", "= (simulado / medido - 1) * 100"),
+            ("c sem este evento (validação cruzada)", "= EXP(média de F nos outros 16 eventos)"),
+            ("Simulado na validação cruzada (t)", "= c sem este evento * x"),
+            ("Erro na validação cruzada (%)", "= (simulado / medido - 1) * 100"),
+            ("Erro absoluto (%)", "= |erro na validação cruzada|"),
+            ("Razão simulado / medido", "= simulado na validação cruzada / medido"),
+            ("Dentro de fator 2?", "sim se a razão está entre 0,5 e 2"),
+            ("ln(simulado)", "= LN(simulado na validação cruzada); usado no NSE em log"),
+            ("Posição do medido (1 = menor)", "ranking, para o Spearman"),
+            ("Posição do simulado (1 = menor)", "ranking, para o Spearman")]
+    header(w, 4, cols, [8, 12, 15, 10, 10, 13, 13, 11, 14, 14, 12, 11, 11, 10, 11, 11, 11])
+    rc = E1 + 4  # linha do c calibrado (resultado)
+    for i in range(N):
+        r, e = E0 + i, E0 + i
+        w.cell(r, 1, f"={EV('A', e)}"); w.cell(r, 2, f"={EV('Q', e)}"); w.cell(r, 3, f"={EV(x_col, e)}")
+        w.cell(r, 4, f"=LN(B{r})"); w.cell(r, 5, f"=LN(C{r})"); w.cell(r, 6, f"=D{r}-E{r}")
+        w.cell(r, 7, f"=$D${rc}*C{r}"); w.cell(r, 8, f"=(G{r}/B{r}-1)*100")
+        w.cell(r, 9, f"=EXP((SUM($F${E0}:$F${E1})-F{r})/{N-1})")
+        w.cell(r, 10, f"=I{r}*C{r}"); w.cell(r, 11, f"=(J{r}/B{r}-1)*100"); w.cell(r, 12, f"=ABS(K{r})")
+        w.cell(r, 13, f"=J{r}/B{r}")
+        w.cell(r, 14, f'=IF(AND(M{r}>=0.5,M{r}<=2),"sim","não")')
+        w.cell(r, 15, f"=LN(J{r})")
+        w.cell(r, 16, f"=RANK(B{r},$B${E0}:$B${E1},1)+(COUNTIF($B${E0}:$B${E1},B{r})-1)/2")
+        w.cell(r, 17, f"=RANK(J{r},$J${E0}:$J${E1},1)+(COUNTIF($J${E0}:$J${E1},J{r})-1)/2")
+    for col, f in [(2, "t"), (3, x_fmt), (4, "ln"), (5, "ln"), (6, "ln"), (7, "t"), (8, "pct"), (9, "c"),
+                   (10, "t"), (11, "pct"), (12, "pct"), (13, "r"), (15, "ln")]:
+        fmt_col(w, col, E0, E1, f)
+    res = [(f"c calibrado com os 17 eventos ({c_unid})", f"=EXP(AVERAGE(F{E0}:F{E1}))", "c"),
+           ("Erro mediano na validação cruzada (%)", f"=MEDIAN(L{E0}:L{E1})", "pct"),
+           ("Eventos dentro de fator 2 (%)", f'=COUNTIF(N{E0}:N{E1},"sim")/{N}*100', "pct"),
+           ("NSE em escala log (validação cruzada)", f"=1-SUMXMY2(O{E0}:O{E1},D{E0}:D{E1})/DEVSQ(D{E0}:D{E1})", "r"),
+           ("NSE linear (validação cruzada; secundário)", f"=1-SUMXMY2(J{E0}:J{E1},B{E0}:B{E1})/DEVSQ(B{E0}:B{E1})", "r"),
+           ("Spearman (validação cruzada)", f"=CORREL(P{E0}:P{E1},Q{E0}:Q{E1})", "r")]
+    cells = {}
+    w.cell(rc - 1, 1, "Resultados").font = TIT
+    for k, (lab, f, nf) in enumerate(res):
+        r = rc + k
+        a = w.cell(r, 1, lab); a.font = B
+        w.merge_cells(start_row=r, start_column=1, end_row=r, end_column=3)
+        c = w.cell(r, 4, f); c.fill = RES_FILL; c.font = B; c.number_format = FMT[nf]
+        cells[k] = f"'{nome}'!$D${r}" if " " in nome else f"{nome}!$D${r}"
+    w.freeze_panes = "B6"
+    RES[nome] = cells
+
+aba_modelo("MC", "Modelo Calculado (MC): SY = c * soma(E_unit), água calculada pelo SCS-CN",
+           "x = soma de E_unit sobre os 153.855 pixels, com o escoamento direto do SCS-CN (só chuva). É a previsão.",
+           "x = soma de E_unit no MC (índice)", "O", "t", "t por unidade de E_unit")
+aba_modelo("MFM", "Modelo Forçado ao Medido (MFM): SY = c * soma(E_unit), água medida",
+           "x = soma de E_unit com o escoamento direto medido distribuído pelo padrão do SCS-CN. Não é previsão: mostra o desempenho com a água certa.",
+           "x = soma de E_unit no MFM (índice)", "P", "t", "t por unidade de E_unit")
+aba_modelo("Regra_chuva", "Regra simples: SY = c * R (chuva do evento)",
+           "Referência para o MC: usa só a chuva, como o MC.",
+           "x = chuva do evento R (mm)", "F", "mm", "t por mm")
+aba_modelo("Regra_Vdir", "Regra simples: SY = c * V_dir (escoamento direto medido)",
+           "Referência para o MFM: usa a mesma água medida, sem a MUSLE.",
+           "x = escoamento direto medido V_dir (m³)", "L", "m3", "t por m³")
+aba_modelo("Regra_TR", "Regra simples: SY = c * TR (volume total medido)",
+           "Só para comparação: usa o volume total, com a vazão de base.",
+           "x = volume total TR (m³)", "I", "m3", "t por m³")
+
+# ================= IC_refeita =================
+wi = wb.create_sheet("IC_refeita")
+titulo(wi, "IC refeita: SY = alfa * (TR * Qpico)^beta * K * LS * C",
+       "Formulação concentrada da Iniciação Científica, com K, LS e C médios da bacia (células D29 a D31). alfa e beta: regressão de ln(SY/KLSC) em ln(D).")
+cols = [("Evento", ""), ("Sedimento medido (t)", "da aba Eventos"),
+        ("D = TR * vazão de pico (m³ * m³/s)", "= TR * Qpico (aba Eventos)"),
+        ("ln(D)", "= LN(D)"), ("ln(medido / KLSC)", "= LN(medido / (K*LS*C))"),
+        ("Simulado no ajuste (t)", "= alfa * D^beta * KLSC (alfa e beta dos 17 eventos)"),
+        ("Erro no ajuste (%)", "= (simulado / medido - 1) * 100"),
+        ("beta sem este evento", "inclinação da regressão sem o evento (SLOPE nos outros 16)"),
+        ("ln(alfa) sem este evento", "intercepto da regressão sem o evento"),
+        ("Simulado na validação cruzada (t)", "= EXP(ln alfa + beta * ln D) * KLSC"),
+        ("Erro na validação cruzada (%)", "= (simulado / medido - 1) * 100"),
+        ("Erro absoluto (%)", "= |erro|"),
+        ("Razão simulado / medido", "= simulado / medido"),
+        ("Dentro de fator 2?", "sim se a razão está entre 0,5 e 2"),
+        ("ln(simulado)", "= LN(simulado na validação cruzada)"),
+        ("Posição do medido (1 = menor)", "ranking"), ("Posição do simulado (1 = menor)", "ranking")]
+header(wi, 4, cols, [8, 12, 16, 10, 12, 13, 11, 13, 13, 14, 12, 11, 11, 10, 11, 11, 11])
+KR = E1 + 7  # linha do K
 for i in range(N):
-    r = i + 2
-    wm.cell(r, 1, f"=eventos!A{r}"); wm.cell(r, 2, f"=calibracao!B{r}")
-    wm.cell(r, 3, f"=RANK(eventos!Q{r},eventos!$Q$2:$Q$18,1)+(COUNTIF(eventos!$Q$2:$Q$18,eventos!Q{r})-1)/2")
-    for k in range(len(models) + 1):
-        c0 = 4 + 6 * k
-        if k < len(models):
-            base = 3 + 4 * k
-            adj, loo = f"calibracao!{L(base+1)}{r}", f"calibracao!{L(base+3)}{r}"
-        else:
-            adj, loo = f"ic!K{r}", f"ic!L{r}"
-        rl = f"{L(c0+1)}"
-        wm.cell(r, c0, f"={adj}/eventos!Q{r}")
-        wm.cell(r, c0 + 1, f"={loo}/eventos!Q{r}")
-        wm.cell(r, c0 + 2, f"=({L(c0+1)}{r}-1)*100")
-        wm.cell(r, c0 + 3, f"=ABS({L(c0+2)}{r})")
-        wm.cell(r, c0 + 4, f"=LN({loo})")
-        wm.cell(r, c0 + 5, f"=RANK({loo},{('calibracao!'+L(base+3)+'$2:'+L(base+3)+'$18') if k < len(models) else 'ic!$L$2:$L$18'},1)+(COUNTIF({('calibracao!'+L(base+3)+'$2:'+L(base+3)+'$18') if k < len(models) else 'ic!$L$2:$L$18'},{loo})-1)/2")
-# resumo (linhas 21 em diante): rotulo em A, valor na coluna razao_LOO de cada modelo
-labels = ["erro_mediano_LOO_pct", "dentro_fator2_pct", "NSE_log_LOO", "NSE_linear_LOO", "Spearman_LOO",
-          "erro_mediano_ajuste_pct", "NSE_log_ajuste"]
-for j, lab in enumerate(labels):
-    wm.cell(21 + j, 1, lab)
-for k, (m, _) in enumerate(models + [("IC", None)]):
-    c0 = 4 + 6 * k
-    ra, rl, ab, ln, rk = L(c0), L(c0 + 1), L(c0 + 3), L(c0 + 4), L(c0 + 5)
-    if k < len(models):
-        loo = f"calibracao!{L(3+4*k+3)}$2:{L(3+4*k+3)}$18"
+    r, e = E0 + i, E0 + i
+    wi.cell(r, 1, f"={EV('A', e)}"); wi.cell(r, 2, f"={EV('Q', e)}")
+    wi.cell(r, 3, f"={EV('I', e)}*{EV('H', e)}")
+    wi.cell(r, 4, f"=LN(C{r})"); wi.cell(r, 5, f"=LN(B{r}/$D${KR+3})")
+    wi.cell(r, 6, f"=$D${E1+4}*C{r}^$D${E1+3}*$D${KR+3}"); wi.cell(r, 7, f"=(F{r}/B{r}-1)*100")
+    # regressao sem o evento i, por somas (n = 16)
+    sx = f"(SUM($D${E0}:$D${E1})-D{r})"; sy = f"(SUM($E${E0}:$E${E1})-E{r})"
+    sxx = f"(SUMSQ($D${E0}:$D${E1})-D{r}^2)"; sxy = f"(SUMPRODUCT($D${E0}:$D${E1},$E${E0}:$E${E1})-D{r}*E{r})"
+    n = N - 1
+    wi.cell(r, 8, f"=({n}*{sxy}-{sx}*{sy})/({n}*{sxx}-{sx}^2)")
+    wi.cell(r, 9, f"=({sy}-H{r}*{sx})/{n}")
+    wi.cell(r, 10, f"=EXP(I{r}+H{r}*D{r})*$D${KR+3}")
+    wi.cell(r, 11, f"=(J{r}/B{r}-1)*100"); wi.cell(r, 12, f"=ABS(K{r})"); wi.cell(r, 13, f"=J{r}/B{r}")
+    wi.cell(r, 14, f'=IF(AND(M{r}>=0.5,M{r}<=2),"sim","não")'); wi.cell(r, 15, f"=LN(J{r})")
+    wi.cell(r, 16, f"=RANK(B{r},$B${E0}:$B${E1},1)+(COUNTIF($B${E0}:$B${E1},B{r})-1)/2")
+    wi.cell(r, 17, f"=RANK(J{r},$J${E0}:$J${E1},1)+(COUNTIF($J${E0}:$J${E1},J{r})-1)/2")
+for col, f in [(2, "t"), (3, "t"), (4, "ln"), (5, "ln"), (6, "t"), (7, "pct"), (8, "q"), (9, "q"),
+               (10, "t"), (11, "pct"), (12, "pct"), (13, "r"), (15, "ln")]:
+    fmt_col(wi, col, E0, E1, f)
+wi.cell(E1 + 2, 1, "Coeficientes (17 eventos)").font = TIT
+par = [("beta (expoente)", f"=SLOPE(E{E0}:E{E1},D{E0}:D{E1})", "q"),
+       ("alfa (coeficiente)", f"=EXP(INTERCEPT(E{E0}:E{E1},D{E0}:D{E1}))", "q")]
+for k, (lab, f, nf) in enumerate(par):
+    r = E1 + 3 + k
+    wi.cell(r, 1, lab).font = B
+    wi.merge_cells(start_row=r, start_column=1, end_row=r, end_column=3)
+    c = wi.cell(r, 4, f); c.fill = RES_FILL; c.font = B; c.number_format = FMT[nf]
+wi.cell(KR - 1, 1, "Fatores médios da bacia usados pela IC").font = TIT
+for k, (lab, v) in enumerate([("K médio", 0.031), ("LS médio", 0.536), ("C médio", 0.267)]):
+    wi.cell(KR + k, 1, lab).font = B
+    wi.merge_cells(start_row=KR + k, start_column=1, end_row=KR + k, end_column=3)
+    wi.cell(KR + k, 4, v)
+wi.cell(KR + 3, 1, "KLSC = K * LS * C").font = B
+wi.merge_cells(start_row=KR + 3, start_column=1, end_row=KR + 3, end_column=3)
+wi.cell(KR + 3, 4, f"=D{KR}*D{KR+1}*D{KR+2}").number_format = "0.00000"
+rr = KR + 5
+wi.cell(rr - 1, 1, "Resultados").font = TIT
+res = [("Erro mediano na validação cruzada (%)", f"=MEDIAN(L{E0}:L{E1})", "pct"),
+       ("Eventos dentro de fator 2 (%)", f'=COUNTIF(N{E0}:N{E1},"sim")/{N}*100', "pct"),
+       ("NSE em escala log (validação cruzada)", f"=1-SUMXMY2(O{E0}:O{E1},LN(B{E0}:B{E1}))/DEVSQ(LN(B{E0}:B{E1}))", "r"),
+       ("NSE linear (validação cruzada; secundário)", f"=1-SUMXMY2(J{E0}:J{E1},B{E0}:B{E1})/DEVSQ(B{E0}:B{E1})", "r"),
+       ("Spearman (validação cruzada)", f"=CORREL(P{E0}:P{E1},Q{E0}:Q{E1})", "r")]
+icc = {}
+for k, (lab, f, nf) in enumerate(res):
+    r = rr + k
+    wi.cell(r, 1, lab).font = B
+    wi.merge_cells(start_row=r, start_column=1, end_row=r, end_column=3)
+    c = wi.cell(r, 4, f); c.fill = RES_FILL; c.font = B; c.number_format = FMT[nf]
+    icc[k] = f"IC_refeita!$D${r}"
+# NSE em log da IC: usa ln do medido da coluna auxiliar (evita formula de matriz)
+wi.cell(rr + 2, 4, f"=1-SUMXMY2(O{E0}:O{E1},R{E0}:R{E1})/DEVSQ(R{E0}:R{E1})")
+wi.cell(4, 18, "ln(medido)").font = B; wi.cell(4, 18).fill = CAB_FILL
+wi.cell(5, 18, "= LN(medido)").font = NOTA
+wi.cell(5, 18).data_type = "s"
+for i in range(N):
+    r = E0 + i
+    wi.cell(r, 18, f"=LN(B{r})").number_format = FMT["ln"]
+wi.freeze_panes = "B6"
+
+# ================= Resumo =================
+wr = wb.create_sheet("Resumo")
+titulo(wr, "Resumo: desempenho na validação cruzada (17 eventos, calibração em log, carga total)",
+       "Todos os números vêm das outras abas. Erro mediano, fator 2, NSE em log e Spearman são as métricas principais; o NSE linear é secundário.")
+header(wr, 4, [("Modelo", ""), ("Informação medida usada", ""), ("Coeficiente c", "c com os 17 eventos"),
+               ("Erro mediano (%)", "validação cruzada"), ("Dentro de fator 2 (%)", "validação cruzada"),
+               ("NSE em log", "validação cruzada"), ("Spearman", "validação cruzada"),
+               ("NSE linear (secundário)", "validação cruzada")],
+       [34, 34, 14, 12, 12, 11, 11, 12])
+mods = [("MC (Modelo Calculado)", "chuva", "MC"), ("Regra SY = c * chuva", "chuva", "Regra_chuva"),
+        ("MFM (Modelo Forçado ao Medido)", "chuva e escoamento direto medido", "MFM"),
+        ("Regra SY = c * V_dir", "escoamento direto medido", "Regra_Vdir"),
+        ("Regra SY = c * TR", "volume total medido", "Regra_TR"),
+        ("IC refeita (concentrada)", "volume total e vazão de pico medidos", "IC")]
+for i, (nome, info, aba) in enumerate(mods):
+    r = 6 + i
+    wr.cell(r, 1, nome).font = B; wr.cell(r, 2, info)
+    if aba == "IC":
+        wr.cell(r, 3, "alfa e beta")
+        vals = [icc[0], icc[1], icc[2], icc[4], icc[3]]
     else:
-        loo = "ic!$L$2:$L$18"
-    wm.cell(21, c0 + 1, f"=MEDIAN({ab}2:{ab}18)")
-    wm.cell(22, c0 + 1, f'=COUNTIFS({rl}2:{rl}18,">=0.5",{rl}2:{rl}18,"<=2")/17*100')
-    wm.cell(23, c0 + 1, f"=1-SUMXMY2({ln}2:{ln}18,$B$2:$B$18)/DEVSQ($B$2:$B$18)")
-    wm.cell(24, c0 + 1, f"=1-SUMXMY2({loo},eventos!$Q$2:$Q$18)/DEVSQ(eventos!$Q$2:$Q$18)")
-    wm.cell(25, c0 + 1, f"=CORREL({rk}2:{rk}18,$C$2:$C$18)")
-# erro mediano e NSE log do ajuste: precisam de colunas auxiliares -> aba ajuste
-wj = wb.create_sheet("ajuste")
-hj = ["evento"]
-for m, _ in models:
-    hj += [f"abs_erro_ajuste_pct_{m}", f"ln_SY_ajuste_{m}"]
-wj.append(hj)
-for i in range(N):
-    r = i + 2
-    wj.cell(r, 1, f"=eventos!A{r}")
-    for k in range(len(models)):
-        sa = f"calibracao!{L(3+4*k+1)}{r}"
-        wj.cell(r, 2 + 2 * k, f"=ABS({sa}/eventos!Q{r}-1)*100")
-        wj.cell(r, 3 + 2 * k, f"=LN({sa})")
-for k in range(len(models)):
-    c0 = 4 + 6 * k
-    wm.cell(26, c0 + 1, f"=MEDIAN(ajuste!{L(2+2*k)}2:{L(2+2*k)}18)")
-    wm.cell(27, c0 + 1, f"=1-SUMXMY2(ajuste!{L(3+2*k)}2:{L(3+2*k)}18,metricas!$B$2:$B$18)/DEVSQ(metricas!$B$2:$B$18)")
+        c = RES[aba]
+        wr.cell(r, 3, f"={c[0]}").number_format = FMT["c"]
+        vals = [c[1], c[2], c[3], c[5], c[4]]
+    for j, (v, nf) in enumerate(zip(vals, ["pct", "pct", "r", "r", "r"])):
+        cc = wr.cell(r, 4 + j, f"={v}"); cc.number_format = FMT[nf]; cc.fill = RES_FILL
+wr.cell(13, 1, "Escoamento direto do SCS-CN contra o medido (aba Volume)").font = TIT
+for k, lab in enumerate(["Viés do total (%)", "Erro médio absoluto por evento (%)", "Erro mediano por evento (%)",
+                         "Eventos dentro de fator 2 (%)", "NSE do volume"]):
+    r = 14 + k
+    wr.cell(r, 1, lab).font = B
+    c = wr.cell(r, 3, f"={VR[lab]}"); c.fill = RES_FILL
+    c.number_format = FMT["r"] if "NSE" in lab else FMT["pct"]
+wr.freeze_panes = "A6"
 
-# ---------- volume ----------
-wv = wb.create_sheet("volume")
-wv.append(["evento", "V_dir_m3", "V_SCS_m3", "erro_abs_pct"])
-for i in range(N):
-    r = i + 2
-    wv.cell(r, 1, f"=eventos!A{r}"); wv.cell(r, 2, f"=eventos!L{r}"); wv.cell(r, 3, f"=eventos!M{r}")
-    wv.cell(r, 4, f"=ABS(C{r}/B{r}-1)*100")
-wv["A21"], wv["B21"] = "vies_total_pct", "=(SUM(C2:C18)/SUM(B2:B18)-1)*100"
-wv["A22"], wv["B22"] = "erro_medio_absoluto_pct", "=AVERAGE(D2:D18)"
-wv["A23"], wv["B23"] = "erro_mediano_pct", "=MEDIAN(D2:D18)"
-wv["A24"], wv["B24"] = "NSE_volume", "=1-SUMXMY2(C2:C18,B2:B18)/DEVSQ(B2:B18)"
-wv["A25"], wv["B25"] = "razao_mediana", "=MEDIAN(eventos!N2:N18)"
-
-# ---------- ic ----------
-wi = wb.create_sheet("ic")
-wi.append(["evento", "D_TR_x_Qpico", "KLSC", "ln_D", "ln_SY_sobre_KLSC", "n_LOO", "Sx", "Sy", "Sxx", "Sxy", "SY_ajuste_t", "SY_LOO_t"])
-wi["O1"], wi["P1"] = "K", 0.031
-wi["O2"], wi["P2"] = "LS", 0.536
-wi["O3"], wi["P3"] = "C", 0.267
-wi["O5"], wi["P5"] = "beta", "=SLOPE(E2:E18,D2:D18)"
-wi["O6"], wi["P6"] = "alfa", "=EXP(INTERCEPT(E2:E18,D2:D18))"
-for i in range(N):
-    r = i + 2
-    wi.cell(r, 1, f"=eventos!A{r}"); wi.cell(r, 2, f"=eventos!I{r}*eventos!H{r}")
-    wi.cell(r, 3, "=$P$1*$P$2*$P$3"); wi.cell(r, 4, f"=LN(B{r})"); wi.cell(r, 5, f"=LN(eventos!Q{r}/C{r})")
-    wi.cell(r, 6, 16)
-    wi.cell(r, 7, f"=SUM($D$2:$D$18)-D{r}"); wi.cell(r, 8, f"=SUM($E$2:$E$18)-E{r}")
-    wi.cell(r, 9, f"=SUMSQ($D$2:$D$18)-D{r}^2"); wi.cell(r, 10, f"=SUMPRODUCT($D$2:$D$18,$E$2:$E$18)-D{r}*E{r}")
-    wi.cell(r, 11, f"=$P$6*B{r}^$P$5*C{r}")
-    sl = f"((F{r}*J{r}-G{r}*H{r})/(F{r}*I{r}-G{r}^2))"
-    wi.cell(r, 12, f"=EXP(((H{r}-{sl}*G{r})/F{r})+{sl}*D{r})*C{r}")
-
+# Resumo como segunda aba, logo depois do Leia-me
+wb.move_sheet("Resumo", offset=-(len(wb.sheetnames) - 2))
 wb.save("Planilhas/planilha_calculos_concentrados.xlsx")
-print("ok")
+print("ok", wb.sheetnames)

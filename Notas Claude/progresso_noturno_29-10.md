@@ -32,3 +32,4 @@ Legenda: `[ ]` a fazer, `[~]` em andamento (com horário UTC de início), `[x]` 
 
 **Não feito:** nada ficou pendente dos itens A a F. A revisão independente (`tarefa_revisao_29-10.md`, com progresso próprio) não fazia parte desta tarefa e não foi tocada.
 - 29/10 05:31 UTC: sessão agendada encontrou todos os itens A a F já [x]; nada a fazer, encerrada.
+- 29/10 13:13 UTC: planilha refeita a pedido do usuário (estava ilegível): aba Leia-me, aba Resumo, uma aba por modelo com o mesmo desenho (MC, MFM, Regra_chuva, Regra_Vdir, Regra_TR, IC_refeita), cabeçalhos com nome e unidade, linha 'como é calculado', cores (azul cabeçalho, amarelo dado dos rasters, verde resultado). Recalculada no LibreOffice: todos os números oficiais conferem, nenhum erro de fórmula.
