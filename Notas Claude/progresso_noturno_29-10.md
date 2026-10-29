@@ -8,7 +8,7 @@ Legenda: `[ ]` a fazer, `[~]` em andamento (com horário UTC de início), `[x]` 
 - [ ] C. `Notas Claude/proposta_secao5.md` (Resultados e Discussão)
 - [ ] D. `Notas Claude/proposta_secao6.md` (Conclusões)
 - [ ] E. `Notas Claude/mapa_figuras_tabelas_secoes_4_a_6.md` (figuras e tabelas, numeração nova)
-- [ ] F. `Planilhas/planilha_calculos_concentrados.xlsx` (planilha mínima, sem formatação, com fórmulas vivas dos cálculos fora dos rasters; ver item F em `tarefa_noturna_29-10.md`)
+- [~] (início: 03:38 UTC) F. `Planilhas/planilha_calculos_concentrados.xlsx` (planilha mínima, sem formatação, com fórmulas vivas dos cálculos fora dos rasters; ver item F em `tarefa_noturna_29-10.md`)
 
 ## Registro (a sessão que trabalhar acrescenta linhas aqui)
 
