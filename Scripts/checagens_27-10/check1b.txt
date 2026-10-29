@@ -1,0 +1,8 @@
+serie do orientador: 20838 2018-11-14 18:00:00 2021-03-31 23:00:00
+horas comuns: 20838  |Q-Q_o| max: 4.440892098500626e-16  |Bt-Qb_o| mediana: 0.001571178696270381 max: 0.040098318868095895
+diferencas de Q > 1e-6: 0
+b0=Bt       : mediana|dif|=1.57e-03 max=4.01e-02; dif em 1.000 h apos inicio: mediana=1.59e-03
+b0=Q0       : mediana|dif|=1.57e-03 max=4.01e-02; dif em 1.000 h apos inicio: mediana=1.59e-03
+b0=0,7*Q0   : mediana|dif|=1.59e-03 max=3.69e-01; dif em 1.000 h apos inicio: mediana=1.59e-03
+serie orientador: max|filtro - Qb|: 8.881784197001252e-16
+onde Bt difere de Qb_o: horas com dif>1e-3: 13874 de 20838

@@ -1,0 +1,43 @@
+=== Checagem 1 (alvo total): pareado ===
+-- Bt fornecido
+    MFM candidata - MFM adotada                  melhora em 13/17 | dif. mediana  -15.9 pt | IC95% [ -34.3;   -4.2]
+    MFM candidata - c*V_dir                      melhora em  6/17 | dif. mediana   +1.4 pt | IC95% [  -5.6;  +10.3]
+-- (i) Eck 0,995/0,70
+    MFM candidata - MFM adotada                  melhora em 13/17 | dif. mediana  -15.8 pt | IC95% [ -34.2;   -4.2]
+    MFM candidata - c*V_dir                      melhora em  6/17 | dif. mediana   +1.5 pt | IC95% [  -5.6;  +10.4]
+-- (ii) Eck 0,995/0,58
+    MFM candidata - MFM adotada                  melhora em 14/17 | dif. mediana  -23.3 pt | IC95% [ -38.5;   -7.6]
+    MFM candidata - c*V_dir                      melhora em  8/17 | dif. mediana   +0.3 pt | IC95% [  -6.1;   +6.9]
+-- (iii) Eck 0,995/0,80
+    MFM candidata - MFM adotada                  melhora em 12/17 | dif. mediana  -14.3 pt | IC95% [ -33.4;  +10.9]
+    MFM candidata - c*V_dir                      melhora em  6/17 | dif. mediana   +2.9 pt | IC95% [  -5.4;   +9.8]
+-- (iv) Eck 0,98/0,70
+    MFM candidata - MFM adotada                  melhora em 11/17 | dif. mediana   -6.3 pt | IC95% [ -26.6;  +15.1]
+    MFM candidata - c*V_dir                      melhora em  5/17 | dif. mediana   +3.8 pt | IC95% [  -4.9;   +8.2]
+-- (v) Lyne-Hollick
+    MFM candidata - MFM adotada                  melhora em 13/17 | dif. mediana  -19.8 pt | IC95% [ -34.8;   -3.0]
+    MFM candidata - c*V_dir                      melhora em  6/17 | dif. mediana   +2.5 pt | IC95% [  -6.7;  +11.7]
+
+=== Checagem 2 (alvo direto, separacao consistente): pareado ===
+-- Bt fornecido
+    MFM candidata - MFM adotada                  melhora em 14/17 | dif. mediana  -25.9 pt | IC95% [ -33.5;   -9.7]
+    MFM candidata - c*V_dir                      melhora em  8/17 | dif. mediana   +0.5 pt | IC95% [ -13.2;  +13.3]
+    MFM candidata - c*chuva                      melhora em 11/17 | dif. mediana  -16.7 pt | IC95% [ -38.6;   +3.7]
+    MFM adotada - c*chuva                        melhora em  9/17 | dif. mediana   -3.5 pt | IC95% [ -24.5;  +17.2]
+    MC candidata - c*chuva                       melhora em  3/17 | dif. mediana  +35.0 pt | IC95% [  +6.1; +113.2]
+-- (ii) Eck 0,995/0,58
+    MFM candidata - MFM adotada                  melhora em 14/17 | dif. mediana  -30.1 pt | IC95% [ -38.6;  -15.6]
+    MFM candidata - c*V_dir                      melhora em  8/17 | dif. mediana   +0.4 pt | IC95% [ -13.2;  +19.0]
+    MFM candidata - c*chuva                      melhora em 10/17 | dif. mediana  -17.2 pt | IC95% [ -48.2;   +1.0]
+    MFM adotada - c*chuva                        melhora em  9/17 | dif. mediana   -0.7 pt | IC95% [ -22.7;  +19.7]
+    MC candidata - c*chuva                       melhora em  3/17 | dif. mediana  +33.7 pt | IC95% [  +6.3; +115.9]
+-- (v) Lyne-Hollick
+    MFM candidata - MFM adotada                  melhora em 14/17 | dif. mediana  -29.1 pt | IC95% [ -38.7;  -10.0]
+    MFM candidata - c*V_dir                      melhora em  8/17 | dif. mediana   +1.0 pt | IC95% [ -13.4;   +7.4]
+    MFM candidata - c*chuva                      melhora em 13/17 | dif. mediana  -18.1 pt | IC95% [ -30.7;   -0.4]
+    MFM adotada - c*chuva                        melhora em  7/17 | dif. mediana   +9.3 pt | IC95% [ -27.2;  +20.7]
+    MC candidata - c*chuva                       melhora em  3/17 | dif. mediana  +35.6 pt | IC95% [  +5.9; +102.7]
+
+=== alvo total, Bt fornecido (comparacao) ===
+    MFM adotada - c*chuva                        melhora em  8/17 | dif. mediana   +3.4 pt | IC95% [ -30.2;  +19.5]
+    MC candidata - c*chuva                       melhora em  3/17 | dif. mediana  +32.6 pt | IC95% [  +3.1; +117.5]

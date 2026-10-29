@@ -1,0 +1,115 @@
+=== parcela da carga medida atribuida a base ===
+    ev  SY_total_t  SY_base_t  SY_dir_t  base_%carga  base_%volume  base_%carga[Eckh]  base_%carga[Lyne]
+0    1       266.4       73.6     192.8         27.6          45.3               23.5               32.2
+1    2      2039.9      529.3    1510.6         25.9          34.2               20.2               32.2
+2    3       927.8      335.4     592.4         36.1          45.3               27.9               46.6
+3    4      1379.9      464.7     915.1         33.7          42.0               27.0               42.0
+4    5      1371.7      482.2     889.5         35.2          54.8               27.9               45.1
+5    6       198.6       70.5     128.1         35.5          43.7               30.2               43.2
+6    7      1316.6      506.0     810.5         38.4          50.0               29.8               45.9
+7    8      2108.5      669.9    1438.6         31.8          51.6               24.3               43.0
+8    9      1154.6      513.9     640.6         44.5          53.9               36.6               53.8
+9   10       847.3      380.9     466.4         45.0          55.3               35.2               57.8
+10  11      1821.8      504.9    1316.9         27.7          39.3               21.0               36.8
+11  12       210.7       67.5     143.2         32.0          46.2               30.1               34.8
+12  13      1196.5      282.1     914.4         23.6          38.7               17.8               27.8
+13  14      1731.2      640.1    1091.1         37.0          48.9               30.0               41.3
+14  15      3828.8     1434.1    2394.8         37.5          49.1               29.5               48.0
+15  16      1736.1      666.7    1069.4         38.4          51.6               33.1               45.2
+16  17      1709.6      472.5    1237.0         27.6          49.1               23.8               31.5
+total: carga base 8094.156427440495 de 23845.71103634317 = 33.9%; mediana por evento 35.2% (min 23.6, max 45.0)
+volume: base 13670832.262789853 de 28933968.15 = 47.2%
+
+=== metricas LOO (log) por alvo; separacao Bt fornecido ===
+alvo / modelo                              MedAPE   F2 NSElog Spear
+-- TOTAL (SY_obs)
+   MC  CANDIDATA                            81.1    35  -0.69  0.59
+   MFM CANDIDATA                            20.6    94   0.84  0.83
+   MC  ADOTADA                              97.9    24  -3.95  0.57
+   MFM ADOTADA                              38.7    94   0.50  0.86
+   REF c*chuva(R)                           41.8    82   0.53  0.63
+   REF c*V_dir medido                       15.9    94   0.85  0.90
+   REF c*T_R (volume total)                 17.6    94   0.86  0.88
+-- DIRETO (SY_dir_obs)
+   MC  CANDIDATA                            80.2    35  -0.68  0.58
+   MFM CANDIDATA                            12.9    94   0.83  0.78
+   MC  ADOTADA                              97.5    18  -3.90  0.54
+   MFM ADOTADA                              36.7    88   0.53  0.82
+   REF c*chuva(R)                           32.8    76   0.52  0.61
+   REF c*V_dir medido                       17.8    94   0.83  0.85
+   REF c*T_R (volume total)                 14.1    94   0.81  0.80
+
+razao mediana LOO sim/obs (alvo direto): {'MC  CANDIDATA': 1.5, 'MFM CANDIDATA': 0.97, 'MC  ADOTADA': 1.71, 'MFM ADOTADA': 1.24, 'REF c*chuva(R)': 0.88, 'REF c*V_dir medido': 1.03, 'REF c*T_R (volume total)': 0.99}
+c (t por unidade de E) alvo total x direto, MFM CANDIDATA: 0.022215049316157216 0.014608011065323242
+
+=== MFM/MC e referencias com alvo DIRETO consistente com a separacao ===
+separacao / modelo                               MedAPE   F2 NSElog Spear
+-- Bt fornecido: carga de base = 33.9% do total; alvo soma 15752 t
+   MC  CANDIDATA                                  80.2    35  -0.68  0.58
+   MFM CANDIDATA                                  12.9    94   0.83  0.78
+   MC  ADOTADA                                    97.5    18  -3.90  0.54
+   MFM ADOTADA                                    36.7    88   0.53  0.82
+   c*chuva                                        32.8    76   0.52  0.61
+   c*V_dir                                        17.8    94   0.83  0.85
+-- Eckhardt BFImax 0,58: carga de base = 27.1% do total; alvo soma 17381 t
+   MC  CANDIDATA                                  80.9    35  -0.65  0.57
+   MFM CANDIDATA                                  14.5    94   0.84  0.80
+   MC  ADOTADA                                    97.6    24  -3.78  0.54
+   MFM ADOTADA                                    39.5    82   0.50  0.84
+   c*chuva                                        34.7    76   0.52  0.60
+   c*V_dir                                        17.7    94   0.84  0.85
+-- Lyne-Hollick 0,925: carga de base = 42.1% do total; alvo soma 13810 t
+   MC  CANDIDATA                                  80.1    35  -0.71  0.60
+   MFM CANDIDATA                                  11.9    94   0.84  0.82
+   MC  ADOTADA                                    97.1    18  -4.02  0.56
+   MFM ADOTADA                                    39.2    88   0.55  0.85
+   c*chuva                                        37.9    71   0.52  0.62
+   c*V_dir                                        18.8    94   0.82  0.82
+
+     ev  obs_total  LOO_total  erro_total_%  obs_dir  LOO_dir  erro_dir_%
+0    1      266.4      363.7          36.6    192.8    237.8        23.3
+1    2     2039.9     2465.2          20.8   1510.6   1609.1         6.5
+2    3      927.8     1272.8          37.2    592.4    838.5        41.5
+3    4     1379.9     2205.9          59.9    915.1   1449.8        58.4
+4    5     1371.7     1625.1          18.5    889.5   1069.6        20.2
+5    6      198.6      364.8          83.7    128.1    240.2        87.5
+6    7     1316.6      920.2         -30.1    810.5    607.6       -25.0
+7    8     2108.5     1909.8          -9.4   1438.6   1252.9       -12.9
+8    9     1154.6      917.0         -20.6    640.6    609.4        -4.9
+9   10      847.3      781.3          -7.8    466.4    519.5        11.4
+10  11     1821.8     1387.6         -23.8   1316.9    907.1       -31.1
+11  12      210.7      226.8           7.6    143.2    148.8         3.9
+12  13     1196.5     1237.3           3.4    914.4    806.0       -11.9
+13  14     1731.2     1552.1         -10.3   1091.1   1023.3        -6.2
+14  15     3828.8     3398.8         -11.2   2394.8   2241.9        -6.4
+15  16     1736.1     1570.7          -9.5   1069.4   1037.1        -3.0
+16  17     1709.6      766.8         -55.1   1237.0    501.2       -59.5
+
+=== Diagnostico da hipotese C_base = C_direta no instante ===
+CSS_Bt informado em 911 horas; periodo 2018-11-14 19:00:00 a 2021-03-23 07:00:00
+CSS_Bt nas horas informadas: mediana 119.09396550322518 | CSS (mistura) nas mesmas horas: mediana 119.0939655032252 | Q/Bt mediano nessas horas 1.0
+corr(CSS_Bt, CSS) nessas horas: 0.9676276462800399  iguais: 0.9571899012074643
+    ev  CSS_pre_mgL  CSS_medio_evento_mgL  base_carga_pre_t  SY_dir_alt_t  base_%carga_pre
+0    1        104.2                 651.2              19.3         247.0              7.2
+1    2        186.8                 775.7             167.9        1872.0              8.2
+2    3        113.8                 866.9              55.2         872.5              6.0
+3    4         72.7                 810.0              52.1        1327.8              3.8
+4    5        180.5                 745.6             181.9        1189.8             13.3
+5    6         61.8                 610.2               8.8         189.8              4.4
+6    7         90.1                1011.6              58.6        1257.9              4.5
+7    8        102.6                 816.9             136.6        1971.9              6.5
+8    9         86.0                 664.8              80.4        1074.1              7.0
+9   10        491.9                 685.6             336.4         511.0             39.7
+10  11         26.8                 747.6              25.6        1796.1              1.4
+11  12         45.6                1123.8               3.9         206.8              1.9
+12  13        128.8                 998.3              59.7        1136.8              5.0
+13  14        801.2                 950.1             713.9        1017.4             41.2
+14  15         88.9                 894.6             187.0        3641.8              4.9
+15  16        154.9                 527.2             263.1        1473.0             15.2
+16  17         48.5                1935.9              21.0        1688.5              1.2
+limite alternativo (base com CSS pre-evento, mediana 48h antes): base = 9.9% da carga total; mediana por evento 6.0%
+   alvo direto-alternativo | MFM CANDIDATA     29.4    94   0.81  0.75
+   alvo direto-alternativo | MFM ADOTADA       45.1    88   0.56  0.75
+   alvo direto-alternativo | c*V_dir           28.7    94   0.80  0.82
+   alvo direto-alternativo | c*chuva           34.5    76   0.55  0.53
+   alvo direto-alternativo | MC CANDIDATA      82.8    35  -0.63  0.47

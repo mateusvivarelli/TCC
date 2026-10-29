@@ -1,5 +1,7 @@
 # Pendências da edição do Google Doc — ponto de retomada de 27/10/2026
 
+> **Desatualizado:** o estado atual e as instruções estão em `Notas Claude/instrucoes_sessao_desktop.md` (28/10/2026).
+
 Nota de passagem entre sessões (o Doc é editado fora do repositório). Estado do modelo: ver `Notas Claude/resumo_modelo_completo.md`.
 
 Sessão de 27/10/2026 parou no meio da revisão do Doc original (id 12xwNDLmeeRB6IcbsprDWuI3XHx_At2RIgsPm6WBKiGo), seção por seção. Decisão do usuário: **usar Woodward** (λ 0,05, S₀,₀₅ = 1,33·S₀,₂₀^1,15, CN-I, MUSLE só com escoamento direto, sem termo de base). Ver [[orientador-vazao-de-base-sedimento]] e [[feedback-ler-referencias-novas]].

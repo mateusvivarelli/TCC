@@ -1,0 +1,27 @@
+n pixels 153855
+S0,20 (mm): min 12.3  p5 106.7  mediana 180.6  p95 558.2  max 558.2  | em pol: min 0.49 max 21.98
+S0,05 (mm): min 14.7  p5 176.0  mediana 322.5  p95 1180.2  max 1180.2  | em pol: min 0.58 max 46.47
+CN-I (lambda 0,20): min 31.3  mediana 58.4  max 95.4
+CN0,05 equivalente: min 17.7  mediana 44.1  max 94.5
+S05/S20: min 1.19  mediana 1.79  max 2.11 ; fracao S05<S20: 0.0000 ; fracao S05>S20: 1.0000
+ponto de cruzamento S05=S20 em S = 3.79 mm (0.149 pol)
+pixels com CN-I < 35 (fora da Tabela 4 de Woodward, S20 > 472 mm): 12933 (8.41%)
+pixels com CN-I < 20.71?? nao aplicavel; CN-I min 31.27147758576212
+verificacao Tabela 4 (S em pol): CN20 | S20 | S05 tab | S05 calc 1,33*S^1,15 | CN05 tab | CN05 eq.9 | CN05 de S05calc
+   95 |   0.526 |   0.636 |   0.635 |  94.02 |  94.02 |  94.03
+   90 |   1.111 |   1.501 |   1.501 |  86.95 |  86.94 |  86.95
+   80 |   2.500 |   3.815 |   3.815 |  72.39 |  72.38 |  72.39
+   70 |   4.286 |   7.091 |   7.091 |  58.51 |  58.51 |  58.51
+   60 |   6.667 |  11.785 |  11.786 |  45.90 |  45.90 |  45.90
+   50 |  10.000 |  18.787 |  18.787 |  34.74 |  34.73 |  34.74
+   35 |  18.571 |  38.285 |  38.284 |  20.71 |  20.71 |  20.71
+Woodward 0,8187*S^1,15 (mm)     : S05 mediana   322.5 mm | razao mediana a Woodward-calc 1.000 (min 1.000 max 1.000)
+Brandao Eq.17 0,919*S^1,174     : S05 mediana   410.0 mm | razao mediana a Woodward-calc 1.272 (min 1.192 max 1.307)
+Brandao Eq.19 0,917*S^1,170     : S05 mediana   400.7 mm | razao mediana a Woodward-calc 1.243 (min 1.178 max 1.271)
+P= 10 mm S= 180.6 lam=0.2: Q=  0.00 mm (adotada) | P= 10 mm S= 322.5 lam=0.05: Q=  0.00 mm (candidata) | 
+P= 25 mm S= 180.6 lam=0.2: Q=  0.00 mm (adotada) | P= 25 mm S= 322.5 lam=0.05: Q=  0.24 mm (candidata) | 
+P= 50 mm S= 180.6 lam=0.2: Q=  0.99 mm (adotada) | P= 50 mm S= 322.5 lam=0.05: Q=  3.22 mm (candidata) | 
+P=100 mm S= 180.6 lam=0.2: Q= 16.68 mm (adotada) | P=100 mm S= 322.5 lam=0.05: Q= 17.31 mm (candidata) | 
+Pcrit (S mediano) = 5.0 mm
+adotada: fracao de pixel-evento sem escoamento (P<=lam*S) = 39.8% ; lam*S mediano = 36.1 mm
+candidata: fracao de pixel-evento sem escoamento (P<=lam*S) = 14.0% ; lam*S mediano = 16.1 mm

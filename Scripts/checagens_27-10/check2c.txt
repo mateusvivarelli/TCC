@@ -1,0 +1,18 @@
+C_base const = 119 mg/L (mediana CSS_Bt): base = 6.8% da carga total (mediana por evento 6.3%, max 11.7%)
+    MFM CANDIDATA     18.4    94   0.83  0.79
+    MFM ADOTADA       41.4    94   0.51  0.82
+    c*V_dir           16.7    94   0.83  0.84
+    c*chuva           40.1    82   0.53  0.60
+    MC CANDIDATA      81.7    35  -0.68  0.57
+C_base const = 63 mg/L (P25 CSS_Bt): base = 3.6% da carga total (mediana por evento 3.3%, max 6.1%)
+    MFM CANDIDATA     19.6    94   0.83  0.79
+    MFM ADOTADA       40.1    94   0.50  0.82
+    c*V_dir           16.3    94   0.84  0.84
+    c*chuva           41.0    82   0.53  0.60
+    MC CANDIDATA      81.6    35  -0.68  0.57
+C_base const = 193 mg/L (P75 CSS_Bt): base = 11.1% da carga total (mediana por evento 10.2%, max 18.9%)
+    MFM CANDIDATA     16.8    94   0.83  0.77
+    MFM ADOTADA       39.9    94   0.51  0.80
+    c*V_dir           17.3    94   0.82  0.84
+    c*chuva           38.8    76   0.52  0.57
+    MC CANDIDATA      81.9    35  -0.67  0.54
