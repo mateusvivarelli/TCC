@@ -7,8 +7,8 @@ Instruções: `Notas Claude/tarefa_nuvem_30-10.md`. Branch: `claude/noite-30-10`
 - [x] C. proposta_cap3_30-10.md
 - [x] D. proposta_cap4_30-10.md
 - [x] E. proposta_cap2_30-10.md
-- [~] (início 21:32 UTC) F. proposta_cap5_30-10.md
-- [ ] G. mapa_figuras_tabelas_30-10.md e planilha (aba ic com valores originais)
+- [x] F. proposta_cap5_30-10.md
+- [~] (início 21:33 UTC) G. mapa_figuras_tabelas_30-10.md e planilha (aba ic com valores originais)
 - [ ] H. leitura_referencias/loteE_medicao_e_validacao.md
 - [ ] I. perguntas_para_o_luis_30-10.md
 - [ ] J. autoconferência
