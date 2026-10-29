@@ -5,8 +5,8 @@ Instruções: `Notas Claude/tarefa_nuvem_30-10.md`. Branch: `claude/noite-30-10`
 - [x] A. plano_reestruturacao_30-10.md
 - [x] B. ajustes_cap1_a_3_30-10.md
 - [x] C. proposta_cap3_30-10.md
-- [~] (início 21:27 UTC) D. proposta_cap4_30-10.md
-- [ ] E. proposta_cap2_30-10.md
+- [x] D. proposta_cap4_30-10.md
+- [~] (início 21:31 UTC) E. proposta_cap2_30-10.md
 - [ ] F. proposta_cap5_30-10.md
 - [ ] G. mapa_figuras_tabelas_30-10.md e planilha (aba ic com valores originais)
 - [ ] H. leitura_referencias/loteE_medicao_e_validacao.md
