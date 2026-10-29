@@ -1217,3 +1217,16 @@ contribuição variável ou contínuo (o SCS-CN tem a forma errada aqui; as conv
 volume mas não o sedimento); na prática, usar a vazão medida onde houver posto. (MFM) entender a variação da concentração
 (curva de turbidez, estações, intensidade da chuva); K e C locais; incluir erosão de canal e conectividade; mais eventos.
 O erro de c·V_dir (15,9%) é perto do piso dado pela própria variação da concentração com estes dados.
+
+
+---
+
+## 34. Para declarar no texto (28/10/2026)
+
+- **Evento 17 (20/02/2020):** único fora do fator 2 no modelo forçado oficial (razão 0,45, -55%; no ajuste 0,47). Concentração
+  média de sedimento no escoamento direto de 3.806 mg/L, contra 1.085 a 2.088 mg/L nos outros 16; SY = c*V_dir também erra
+  -61%. Hipóteses: curva turbidez-CSS fora da faixa calibrada (ver pergunta da quebra em 250 NTU) ou outra fonte de sedimento.
+  Perguntar ao Luis; declarar na discussão; sem ele o MFM teria 100% em fator 2 (sensibilidade, não remover).
+- **Volume do SCS-CN oficial:** viés total +2,9%, mas erro médio absoluto por evento de 53,9% (mediana 46,3%); 8 eventos
+  superestimados (grandes) e 9 subestimados (pequenos). Reportar os dois números juntos.
+- **Nomes dos modelos:** em discussão ("preditivo" e "diagnóstico" em vez de "calculado" e "forçado"); decidir antes de escrever a seção 4.

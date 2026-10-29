@@ -1,6 +1,7 @@
 """
-Tabela do Apendice B: NSE linear (calibracao em log) com e sem o evento 15. Atualizada em 26/10/2026 para o modelo
-adotado (so escoamento direto, sem termo de base); grava TCC_Texto/tabelas/tab_nse_linear.md.
+Tabela do Apendice B: NSE linear (calibracao em log) com e sem o evento 15. Atualizada em 28/10/2026 para o MODELO OFICIAL
+(CN-I, lambda 0,05 com S convertido por Woodward et al. 2003, so escoamento direto, sem termo de base);
+grava TCC_Texto/tabelas/tab_nse_linear.md. Linhas 'nao adotado' mantidas como comparacao (modelo de 26/10 com lambda 0,20 e dois componentes).
 
 Historico - o modelo B funcionaria bem se o Q calculado a partir da chuva fosse bom? (15/10/2026)
 
@@ -42,7 +43,7 @@ o = gdal.Warp("", gdal.Open(os.path.join(DI, "S - Seco.tif")), format="MEM", wid
               outputBounds=(gt[0], gt[3] + ny * gt[5], gt[0] + nx * gt[1], gt[3]), dstSRS=ds0.GetProjection(), resampleAlg=gdal.GRA_NearestNeighbour)
 S = o.GetRasterBand(1).ReadAsArray().astype(np.float64); S = np.where(S > -1e30, S, np.nan)
 valido = np.isfinite(S) & np.isfinite(K) & np.isfinite(C) & np.isfinite(LS)
-KCLS = (K * C * LS)[valido]; Sv = S[valido]
+KCLS = (K * C * LS)[valido]; S20 = S[valido]; Sv = S20.copy()
 ev = pd.read_excel(os.path.join(DI, "eventos_processados_manuais.xlsx"), sheet_name="Sheet1").iloc[:18]
 h = pd.read_excel(os.path.join(DI, "Dados_finais_histereses_corrigido.xlsx"), sheet_name="Planilha1").iloc[:, :8]
 h.columns = ["Data", "P1", "P2", "Ptot", "Q", "CSS", "Bt", "CSSBt"]; h["Data"] = pd.to_datetime(h["Data"]); h = h.set_index("Data")
@@ -55,8 +56,9 @@ for n in range(1, N + 1):
     Pv.append(le(os.path.join(BASE, f"Evento {n}", f"ChuvaIDW{n}.tif"))[0][valido])
 
 
-def esoma(i, lam, V=None):
-    p = Pv[i]; Q = np.where(p <= lam * Sv, 0.0, (p - lam * Sv) ** 2 / (p + (1 - lam) * Sv))
+def esoma(i, lam, V=None, conv=False):
+    Sx = 25.4 * 1.33 * (S20 / 25.4) ** 1.15 if conv else S20   # conv=True: retencao convertida por Woodward (lambda 0,05)
+    p = Pv[i]; Q = np.where(p <= lam * Sx, 0.0, (p - lam * Sx) ** 2 / (p + (1 - lam) * Sx))
     if V is not None:
         Q = np.minimum(V / (Q.sum() / 1000.0 * A) * Q, p)
     pr = Q / 1000.0 * A * (RI[i] / R[i]) / 3600.0
@@ -97,6 +99,7 @@ def roda(nome, x1, x2=None):
 base_chuva = Qb0 * durR * 3600.0
 E_prev05 = pd.read_csv(os.path.join(DI, "comparacao_SY_previsao_vs_restrito.csv")).sort_values("evento").soma_E_unit_previsao_t.to_numpy(float)
 E20 = np.array([esoma(i, 0.20) for i in range(N)]); E_bom = np.array([esoma(i, 0.20, VD[i]) for i in range(N)])
+Ew = np.array([esoma(i, 0.05, conv=True) for i in range(N)]); Ew_bom = np.array([esoma(i, 0.05, VD[i], conv=True) for i in range(N)])
 TRv = VD + BTV
 V_ = np.array([float(ev.iloc[0 if n == 1 else n]["T_R_m3"]) for n in range(1, N + 1)]); QPm = np.array([float(ev.iloc[0 if n == 1 else n]["Q_pico"]) for n in range(1, N + 1)])
 KLSC = 0.031 * 0.536 * 0.267
@@ -127,20 +130,22 @@ def print(*a, **k):  # guarda as linhas da tabela para gravar o .md
     txt = " ".join(str(x) for x in a)
     if txt.startswith("|"):
         if not txt.startswith("|---"):
-            txt = re.sub(r"(\d)\.(\d)", r"\1,\2", txt).replace("| -", "| −")
+            txt = re.sub(r"(\d)\.(\d)", r"\1,\2", txt).replace("| −", "| -")
         LINHAS.append(txt)
     _print(*a, **k)
 
 
 print("| Modelo | NSE (ajuste) | NSE (validação cruzada) | NSE sem o evento 15 |")
 print("|---|---|---|---|")
-avalia("SY = c · chuva do evento", "scale", [R])
-avalia("SY = c · volume total medido", "scale", [V_])
-avalia("SY = c · escoamento direto medido", "scale", [VD])
-avalia("Modelo calculado (só escoamento direto, λ = 0,20) — adotado", "scale", [E20])
-avalia("Modelo forçado (escoamento direto medido, λ = 0,20) — adotado", "scale", [E_bom])
+avalia("SY = c * chuva do evento", "scale", [R])
+avalia("SY = c * volume total medido", "scale", [V_])
+avalia("SY = c * escoamento direto medido", "scale", [VD])
+avalia("MC oficial (só escoamento direto, λ = 0,05 com S convertido)", "scale", [Ew])
+avalia("MFM oficial (escoamento direto medido, λ = 0,05 com S convertido)", "scale", [Ew_bom])
 avalia("IC refeita (concentrada)", "power", [V_ * QPm])
-avalia("Sensibilidade: calculado com λ = 0,05 (previsão pura anterior)", "scale", [np.array([esoma(i, 0.05) for i in range(N)])])
+avalia("Não adotado (26/10): MC com λ = 0,20, sem conversão de S", "scale", [E20])
+avalia("Não adotado (26/10): MFM com λ = 0,20, sem conversão de S", "scale", [E_bom])
+avalia("Sensibilidade: MC com λ = 0,05 sem converter S (escoamento inflado)", "scale", [np.array([esoma(i, 0.05) for i in range(N)])])
 avalia("Não adotado: dois componentes, base prevista (até 26/10/2026)", "two", [E20, base_chuva])
 avalia("Não adotado: dois componentes, base observada (até 26/10/2026)", "two", [E_bom, BTV])
 OUT = os.path.join(BASE, "TCC_Texto", "tabelas", "tab_nse_linear.md")

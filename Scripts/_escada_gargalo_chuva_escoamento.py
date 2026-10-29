@@ -1,7 +1,8 @@
 """
-ESCADA DA INFORMACAO HIDROLOGICA (15/10/2026; refeita em 26/10/2026 SEM termo de vazao de base) - onde esta o gargalo.
+ESCADA DA INFORMACAO HIDROLOGICA (15/10/2026; refeita em 28/10/2026 com o MODELO OFICIAL: CN-I, lambda 0,05 com S convertido
+por Woodward et al. 2003, sem termo de vazao de base) - onde esta o gargalo.
 
-Degraus (de menos para mais informacao hidrologica), alvo = carga TOTAL de sedimentos, c em log, LOO, lambda 0,20.
+Degraus (de menos para mais informacao hidrologica), alvo = carga TOTAL de sedimentos, c em log, LOO, lambda 0,05 com S convertido.
 Modelo adotado desde 26/10/2026: so escoamento direto, um coeficiente (SY = c * soma E_unit).
   N1  so chuva                                   : MUSLE (SCS-CN previsto)          x  SY = c*chuva
   N2  volume direto PREVISTO por regressao(chuva): MUSLE (volume previsto, padrao SCS-CN) x SY = c*V_prev
@@ -25,7 +26,7 @@ gdal.UseExceptions()
 sys.stdout.reconfigure(encoding="utf-8")
 BASE = r"C:\TCC"; DI = os.path.join(BASE, "Dados Iniciais"); FIG = os.path.join(BASE, "TCC_Texto", "figuras")
 os.makedirs(FIG, exist_ok=True)
-COEF, EXPO, N, LAM = 11.8, 0.56, 17, 0.20
+COEF, EXPO, N, LAM = 11.8, 0.56, 17, 0.05
 rng = np.random.default_rng(15102026)
 
 
@@ -44,7 +45,7 @@ o = gdal.Warp("", gdal.Open(os.path.join(DI, "S - Seco.tif")), format="MEM", wid
               outputBounds=(gt[0], gt[3] + ny * gt[5], gt[0] + nx * gt[1], gt[3]), dstSRS=ds0.GetProjection(), resampleAlg=gdal.GRA_NearestNeighbour)
 S = o.GetRasterBand(1).ReadAsArray().astype(np.float64); S = np.where(S > -1e30, S, np.nan)
 valido = np.isfinite(S) & np.isfinite(K) & np.isfinite(C) & np.isfinite(LS)
-KCLS = (K * C * LS)[valido]; Sv = S[valido]
+KCLS = (K * C * LS)[valido]; Sv = 25.4 * 1.33 * (S[valido] / 25.4) ** 1.15   # Woodward et al. (2003): S0,05 a partir do S do CN-I
 ev = pd.read_excel(os.path.join(DI, "eventos_processados_manuais.xlsx"), sheet_name="Sheet1").iloc[:18]
 h = pd.read_excel(os.path.join(DI, "Dados_finais_histereses_corrigido.xlsx"), sheet_name="Planilha1").iloc[:, :8]
 h.columns = ["Data", "P1", "P2", "Ptot", "Q", "CSS", "Bt", "CSSBt"]; h["Data"] = pd.to_datetime(h["Data"]); h = h.set_index("Data")
@@ -121,7 +122,7 @@ NIV = [
 ]
 ref = np.array([np.exp(np.mean(np.log(SY[ids != i]) - np.log(R[ids != i]))) * R[i] for i in range(N)])
 print("=" * 118)
-print("ESCADA (alvo carga total, c em log, LOO, lambda 0,20, sem termo de base)")
+print("ESCADA (alvo carga total, c em log, LOO, lambda 0,05 com S convertido, sem termo de base)")
 print(f"{'nivel':<44} {'modelo':<26} {'MedAPE':>7} {'fator2':>7} {'NSE-log':>8} {'Spearman':>8} | melhora de B vs simples: n eventos / mediana (IC95%)")
 rows = []
 for nome, b, s in NIV:
@@ -143,10 +144,10 @@ for k, (key, tit, fmt) in enumerate((("MedAPE", "Erro percentual mediano (menor 
     vb = [np.median(ape(b)) if key == "MedAPE" else f2(b) for _, b, _ in NIV_FIG]
     vs = [np.median(ape(s)) if key == "MedAPE" else f2(s) for _, _, s in NIV_FIG]
     r1 = a.bar(x - wd / 2, vb, wd, color=cb, label="MUSLE espacializada (só escoamento direto)")
-    r2 = a.bar(x + wd / 2, vs, wd, color=cs, label="Regra simples com o mesmo insumo (c · chuva ou c · volume direto)")
+    r2 = a.bar(x + wd / 2, vs, wd, color=cs, label="Regra simples com o mesmo insumo (c * chuva ou c * volume direto)")
     for rr in list(r1) + list(r2):
         a.text(rr.get_x() + rr.get_width() / 2, rr.get_height() + 1, fmt.format(rr.get_height()), ha="center", fontsize=9)
-    a.axhline(np.median(ape(ref)) if key == "MedAPE" else f2(ref), color="#c0392b", ls="--", lw=1.2, label="Referência: SY = c · chuva")
+    a.axhline(np.median(ape(ref)) if key == "MedAPE" else f2(ref), color="#c0392b", ls="--", lw=1.2, label="Referência: SY = c * chuva")
     a.set_xticks(x); a.set_xticklabels(["Água calculada\nda chuva (previsão)", "Água forçada\nao medido"], fontsize=10)
     a.set_title(tit, fontsize=11)
     a.spines[["top", "right"]].set_visible(False)
@@ -154,8 +155,8 @@ for k, (key, tit, fmt) in enumerate((("MedAPE", "Erro percentual mediano (menor 
 h_, l_ = ax[0].get_legend_handles_labels()
 fig.legend(h_, l_, loc="lower center", ncol=3, frameon=False, fontsize=9, bbox_to_anchor=(0.5, 0.045))
 fig.suptitle("Quanto melhor a estimativa da água, melhor o sedimento: o gargalo é transformar chuva em escoamento", fontsize=12)
-fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN. Forçada ao medido: escoamento direto medido (volume total menos a vazão de base). Sem termo de vazão de base.\n"
-         "Validação leave-one-out, calibração em log (um coeficiente), 17 eventos, λ = 0,20, carga total de sedimentos.", ha="center", fontsize=7.5)
+fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN (CN-I). Forçada ao medido: escoamento direto medido (volume total menos a vazão de base). Sem termo de vazão de base.\n"
+         "Validação leave-one-out, calibração em log (um coeficiente), 17 eventos, λ = 0,05 com S convertido (Woodward), carga total de sedimentos.", ha="center", fontsize=7.5)
 fig.tight_layout(rect=(0, 0.11, 1, 0.95))
 fig.savefig(os.path.join(FIG, "escada_gargalo.png"), dpi=150)
 print("figura:", os.path.join(FIG, "escada_gargalo.png"))

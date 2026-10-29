@@ -1,5 +1,6 @@
 """
-Figuras do texto do TCC (15/10/2026; refeitas em 26/10/2026 com o modelo so com escoamento direto):
+Figuras do texto do TCC (15/10/2026; refeitas em 28/10/2026 com o MODELO OFICIAL: CN-I, lambda 0,05 com S convertido
+(Woodward et al., 2003), so escoamento direto, c em log, LOO):
 dispersao observado x simulado, escoamento direto SCS-CN x medido, mapa medio.
 Saidas em TCC_Texto/figuras/: fig_dispersao.png, fig_volume_direto.png, fig_mapa_sy_medio.png
 (fig_decomposicao.png, encostas x termo de base, deixou de existir junto com o termo de base)
@@ -24,7 +25,7 @@ N = 17
 AZUL, CINZA, VERM, LARANJA = "#1f5fa8", "#9a9a9a", "#c0392b", "#d98b1d"
 plt.rcParams.update({"font.size": 10, "axes.spines.top": False, "axes.spines.right": False})
 
-sd = pd.read_csv(os.path.join(DI, "comparacao_SY_so_direto.csv")).sort_values("evento")
+sd = pd.read_csv(os.path.join(DI, "comparacao_SY_lambda005_woodward.csv")).sort_values("evento")
 ev = pd.read_excel(os.path.join(DI, "eventos_processados_manuais.xlsx"), sheet_name="Sheet1").iloc[:18]
 R_ = [ev.iloc[0 if n == 1 else n] for n in range(1, N + 1)]
 SY = np.array([float(r["SYY_t"]) for r in R_]); V = np.array([float(r["T_R_m3"]) for r in R_]); QP = np.array([float(r["Q_pico"]) for r in R_])
@@ -41,7 +42,7 @@ B = sd.SY_calc_LOO_t.to_numpy(); F = sd.SY_forc_LOO_t.to_numpy()
 # ---- Figura 1: dispersao observado x simulado (log-log, faixa de fator 2)
 fig, ax = plt.subplots(2, 2, figsize=(10.5, 9.4), sharex=True, sharey=True); ax = ax.ravel()
 lim = np.array([10, 30000])
-for a_, (tit, sim, cor) in zip(ax, (("SY = c · chuva do evento\n(referência simples, só chuva)", ch, CINZA),
+for a_, (tit, sim, cor) in zip(ax, (("SY = c * chuva do evento\n(referência simples, só chuva)", ch, CINZA),
                                     ("Modelo calculado: MUSLE espacializada,\nescoamento direto do SCS-CN (só chuva)", B, AZUL),
                                     ("Modelo forçado: MUSLE espacializada,\nescoamento direto medido", F, VERM),
                                     ("IC (concentrada), com volume total e\npico medidos", ic, LARANJA))):
@@ -74,11 +75,11 @@ ax.scatter(Vm, Vs, c=AZUL, s=36, zorder=3, edgecolor="white", linewidth=0.5)
 for i in range(N):
     ax.annotate(str(i + 1), (Vm[i], Vs[i]), fontsize=7, xytext=(3, 3), textcoords="offset points", color="#444")
 ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlim(lv); ax.set_ylim(lv)
-ax.set_xlabel("Escoamento direto medido, T_R − ΣBt (10³ m³)"); ax.set_ylabel("Escoamento direto do SCS-CN, λ = 0,20 (10³ m³)")
+ax.set_xlabel("Escoamento direto medido, T_R - ΣBt (10³ m³)"); ax.set_ylabel("Escoamento direto do SCS-CN, λ = 0,05 com S convertido (10³ m³)")
 r_ = Vs / Vm
 ax.text(0.04, 0.95, f"dentro de fator 2: {100*np.mean((r_ >= 0.5) & (r_ <= 2)):.0f}%\nerro mediano: {np.median(100*np.abs(Vs-Vm)/Vm):.0f}%",
         transform=ax.transAxes, va="top", fontsize=9)
-ax.set_title("Escoamento direto por evento: SCS-CN x medido", fontsize=10)
+ax.set_title("Escoamento direto por evento:\nSCS-CN (λ = 0,05, S convertido) x medido", fontsize=10)
 fig.tight_layout(); fig.savefig(os.path.join(FIG, "fig_volume_direto.png"), dpi=150); plt.close(fig)
 if os.path.exists(os.path.join(FIG, "fig_decomposicao.png")):
     os.remove(os.path.join(FIG, "fig_decomposicao.png"))
@@ -87,14 +88,14 @@ if os.path.exists(os.path.join(FIG, "fig_decomposicao.png")):
 def le(p):
     ds = gdal.Open(p); b = ds.GetRasterBand(1); a = b.ReadAsArray().astype(float); nd = b.GetNoDataValue()
     return np.where((a != nd) & np.isfinite(a), a, np.nan), ds.GetGeoTransform()
-m, gt = le(os.path.join(DI, "SY_medio_eventos_sd.tif"))
+m, gt = le(os.path.join(DI, "SY_medio_eventos_l05w.tif"))
 ny, nx = m.shape; ext = (gt[0], gt[0] + nx * gt[1], gt[3] + ny * gt[5], gt[3])
 masc = gpd.read_file(os.path.join(DI, "Máscara Jundiaí.shp"))
 fig, ax = plt.subplots(1, 2, figsize=(13, 4.6))
 v = m[np.isfinite(m)]
 im = ax[0].imshow(m * 1000, extent=ext, cmap="YlOrRd", vmin=0, vmax=np.percentile(v * 1000, 99.5))
 masc.boundary.plot(ax=ax[0], color="k", lw=0.7); ax[0].set_xticks([]); ax[0].set_yticks([]); ax[0].axis("off")
-ax[0].set_title("Sedimento médio dos 17 eventos, modelo calculado (kg por pixel)", fontsize=10)
+ax[0].set_title("Sedimento médio dos 17 eventos, MC (kg por pixel)", fontsize=10)
 plt.colorbar(im, ax=ax[0], fraction=0.04, pad=0.02)
 q95 = np.nanpercentile(v, 95); hot = np.where(np.isfinite(m), (m >= q95).astype(float), np.nan)
 ax[1].imshow(np.where(np.isfinite(m), 0.0, np.nan), extent=ext, cmap="Greys", vmin=0, vmax=3)

@@ -1,3 +1,8 @@
+"""
+Planilha de comparacao dos modelos. 28/10/2026: o modelo ADOTADO passa a ser o OFICIAL (CN-I, lambda 0,05 com S convertido por
+Woodward et al. 2003, so escoamento direto; comparacao_SY_lambda005_woodward.csv). O modelo de 26/10 (lambda 0,20, _sd) fica como
+"Nao adotado (26/10/2026)". Escalas c por minimos quadrados lineares nesta planilha (no texto do TCC, c em log).
+"""
 import sys
 import numpy as np
 import pandas as pd
@@ -24,6 +29,8 @@ E_base = nb["soma_E_unit_t"].to_numpy(float); V_dir_obs = nb["V_direto_obs_m3"].
 R_chuva = np.array([float(r["Chuva_evento_mm"]) for r in R])
 sd = pd.read_csv(DI + r"\comparacao_SY_so_direto.csv").sort_values("evento")   # modelo adotado em 26/10/2026 (so escoamento direto)
 E_sdc = sd["soma_E_unit_calc_t"].to_numpy(float); E_sdf = sd["soma_E_unit_forc_t"].to_numpy(float)
+of = pd.read_csv(DI + r"\comparacao_SY_lambda005_woodward.csv").sort_values("evento")   # MODELO OFICIAL (28/10/2026)
+E_ofc = of["soma_E_unit_calc_t"].to_numpy(float); E_off = of["soma_E_unit_forc_t"].to_numpy(float)
 
 den = np.sum((SY - SY.mean()) ** 2)
 
@@ -64,13 +71,17 @@ c_vd, s_vd, l_vd = escala(V_dir_obs)
 c_ch, s_ch, l_ch = escala(R_chuva)
 c_sdc, s_sdc, l_sdc = escala(E_sdc)
 c_sdf, s_sdf, l_sdf = escala(E_sdf)
+c_ofc, s_ofc, l_ofc = escala(E_ofc)
+c_off, s_off, l_off = escala(E_off)
 c_base = np.sum(E_base * SY) / np.sum(E_base ** 2)
 XS = {"Concentrada — D e qp do modelo (só escala)": (V_calc * QP_calc) ** 0.56,
       "Concentrada — D e qp medidos (só escala)": (V_med * QP_med) ** 0.56,
       "Espacializada — Q do modelo (previsão pura, λ = 0,05, sem vazão de base)": E_prev,
       "Espacializada — Q forçado ao volume medido total (volume restrito)": E_rest,
-      "ADOTADO — Espacializada — calculado: Q = só escoamento direto do SCS-CN (λ = 0,20)": E_sdc,
-      "ADOTADO — Espacializada — forçado: Q reescalado para o escoamento direto medido": E_sdf,
+      "ADOTADO (oficial, 28/10/2026) — Espacializada — MC: SCS-CN com CN-I, λ = 0,05 e S convertido (Woodward)": E_ofc,
+      "ADOTADO (oficial, 28/10/2026) — Espacializada — MFM: Q reescalado para o escoamento direto medido": E_off,
+      "Não adotado (26/10/2026) — Espacializada — calculado: só escoamento direto do SCS-CN (λ = 0,20)": E_sdc,
+      "Não adotado (26/10/2026) — Espacializada — forçado, padrão do SCS-CN com λ = 0,20": E_sdf,
       "Não adotado (até 26/10/2026) — Espacializada — Q = escoamento direto (λ = 0,20) + vazão de base prevista": E_base,
       "Sem MUSLE — SY = c · volume total medido (T_R)": V_med,
       "Sem MUSLE — SY = c · escoamento direto medido": V_dir_obs,
@@ -105,10 +116,14 @@ CFG = [
      "SY = c·ΣE_unit, com Q de cada pixel pelo SCS-CN (CN-I, λ = 0,05). Versão anterior (até 14/10/2026): calibrada contra o volume TOTAL, que inclui vazão de base.", "esp"),
     ("Espacializada — Q forçado ao volume medido total (volume restrito)", s_rest, l_rest, 1, "Sim (volume)", "Sim", c_rest,
      "Q de cada pixel multiplicado pelo fator f do evento para o volume total bater T_R_m3 (limite Q ≤ chuva). Não é previsão pura; T_R_m3 inclui vazão de base.", "esp"),
-    ("ADOTADO — Espacializada — calculado: Q = só escoamento direto do SCS-CN (λ = 0,20)", s_sdc, l_sdc, 1, "Não", "Sim", c_sdc,
-     "SY = c·ΣE_unit, com Q de cada pixel pelo SCS-CN (CN-I, λ = 0,20), sem termo de vazão de base (decisão de 26/10/2026). Aqui c por mínimos quadrados lineares, como nas demais linhas; no texto do TCC c é calibrado em log (tab_resultados.md).", "esp"),
-    ("ADOTADO — Espacializada — forçado: Q reescalado para o escoamento direto medido", s_sdf, l_sdf, 1, "Sim (volume direto)", "Sim", c_sdf,
-     "Q de cada pixel reescalado para o escoamento direto medido do evento (T_R − ΣBt·3600; limite Q ≤ chuva). Sem termo de base. Não é previsão: usa o volume medido. c por mínimos quadrados lineares nesta planilha.", "esp"),
+    ("ADOTADO (oficial, 28/10/2026) — Espacializada — MC: SCS-CN com CN-I, λ = 0,05 e S convertido (Woodward)", s_ofc, l_ofc, 1, "Não", "Sim", c_ofc,
+     "SY = c*ΣE_unit, com Q de cada pixel pelo SCS-CN (CN-II da ANA convertido para CN-I; λ = 0,05; S0,05 = 25,4*1,33*(S0,20/25,4)^1,15, Woodward et al., 2003), sem termo de vazão de base. Aqui c por mínimos quadrados lineares, como nas demais linhas; no texto do TCC c é calibrado em log (tab_resultados.md).", "esp"),
+    ("ADOTADO (oficial, 28/10/2026) — Espacializada — MFM: Q reescalado para o escoamento direto medido", s_off, l_off, 1, "Sim (volume direto)", "Sim", c_off,
+     "Q de cada pixel (padrão do SCS-CN oficial) reescalado para o escoamento direto medido do evento (T_R - ΣBt*3600; limite Q ≤ chuva). Sem termo de base. Não é previsão: usa o volume medido. c por mínimos quadrados lineares nesta planilha.", "esp"),
+    ("Não adotado (26/10/2026) — Espacializada — calculado: só escoamento direto do SCS-CN (λ = 0,20)", s_sdc, l_sdc, 1, "Não", "Sim", c_sdc,
+     "Modelo de 26/10/2026: SCS-CN com CN-I e λ = 0,20 (sem converter S), sem termo de vazão de base. Substituído pelo modelo oficial de 28/10/2026.", "esp"),
+    ("Não adotado (26/10/2026) — Espacializada — forçado, padrão do SCS-CN com λ = 0,20", s_sdf, l_sdf, 1, "Sim (volume direto)", "Sim", c_sdf,
+     "Modelo de 26/10/2026: Q reescalado para o escoamento direto medido, com o padrão espacial do SCS-CN com λ = 0,20. Substituído pelo modelo oficial.", "esp"),
     ("Não adotado (até 26/10/2026) — Espacializada — Q = escoamento direto (λ = 0,20) + vazão de base prevista", S_base, L_base, 2, "Parcial (Qb inicial e duração)", "Sim", c_base,
      "Q do pixel = SCS-CN (CN-I, λ = 0,20) + lâmina de base uniforme = kb·Qb_inicio·duração (kb = 1,93). LOO aninhado (kb e c refeitos sem o evento). A duração é a da janela observada.", "esp"),
     ("Sem MUSLE — SY = c · volume total medido (T_R)", s_tr, l_tr, 1, "Sim (volume)", "Não", c_tr,
@@ -194,19 +209,21 @@ w3["A1"] = "Entradas e quantidades intermediárias por evento"; w3["A1"].font = 
 h3 = ["Evento", "Chuva do evento R (mm)", "Intensidade 60 min RI (mm/h)", "RI/R (1/h)", "Duração (h)", "Volume medido (m³)", "Volume calculado, SCS-CN (m³)",
       "Fator f = medido/calculado", "Q pico medido (m³/s)", "Q pico calculado, HU-SCS (m³/s)", "ΣE_unit previsão pura (t)", "ΣE_unit volume restrito (t)",
       "SY medido (t)", "SY medido / ΣE (previsão)", "SY medido / ΣE (restrito)",
-      "Vazão de base observada, Σ Bt (m³)", "Escoamento direto observado (m³)", "Escoamento direto SCS-CN λ = 0,20 (m³)", "Vazão de base prevista (m³)", "Volume total previsto, LOO (m³)", "Erro do volume total previsto (%)"]
+      "Vazão de base observada, Σ Bt (m³)", "Escoamento direto observado (m³)", "Escoamento direto SCS-CN λ = 0,20 (m³)", "Vazão de base prevista (m³)", "Volume total previsto, LOO (m³)", "Erro do volume total previsto (%)",
+      "Escoamento direto medido, oficial (m³)", "Escoamento direto SCS-CN oficial, λ = 0,05 com S convertido (m³)", "SCS-CN oficial / medido", "ΣE_unit oficial, MC", "ΣE_unit oficial, MFM"]
 cab(w3, 3, h3); w3.row_dimensions[3].height = 62
 for n in range(17):
     r = R[n]; Rm = float(r["Chuva_evento_mm"]); RI = float(r["Intensidade_60min_mm/h"])
     row = [n + 1, Rm, RI, RI / Rm, float(r["Duracao_horas"]), V_med[n], V_calc[n], V_med[n] / V_calc[n], QP_med[n], QP_calc[n], E_prev[n], E_rest[n],
            SY[n], SY[n] / E_prev[n], SY[n] / E_rest[n], nb["V_base_obs_m3"].iloc[n], nb["V_direto_obs_m3"].iloc[n], nb["V_dir_SCS_m3"].iloc[n],
-           nb["V_base_prev_m3"].iloc[n], nb["V_total_prev_loo_m3"].iloc[n], nb["erro_V_total_pct"].iloc[n]]
-    fm = [None, "0.0", "0.0", "0.000", "0", "#,##0", "#,##0", "0.00", "0.0", "0.0", "#,##0", "#,##0", "#,##0.0", "0.000", "0.000", "#,##0", "#,##0", "#,##0", "#,##0", "#,##0", "0.0"]
+           nb["V_base_prev_m3"].iloc[n], nb["V_total_prev_loo_m3"].iloc[n], nb["erro_V_total_pct"].iloc[n],
+           of["V_dir_medido_m3"].iloc[n], of["V_dir_SCS_m3"].iloc[n], of["V_dir_SCS_m3"].iloc[n] / of["V_dir_medido_m3"].iloc[n], E_ofc[n], E_off[n]]
+    fm = [None, "0.0", "0.0", "0.000", "0", "#,##0", "#,##0", "0.00", "0.0", "0.0", "#,##0", "#,##0", "#,##0.0", "0.000", "0.000", "#,##0", "#,##0", "#,##0", "#,##0", "#,##0", "0.0", "#,##0", "#,##0", "0.00", "#,##0", "#,##0"]
     for j, (v, f) in enumerate(zip(row, fm), 1):
         c = w3.cell(row=4 + n, column=j, value=float(v) if j > 1 else v)
         if f: c.number_format = f
         c.alignment = Alignment(horizontal="center")
-for j in range(1, 22):
+for j in range(1, 27):
     w3.column_dimensions[get_column_letter(j)].width = 16
 w3.freeze_panes = "B4"
 
@@ -214,14 +231,15 @@ w3.freeze_panes = "B4"
 w4 = wb.create_sheet("Leia-me")
 linhas = [
     "Como esta planilha foi feita",
-    "Gerada/atualizada em 15/10/2026 (modelo adotado trocado em 26/10/2026) por Scripts/gerar_planilha_comparacao.py a partir de: eventos_processados_manuais.xlsx, comparacao_volumes_medido_vs_calculado.csv,",
-    "comparacao_qpico_convolucao_medido_vs_calculado.csv, comparacao_SY_previsao_vs_restrito.csv, comparacao_SY_modelo_com_base.csv (vazão de base, não adotado) e comparacao_SY_so_direto.csv (adotado).",
+    "Gerada/atualizada em 15/10/2026 (modelo adotado trocado em 26/10/2026 e de novo em 28/10/2026, para o modelo oficial) por Scripts/gerar_planilha_comparacao.py a partir de: eventos_processados_manuais.xlsx, comparacao_volumes_medido_vs_calculado.csv,",
+    "comparacao_qpico_convolucao_medido_vs_calculado.csv, comparacao_SY_previsao_vs_restrito.csv, comparacao_SY_modelo_com_base.csv (vazão de base, não adotado), comparacao_SY_so_direto.csv (modelo de 26/10, não adotado) e comparacao_SY_lambda005_woodward.csv (ADOTADO, oficial de 28/10/2026).",
     "",
     "O que cada modelo é",
     "• Chute da média: prever sempre a média dos sedimentos medidos. Dá NSE = 0 por definição; é a régua mínima.",
     "• Concentrada: um único volume D e um único pico qp por evento para a bacia toda com os expoentes fixos de Williams (0,56). Só a escala c é ajustada.",
     "• Espacializada: a MUSLE é calculada em cada pixel e somada. 'Q do modelo' usa o escoamento do SCS-CN; 'Q forçado' reescala o Q do raster para o volume total bater o volume medido.",
-    "• ADOTADO (26/10/2026): só escoamento direto, sem termo de vazão de base. Calculado: Q do SCS-CN (λ = 0,20); forçado: Q reescalado para o escoamento direto medido. Compara-se com a carga TOTAL medida (todo o sedimento do evento é atribuído ao escoamento superficial).",
+    "• ADOTADO (oficial, 28/10/2026): só escoamento direto, sem termo de vazão de base. MC: Q do SCS-CN com CN-I, λ = 0,05 e S convertido (Woodward et al., 2003); MFM: Q reescalado para o escoamento direto medido. Compara-se com a carga TOTAL medida (todo o sedimento do evento é atribuído ao escoamento superficial).",
+    "• Não adotado (26/10/2026): o mesmo desenho com λ = 0,20 e sem converter S.",
     "• Nesta planilha todas as escalas c são ajustadas por mínimos quadrados lineares; no texto do TCC a calibração adotada é em log (ver TCC_Texto/tabelas/).",
     "• Não adotado (15 a 26/10/2026): Q = escoamento direto + lâmina de vazão de base prevista, uniforme (kb·Qb_inicio·duração). Removido: a vazão de base não produz erosão nas encostas.",
     "• Sem MUSLE: modelos triviais (SY proporcional ao volume ou à chuva), com um parâmetro c. Servem de régua: um modelo espacializado só se justifica se superar isso.",
@@ -230,9 +248,9 @@ linhas = [
     "Pontos de atenção",
     "• T_R_m3 (volume 'medido') = soma das vazões horárias × 3600: é o volume TOTAL, inclui a vazão de base (34–55%). SYY_t é a carga total (Q·CSS). O SCS-CN calcula só escoamento direto.",
     "• NSE in-sample é otimista; o leave-one-out (c, e no modelo adotado também kb, refeitos sem o evento testado) é o valor honesto. Para α/β livres e FCI/DSC não foi calculado.",
-    "• O evento 15 responde por 49% da variância do SY medido; veja a coluna 'NSE sem o evento 15'. Com n = 17, os intervalos são largos (bootstrap do NSE do modelo adotado: [−0,96; 0,88]).",
+    "• O evento 15 responde por 49% da variância do SY medido; veja a coluna 'NSE sem o evento 15'. Com n = 17, os intervalos são largos (bootstrap do NSE do modelo de dois componentes, não adotado: [-0,96; 0,88]).",
     "• 'Q forçado', 'D e qp medidos' e os modelos 'Sem MUSLE' usam dado medido do evento; não são previsões puras e não devem ser comparados diretamente com a previsão de Hao et al. (2022).",
-    "• No modelo adotado, a duração é a janela observada do evento, kb é ajustado nos mesmos 17 eventos e λ foi fixado em 0,20 (padrão) depois de ver diagnósticos com outros valores.",
+    "• No modelo oficial, λ = 0,05 com S convertido e o CN-I foram escolhidos olhando os mesmos 17 eventos (ver limitações no TCC). No modelo de dois componentes (não adotado), a duração é a janela observada e kb é ajustado nos mesmos 17 eventos.",
     "• Os valores por evento de α/β livres e de FCI/DSC vêm das saídas de calibrar_alfa_beta_pixel.py (17/09) e da recalibração com a Eq. 8 exata (02/10); o FCI/DSC está arredondado em t.",
 ]
 for i, t in enumerate(linhas, 1):

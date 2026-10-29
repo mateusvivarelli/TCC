@@ -1,11 +1,12 @@
 """
-MAPAS DO TCC (15/10/2026): todos com titulo, escala grafica, seta do norte, legenda e coordenadas UTM (SIRGAS 2000 / UTM 23S).
+MAPAS DO TCC (15/10/2026; refeitos em 28/10/2026 com o MODELO OFICIAL: CN-I, lambda 0,05 com S convertido por Woodward et al., 2003,
+so escoamento direto; arquivos *_l05w.tif): todos com titulo, escala grafica, seta do norte, legenda e coordenadas UTM (SIRGAS 2000 / UTM 23S).
 
   mapa_01_area_estudo.png      relevo (sombreado), rede de drenagem, postos pluviometricos e exutorio
   mapa_02_solo_uso.png         classes de solo e de uso, com % da area
   mapa_03_fatores.png          K, C, LS e CN (AMC I)
   mapa_04_chuva_eventos.png    chuva interpolada (IDW) nos 17 eventos
-  mapa_05_escoamento_eventos.png  escoamento direto (SCS-CN, lambda 0,20) nos 17 eventos
+  mapa_05_escoamento_eventos.png  escoamento direto (SCS-CN, CN-I, lambda 0,05 com S convertido) nos 17 eventos
   mapa_06_sedimento_eventos.png   sedimento das encostas (modelo calculado) nos 17 eventos
   mapa_07_sedimento_medio.png  sedimento medio e areas criticas: modelo calculado e forcado ao medido
   mapa_08_evento11.png         cadeia do evento 11 (chuva, S, Q, E_unit, SY)
@@ -174,10 +175,10 @@ print("mapa 2 ok")
 # ================================================================= MAPA 3: K, C, LS, CN
 cn1, _ = le(os.path.join(BASE, "Evento11_Auditoria", "3_Rasters_QGIS", "CN_I_alinhado.tif"))
 fig, axs = plt.subplots(2, 2, figsize=(13, 7.6))
-for ax, arr, cmap, tit, rot, vmax in ((axs[0, 0], K, "YlOrBr", "Erodibilidade do solo, K", "K (t·h/MJ/mm)", None),
+for ax, arr, cmap, tit, rot, vmax in ((axs[0, 0], K, "YlOrBr", "Erodibilidade do solo, K", "K (t*h/MJ/mm)", None),
                                       (axs[0, 1], C, "YlGn_r", "Cobertura e manejo, C", "C (adimensional)", None),
                                       (axs[1, 0], LS, "magma_r", "Fator topográfico, LS", "LS (adimensional)", np.nanpercentile(LS, 99.5)),
-                                      (axs[1, 1], cn1, "RdYlBu_r", "Número de curva, condição seca (AMC I)", "CN (adimensional)", None)):
+                                      (axs[1, 1], cn1, "RdYlBu_r", "Número de curva CN-I (conversão do CN-II da ANA)", "CN (adimensional)", None)):
     im = mostra(ax, arr, cmap, vmin=np.nanmin(arr), vmax=vmax if vmax else np.nanmax(arr)); contorno(ax)
     moldura(ax, titulo=tit, km=5); cb = plt.colorbar(im, ax=ax, fraction=0.03, pad=0.01); cb.set_label(rot, fontsize=8); cb.ax.tick_params(labelsize=7)
 fig.suptitle("Fatores espacializados da MUSLE e do SCS-CN", fontsize=11, y=1.0)
@@ -210,21 +211,21 @@ def multiplos(arqs, cmap, rot, titulo, nome, vmin=0.0, vmax=None, fator=1.0, not
 multiplos([os.path.join(BASE, f"Evento {n}", f"ChuvaIDW{n}.tif") for n in range(1, N + 1)], "Blues", "Chuva interpolada do evento (mm)",
           "Chuva total de cada evento, interpolada por IDW a partir de dois postos", "mapa_04_chuva_eventos.png", vmin=0,
           nota="Escala comum a todos os eventos. Escala gráfica de 5 km em cada mapa; norte para cima; limite da bacia em preto.")
-multiplos([os.path.join(BASE, f"Evento {n}", f"Qdir{n}_sd.tif") for n in range(1, N + 1)], "PuBuGn", "Escoamento direto (mm)",
-          "Escoamento direto calculado pelo SCS-CN (CN seco, λ = 0,20) em cada evento", "mapa_05_escoamento_eventos.png", vmin=0, gamma=0.5,
+multiplos([os.path.join(BASE, f"Evento {n}", f"Qdir{n}_l05w.tif") for n in range(1, N + 1)], "PuBuGn", "Escoamento direto (mm)",
+          "Escoamento direto calculado pelo SCS-CN (CN-I, λ = 0,05 com S convertido) em cada evento", "mapa_05_escoamento_eventos.png", vmin=0, gamma=0.5,
           nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados. Escala gráfica de 5 km; norte para cima.")
-multiplos([os.path.join(BASE, f"Evento {n}", f"SY{n}_sd.tif") for n in range(1, N + 1)], "YlOrRd", "Sedimento das encostas (kg por pixel)",
-          "Sedimento produzido nas encostas em cada evento (modelo calculado)", "mapa_06_sedimento_eventos.png", vmin=0, fator=1000.0, gamma=0.5,
-          nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados.\nSedimento das encostas, c · E_unit (modelo só com escoamento direto). Escala gráfica de 5 km; norte para cima.")
+multiplos([os.path.join(BASE, f"Evento {n}", f"SY{n}_l05w.tif") for n in range(1, N + 1)], "YlOrRd", "Sedimento das encostas (kg por pixel)",
+          "Sedimento produzido nas encostas em cada evento (MC)", "mapa_06_sedimento_eventos.png", vmin=0, fator=1000.0, gamma=0.5,
+          nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados.\nSedimento das encostas, c * E_unit (modelo só com escoamento direto). Escala gráfica de 5 km; norte para cima.")
 print("mapas 4-6 ok")
 
-# ================================================================= mapas medios (gerados por calcular_sy_so_direto.py, 26/10/2026)
-SYc_mean, _ = le(os.path.join(DI, "SY_medio_eventos_sd.tif")); SYf_mean, _ = le(os.path.join(DI, "SY_medio_eventos_forcado_sd.tif"))
-SD = pd.read_csv(os.path.join(DI, "comparacao_SY_so_direto.csv")).set_index("evento")
+# ================================================================= mapas medios (gerados por calcular_sy_lambda005_woodward.py)
+SYc_mean, _ = le(os.path.join(DI, "SY_medio_eventos_l05w.tif")); SYf_mean, _ = le(os.path.join(DI, "SY_medio_eventos_forcado_l05w.tif"))
+SD = pd.read_csv(os.path.join(DI, "comparacao_SY_lambda005_woodward.csv")).set_index("evento")
 
 # ================================================================= MAPA 7: sedimento medio e areas criticas
 fig, axs = plt.subplots(2, 2, figsize=(13, 8))
-for col, (arr, nome) in enumerate(((SYc_mean, "Modelo calculado (água estimada da chuva)"), (SYf_mean, "Modelo forçado ao medido (água medida)"))):
+for col, (arr, nome) in enumerate(((SYc_mean, "MC (água calculada pelo SCS-CN, só chuva)"), (SYf_mean, "MFM (escoamento direto forçado ao medido)"))):
     v = arr[np.isfinite(arr)]; vmax = np.percentile(v * 1000, 99.5)
     im = mostra(axs[0, col], arr * 1000, "YlOrRd", vmin=0, vmax=vmax); contorno(axs[0, col])
     moldura(axs[0, col], titulo=f"Sedimento médio dos 17 eventos\n{nome}", km=5)
@@ -244,12 +245,13 @@ print(f"mapa 7 ok | r(calculado, forcado) = {np.corrcoef(a_, b_)[0,1]:.3f} | are
 
 # ================================================================= MAPA 8: cadeia do evento 11
 E11 = Path = None
+Sw = 25.4 * 1.33 * (S / 25.4) ** 1.15   # Woodward et al. (2003): S0,05 a partir do S do CN-I
 pastas = os.path.join(BASE, "Evento 11")
-q11, _ = le(os.path.join(pastas, "Qdir11_sd.tif")); e11, _ = le(os.path.join(pastas, "E_unit11_sd.tif")); s11, _ = le(os.path.join(pastas, "SY11_sd.tif")); p11, _ = le(os.path.join(pastas, "ChuvaIDW11.tif"))
+q11, _ = le(os.path.join(pastas, "Qdir11_l05w.tif")); e11, _ = le(os.path.join(pastas, "E_unit11_l05w.tif")); s11, _ = le(os.path.join(pastas, "SY11_l05w.tif")); p11, _ = le(os.path.join(pastas, "ChuvaIDW11.tif"))
 fig, axs = plt.subplots(2, 3, figsize=(14, 7.2))
-pan = [(p11, "Blues", "Chuva do evento (IDW)", "mm", None), (S, "YlOrBr", "Retenção potencial S (CN seco)", "mm", None),
-       (q11, "PuBuGn", "Escoamento direto (SCS-CN, λ = 0,20)", "mm", None), (e11 * 1000, "YlOrRd", "Índice de erosão E_unit (Williams)", "kg por pixel, sem calibrar", 99.5),
-       (s11 * 1000, "YlOrRd", "Sedimento das encostas (c · E_unit)", "kg por pixel", 99.5), (None, None, None, None, None)]
+pan = [(p11, "Blues", "Chuva do evento (IDW)", "mm", None), (Sw, "YlOrBr", "Retenção S0,05 (CN-I, convertida)", "mm", None),
+       (q11, "PuBuGn", "Escoamento direto (SCS-CN, λ = 0,05)", "mm", None), (e11 * 1000, "YlOrRd", "Índice de erosão E_unit (Williams)", "kg por pixel, sem calibrar", 99.5),
+       (s11 * 1000, "YlOrRd", "Sedimento das encostas (c * E_unit)", "kg por pixel", 99.5), (None, None, None, None, None)]
 for ax, (arr, cm, tit, rot, pc) in zip(axs.ravel(), pan):
     if arr is None:
         ax.axis("off"); continue
@@ -259,8 +261,8 @@ for ax, (arr, cm, tit, rot, pc) in zip(axs.ravel(), pan):
 axs[1, 2].text(0.02, 0.9, "Evento 11 (04 a 08/07/2019)", fontsize=10, fontweight="bold", transform=axs[1, 2].transAxes, va="top")
 axs[1, 2].text(0.02, 0.8, f"Chuva ponderada: {EV[10]['Chuva_evento_mm']:.1f} mm\nIntensidade máxima em 60 min: {EV[10]['Intensidade_60min_mm/h']:.1f} mm/h\n"
                f"Volume total medido: {EV[10]['T_R_m3']/1e6:.2f} milhões de m³\nSedimento medido: {EV[10]['SYY_t']:,.0f} t\n\n"
-               f"Modelo calculado (validação cruzada): {SD.loc[11, 'SY_calc_LOO_t']:,.0f} t\n"
-               f"Modelo forçado (validação cruzada): {SD.loc[11, 'SY_forc_LOO_t']:,.0f} t".replace(",", "#").replace(".", ",").replace("#", "."), fontsize=9, transform=axs[1, 2].transAxes, va="top", linespacing=1.5)
+               f"MC (validação cruzada): {SD.loc[11, 'SY_calc_LOO_t']:,.0f} t\n"
+               f"MFM (validação cruzada): {SD.loc[11, 'SY_forc_LOO_t']:,.0f} t".replace(",", "#").replace(".", ",").replace("#", "."), fontsize=9, transform=axs[1, 2].transAxes, va="top", linespacing=1.5)
 fig.suptitle("Da chuva ao sedimento no evento 11: etapas espaciais do modelo", fontsize=12, y=1.0)
 fig.tight_layout(rect=(0, 0, 1, 0.97)); fig.savefig(os.path.join(OUT, "mapa_08_evento11.png"), dpi=170); plt.close(fig)
 print("mapa 8 ok")
@@ -281,16 +283,16 @@ def seta(x0, y0, x1, y1, ls="-"):
 ent, pro, res, obs = "#dbe9f6", "#fff2cc", "#e2f0d9", "#fce4d6"
 C1, C2, C3, W = 2.2, 6.0, 9.8, 3.5
 caixa(C1, 6.6, W, 0.85, "Chuva horária\nnos 2 postos (17 eventos)", ent)
-caixa(C2, 6.6, W, 0.85, "Mapas de solo, uso e relevo\n→ CN, K, C e LS (raster de 30 m)", ent)
+caixa(C2, 6.6, W, 0.85, "Mapas de solo, uso e relevo\n→ CN-I, K, C e LS (raster de 30 m)", ent)
 caixa(C3, 6.6, W, 0.85, "Medições no exutório:\nvazão, sedimento e vazão de base", obs)
 caixa(C1, 5.2, W, 0.85, "Interpolação IDW\n→ chuva P em cada pixel", pro)
-caixa(C2, 5.2, W, 0.85, "SCS-CN (λ = 0,20)\n→ escoamento direto Q do pixel", pro)
-caixa(C3, 5.2, W, 0.85, "Sedimento medido SY_obs = Σ Q·CSS\nescoamento direto medido = T_R − ΣBt", obs)
-caixa(C2, 3.8, W + 0.6, 0.85, "pr = Q·(RI/R);  E_unit = 11,8·(Q·pr·A)^0,56·K·LS·C\n(erosão local do pixel, índice relativo)", pro, 8.5)
+caixa(C2, 5.2, W, 0.85, "SCS-CN (CN-I; λ = 0,05 com S\nconvertido) → escoamento direto Q do pixel", pro)
+caixa(C3, 5.2, W, 0.85, "Sedimento medido SY_obs = Σ Q*CSS\nescoamento direto medido = T_R - ΣBt", obs)
+caixa(C2, 3.8, W + 0.2, 0.85, "pr = Q*(RI/R)  e  E_unit = 11,8*(Q*pr*A)^0,56*K*LS*C\n(erosão local do pixel, índice relativo)", pro, 7.5)
 caixa(C3, 3.8, W, 0.85, "Modelo forçado: Q do pixel\nreescalado para o escoamento\ndireto medido do evento", pro, 8.5)
 caixa(C2, 2.4, W, 0.85, "Soma de E_unit sobre os pixels", pro)
-caixa(6.4, 0.7, 8.2, 1.0, "SY = c · ΣE_unit\nc ajustado em escala logarítmica contra SY_obs; validação leave-one-out", res)
-caixa(3.0, -0.9, 4.6, 0.8, "Mapa de áreas críticas\n(c · E_unit em cada pixel)", res, 8.5)
+caixa(6.4, 0.7, 8.2, 1.0, "SY = c * ΣE_unit\nc ajustado em escala logarítmica contra SY_obs; validação leave-one-out", res)
+caixa(3.0, -0.9, 4.6, 0.8, "Mapa de áreas críticas\n(c * E_unit em cada pixel)", res, 8.5)
 caixa(9.4, -0.9, 4.6, 0.8, "Métricas e comparação com\ntestes simples e com a IC", res, 8.5)
 for (x0, y0, x1, y1) in ((C1, 6.6, C1, 6.05), (C2, 6.6, C2, 6.05), (C3, 6.6, C3, 6.05), (C1 + W / 2, 5.62, C2 - W / 2, 5.62),
                          (C2, 5.2, C2, 4.65), (C3, 5.2, C3, 4.65), (C2, 3.8, C2, 3.25), (C2, 2.4, C2, 1.7), (C3, 3.8, C3, 1.7),
