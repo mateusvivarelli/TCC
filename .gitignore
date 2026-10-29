@@ -34,3 +34,6 @@ Evento11_Auditoria/dados_evento11.pkl
 Evento11_Auditoria/1_Planilhas/02_Evento11_Pixel_a_Pixel.xlsx
 Evento11_Auditoria/2_Shapefiles_QGIS/Pixels_Evento11.*
 Scripts/checagens_27-10/cache_rasters.npz
+
+# arquivos auxiliares do GDAL
+*.aux.xml

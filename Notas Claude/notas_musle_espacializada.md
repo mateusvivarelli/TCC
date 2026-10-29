@@ -1230,3 +1230,28 @@ O erro de c·V_dir (15,9%) é perto do piso dado pela própria variação da con
 - **Volume do SCS-CN oficial:** viés total +2,9%, mas erro médio absoluto por evento de 53,9% (mediana 46,3%); 8 eventos
   superestimados (grandes) e 9 subestimados (pequenos). Reportar os dois números juntos.
 - **Nomes dos modelos:** em discussão ("preditivo" e "diagnóstico" em vez de "calculado" e "forçado"); decidir antes de escrever a seção 4.
+
+
+---
+
+## 35. Seção 3.1 aplicada e formatação de tabelas (28/10/2026)
+
+**Aplicado no Doc (a pedido do usuário):**
+- **1.1:** "grande concentração urbana e atividades agrícolas intensivas" -> "áreas urbanizadas e usos como campo e silvicultura (no alto curso, 14,1% e cerca de 42% da área, respectivamente; seção 3.1)" (lavoura temporária é só 3,9% da área).
+- **3.1, parágrafo 1:** área 137,8 km² com fonte (acumulação de fluxo no MDE; 139,3 km² em Murillo-Bermúdez e Martim, 2022); altitudes 724 a 1.314 m (calculadas: 723,5 e 1.314,1); fecha 100% do uso do solo (0,3% = água, mineração, afloramento); exutório ~900 m a jusante da estação.
+- **3.1, parágrafo 2:** Köppen lido no mapa da Figura 3.6 do Plano (p. 119): cabeceira do Jundiaí em Cfb com Cfa nos trechos baixos (o Plano não dá a classe da área; leitura de mapa de baixa resolução); chuva: menores totais a jusante, cabeceira tende à porção mais chuvosa; população removida (16,55% era da sub-bacia inteira); entra "áreas urbanizadas ocupam 14,1% (Figura 2)".
+
+**Formatação (Doc, tabelas 1 a 8 e Referências):** 16 parágrafos vazios entre a Tabela 1 e a Tabela 2 (causavam 1/3 de página em branco) removidos; também 9 antes da Tabela 9 e 5 antes da Tabela 12; 26 vazios antes de REFERÊNCIAS trocados por "quebra de página antes" no título. Alinhamento padronizado: texto à esquerda, números e símbolos centralizados, cabeçalho centralizado (Tabelas 1, 2, 3, 4, 6, 7, 8); larguras da Tabela 2 refeitas (datas em uma linha); legenda da Tabela 8 alinhada à esquerda e presa à tabela. Tabelas 9 a 13 NÃO foram mexidas (serão refeitas nas seções 4 e 5). Limitação da API: não redimensiona nem troca imagens; títulos dentro das imagens das Figuras 1 a 3 repetem as legendas; ABNT pede a legenda das figuras acima, hoje estão abaixo.
+**Pendente na 3.2 e 3.3** (propostas já mostradas ao usuário): Tabela 1 (linha Bt), parágrafo do volume e carga, Tabela 3 (λ 0,05, valores novos em `tab_volumes.md`), frase de abertura e último parágrafo da 3.3, Tabela 4 (linha CN: CN-I 52,5), Tabela 5 em K e C (5A e 5B).
+
+
+---
+
+## 36. Seção 3.2 e 3.3 aplicadas; Tabela 5 dividida em K e C (28/10/2026, a pedido do usuário)
+
+**Regra nova (usuário):** o texto do Doc não menciona métodos/parâmetros descartados (λ 0,20, dois componentes, AMC III...). Os registros ficam aqui nas notas.
+**Aplicado no Doc:** Tabela 1 (linha Bt: filtro de Eckhardt, seção 2.4); parágrafo de volume e carga da 3.2 (volume medido inclui a base; separada por Eckhardt; "SYobs é a carga total do evento"); Tabela 3 (cabeçalho "SCS-CN, λ = 0,05" e colunas SCS-CN e razão com os valores de `tab_volumes.md`, total 15.702 mil m³, razão 1,03); abertura e último parágrafo da 3.3 reescritos; Tabela 4 (CN: "raster BR_CN-2022 da ANA (30 m), CN-II convertido para CN-I", valor 52,5); legenda da Figura 3 "(CN-I)"; **Tabela 5 = K** (nova, 5 linhas) e **Tabela 6 = C** (a antiga reduzida às classes de uso); tabelas seguintes renumeradas (6..13 -> 7..14) com as referências no texto; "(Tabelas 5 e 6)" na 4.2.2.
+**Formatação:** Tabela 3 não se divide mais (quebra de página antes da legenda; o Docs ignora "manter com o próximo" em tabelas); linhas de todas as tabelas 1 a 8 com keepWithNext. Limitação: a API não tem recuo de tabela; a Tabela 5 (criada pela API) fica alguns pontos mais estreita e deslocada que a 6 (importada do .docx); para igualar, copiar a Tabela 6 e editar.
+**Imagens do Doc:** vieram embutidas no .docx gerado por `md_para_docx.py` (sem `sourceUri`); a API só insere imagem por URL pública, não troca imagem existente. Opções: substituir à mão (Ctrl+clique > Substituir imagem) ou subir os PNGs ao Drive com link público (precisa de autorização do usuário).
+**ABNT (NBR 14724, de memória):** identificação da ilustração (figura, quadro, gráfico, mapa etc.) na parte superior, seguida da "Fonte" na parte inferior, mesmo sendo do próprio autor ("Fonte: elaborado pelo autor"); tabelas seguem as normas do IBGE (título em cima, fonte embaixo). Hoje as legendas das figuras estão abaixo, e falta "Fonte:" fora da imagem. Conferir o guia da FEC/Unicamp.
+**Fontes dos valores de K e C por classe (IC):** não entraram nas Tabelas 5 e 6; exigiriam acrescentar ~11 referências à lista (Corrêa et al. 2015; Silva 2016; Martins et al. 2011; Silva e Alvares 2005; Chagas 2011; Rocha Lima et al. 2016; Demarchi e Zimback 2014; Castro et al. 2011; Silva et al. 2016; Silva e Luchiari 2016; Wischmeier e Smith 1978), todas ainda não lidas. Tabelas com as fontes: `TCC_Texto/tabelas/tab_fator_K.md` e `tab_fator_C.md`.

@@ -85,6 +85,13 @@ Baert, autoria de Valle Junior et al.). Pontos ainda a confirmar estão no Apên
   sugeridos: `Notas Claude/mudancas_docs_sem_base_26-10.md`, parte "Atualização de 27/10/2026".
 - Tabela 5 separada em K e C: `TCC_Texto/tabelas/tab_fator_K.md` e `tab_fator_C.md`.
 
+## Próxima sessão (manhã de 29/10/2026): seção 4 do Doc + fontes de K e C
+
+**Estado do Doc ("TCC arquivo"):** revisado e no modelo oficial da capa até a **seção 3 inclusive** (3.1, 3.2, 3.3, Tabelas 1 a 6, K e C separadas). Formatação das tabelas 1 a 8 padronizada. Detalhes em `Notas Claude/notas_musle_espacializada.md` §35 e §36.
+**Falta:** (1) **seção 4 (Metodologia)** inteira: 4.1 a 4.9, Tabelas 7 a 14, Figuras 4 e 5; usar as tabelas e figuras novas de `TCC_Texto/` (modelo oficial) e a lista `Notas Claude/mudancas_docs_sem_base_26-10.md` (números de 26/10 estão desatualizados: usar `relatorio_regeneracao_oficial_28-10.md` e `resumo_modelo_completo.md`); (2) **fontes dos valores de K e C por classe** (pedido do Luis): ler as ~11 referências da IC e acrescentá-las à lista (`tab_fator_K.md` e `tab_fator_C.md` têm a fonte de cada classe); (3) **seções 5 (Resultados e Discussão) e 6 (Conclusões)**, com as imagens e tabelas certas do modelo oficial: Tabelas 10 a 14 e Figuras 5 a 11 do Doc ainda são do modelo antigo (de dois termos); os arquivos novos estão em `TCC_Texto/tabelas/` e `TCC_Texto/figuras/`. **Atenção:** a API do Docs não troca imagens; para as Figuras 4 a 11 (e 1 a 3, se for tirar o título interno) é preciso substituí-las à mão ou subir os PNGs ao Drive com link público (autorização do usuário) e inseri-los pela API.
+**Regras do usuário:** só editar o Doc quando ele pedir (mostrar proposta no chat); caracteres de teclado (`*`, `-`); **sem métodos descartados no texto** (λ 0,20, dois componentes, AMC III...); ler a referência antes de citar; commit e push só quando pedir.
+**Decisões que dependem do usuário/Luis:** nomes dos modelos ("preditivo" e "diagnóstico" ou "calculado" e "forçado"); troca das imagens das Figuras 1 a 3 (títulos internos; legendas acima, ABNT); BFImax 0,70 ou 0,58; evento 24/11 x 17/12/2018; curva turbidez-CSS; aprovação do modelo oficial pelo Luis. Evento 17 (único fora do fator 2 no MFM) a declarar na discussão.
+
 ## Onde estamos agora (26/10/2026) — VAZÃO DE BASE REMOVIDA (ler primeiro)
 
 **Decisão com o orientador:** λ = 0,20 e **sem termo de vazão de base**. A MUSLE usa só o escoamento direto
