@@ -5,8 +5,8 @@ Legenda: `[ ]` a fazer, `[~]` em andamento (com horário UTC de início), `[x]` 
 
 - [x] A. `Notas Claude/proposta_secao4.md` (Metodologia, 4.1 a 4.9) — pronto: proposta_secao4.md com 4.1 a 4.9, dúvidas no fim
 - [x] B. `Notas Claude/leitura_referencias/loteD_fontes_K_C.md` (fontes dos valores de K e C) — pronto: 10 fontes lidas (9 texto completo; dissertação Silva 2016 inacessível); 4 valores não conferem com a fonte citada (K afloramento 0,0087, K Neossolo Litólico 0,0463, C pastagem 0,050, C cultura anual 0,2116 = soja); tabelas K e C propostas
-- [~] (início: 03:53 UTC) C. `Notas Claude/proposta_secao5.md` (Resultados e Discussão)
-- [ ] D. `Notas Claude/proposta_secao6.md` (Conclusões)
+- [x] C. `Notas Claude/proposta_secao5.md` (Resultados e Discussão) — pronto: 5.1 a 5.7 com Tabelas 11-14 e Figuras 6-12; Spearman da IC refeita (0,93) calculado na planilha, conferir
+- [~] (início: 03:56 UTC) D. `Notas Claude/proposta_secao6.md` (Conclusões)
 - [ ] E. `Notas Claude/mapa_figuras_tabelas_secoes_4_a_6.md` (figuras e tabelas, numeração nova)
 - [x] F. `Planilhas/planilha_calculos_concentrados.xlsx` (planilha mínima, sem formatação, com fórmulas vivas dos cálculos fora dos rasters; ver item F em `tarefa_noturna_29-10.md`) — pronto (script `Scripts/gerar_planilha_calculos_concentrados.py`)
 
