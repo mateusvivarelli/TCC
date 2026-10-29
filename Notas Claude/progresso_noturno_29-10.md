@@ -31,3 +31,4 @@ Legenda: `[ ]` a fazer, `[~]` em andamento (com horário UTC de início), `[x]` 
 **Suposições feitas:** nomes MC/MFM mantidos; λ = 0,20 citado só como valor de definição do CN tabelado (4.2.3) e na frase de Brandão (5.7); Tabela 9 sem a linha da IC refeita; Figura 12 = `mapa_07`; legendas de figura acima e "Fonte:" abaixo (ABNT de memória). Dúvidas listadas no fim de cada proposta.
 
 **Não feito:** nada ficou pendente dos itens A a F. A revisão independente (`tarefa_revisao_29-10.md`, com progresso próprio) não fazia parte desta tarefa e não foi tocada.
+- 29/10 05:31 UTC: sessão agendada encontrou todos os itens A a F já [x]; nada a fazer, encerrada.
