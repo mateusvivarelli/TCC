@@ -179,3 +179,12 @@ Para concluir a leitura, é preciso liberar nas configurações de rede da sess�
 * Todas as obras deste lote, pois nenhuma página oficial nem PDF pôde ser aberto nesta sessão (rede bloqueada para os sites de periódicos e repositórios).
 * Não buscadas: Stone (1974), Klemeš (1986), Gippel (1995), Lewis (1996), Tang e Carey (2017), Arnaud et al. (2002), Zhang e Han (2017), Russell et al. (2017), Ziegler et al. (2001).
 * Prioridade para conferir quando houver acesso (todas abertas): Varma e Simon (2006), Cawley e Talbot (2010), Krstajic et al. (2014), Rasmussen et al. (2009) e Gray e Gartner (2009).
+
+---
+
+## Conferência da sessão principal (30/10/2026)
+
+- Conferi o bloqueio com `curl` (código 000 em pubs.usgs.gov, bmcbioinformatics.biomedcentral.com, www.jmlr.org, pmc.ncbi.nlm.nih.gov e api.crossref.org; só o GitHub respondeu) e com WebFetch (www.jmlr.org: "host fora dos domínios permitidos"). O bloqueio é da configuração de rede do ambiente da nuvem, não das obras.
+- Consequência: **nenhuma obra deste lote foi citada** nas propostas de 30/10. Os lugares onde caberiam estão marcados `[REFERÊNCIA A LER: ...]` em `proposta_cap2_30-10.md` (2.5, 2.7, 2.8) e `proposta_cap3_30-10.md` (3.4.6), e listados em `proposta_cap4_30-10.md` (notas da 4.6).
+- Prioridade de leitura (todas de acesso aberto, segundo os resultados de busca): (1) Varma e Simon (2006), para a validação aninhada pedida pelo Luis (C19); (2) Rasmussen et al. (2009), USGS TM 3-C4, para a turbidez como substituto da CSS (C10); (3) Gray e Gartner (2009); (4) Cawley e Talbot (2010). Depois de ler, completar neste arquivo o "Nível de leitura" e o "O que diz", e trocar os marcadores pelas chamadas.
+- Para a referência de erosão urbana e de densidade de postos, nada foi lido; as frases correspondentes nas propostas não têm citação.
