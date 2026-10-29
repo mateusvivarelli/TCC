@@ -71,12 +71,12 @@ linhas = [
     ("Serie_horaria", "Dados horários da seção de controle (vazão Q e concentração CSS) e a vazão de base: a da planilha original e a recalculada aqui pelo filtro de Eckhardt (alfa = 0,995; BFImax = 0,70)."),
     ("Eventos", "Uma linha por evento: chuva, volume total, vazão de base, escoamento direto medido (V_dir), carga medida (SY_medido), e os números que vêm dos rasters (volume do SCS-CN e soma de E_unit no MC e no MFM)."),
     ("Volume", "Compara o escoamento direto calculado pelo SCS-CN com o medido (viés, erro, NSE do volume)."),
-    ("MC", "Modelo Calculado: SY = c * soma(E_unit), com a água do SCS-CN (só chuva). Calibra c, faz a validação cruzada e calcula as métricas."),
+    ("MC", "Modelo Calculado: SY = c * soma(E_unit), com o escoamento direto do SCS-CN (só chuva). Calibra c, faz a validação cruzada e calcula as métricas."),
     ("MFM", "Modelo Forçado ao Medido: igual ao MC, mas com o escoamento direto medido distribuído pelo padrão do SCS-CN."),
     ("Regra_chuva", "Regra simples SY = c * R (R = chuva do evento, mm). Referência para o MC (usa a mesma informação: só chuva)."),
     ("Regra_Vdir", "Regra simples SY = c * V_dir (escoamento direto medido). Referência para o MFM."),
     ("Regra_TR", "Regra simples SY = c * TR (volume total medido, com a vazão de base). Só para comparação."),
-    ("IC_refeita", "Formulação concentrada da Iniciação Científica: SY = alfa * (TR * Qpico)^beta * K * LS * C, com alfa e beta ajustados por regressão em log."),
+    ("IC", "Formulação concentrada da Iniciação Científica com os VALORES ORIGINAIS (alfa 0,277; beta 0,807; sedimento simulado e medido da planilha da IC). Ajuste nos 17 eventos da própria IC, sem validação cruzada; eventos e carga medida não são os mesmos do TCC."),
     ("Resumo", "Tabela final comparando todos os modelos (puxa os resultados das outras abas)."),
     ("", None),
     ("Calibração de c", "c é escolhido para minimizar o erro em escala log: ln c = média de [ln(SY_medido) - ln(x)], em que x é a soma de E_unit (MC, MFM) ou a grandeza da regra simples. Na prática, c é a média geométrica de SY_medido / x."),
@@ -130,8 +130,8 @@ cols = [("Evento", ""), ("Início", "dado"), ("Fim", "dado"),
         ("Escoamento direto medido V_dir (m³)", "= TR - volume da base"),
         ("Escoamento direto calculado pelo SCS-CN V_SCS (m³)", "RASTERS: soma de Q de todos os pixels"),
         ("Razão SCS-CN / medido", "= V_SCS / V_dir"),
-        ("Soma de E_unit no MC (índice)", "RASTERS: soma do índice de erosão, água do SCS-CN"),
-        ("Soma de E_unit no MFM (índice)", "RASTERS: soma do índice de erosão, água medida"),
+        ("Soma de E_unit no MC (índice)", "RASTERS: soma do índice de erosão, escoamento direto do SCS-CN"),
+        ("Soma de E_unit no MFM (índice)", "RASTERS: soma do índice de erosão, escoamento direto medido"),
         ("Sedimento medido SY_medido (t)", "= soma da carga horária na janela")]
 header(we, 4, cols, [8, 15, 15, 11, 11, 11, 12, 11, 14, 14, 15, 14, 15, 11, 13, 13, 13])
 E0 = 6
@@ -167,7 +167,7 @@ RNG = lambda col: f"Eventos!${col}${E0}:${col}${E1}"
 # ================= Volume =================
 wv = wb.create_sheet("Volume")
 titulo(wv, "Escoamento direto: SCS-CN contra o medido",
-       "Mostra quanto o SCS-CN (CN-I, lambda = 0,05 com S convertido) erra a água de cada evento.")
+       "Mostra quanto o SCS-CN (CN-I, lambda = 0,05 com S convertido) erra o escoamento direto de cada evento.")
 header(wv, 4, [("Evento", ""), ("Escoamento direto medido V_dir (m³)", "da aba Eventos"),
                ("Escoamento direto do SCS-CN V_SCS (m³)", "da aba Eventos (rasters)"),
                ("Razão V_SCS / V_dir", "= V_SCS / V_dir"),
@@ -253,105 +253,71 @@ def aba_modelo(nome, titulo_txt, explica, x_nome, x_col, x_fmt, c_unid):
     w.freeze_panes = "B6"
     RES[nome] = cells
 
-aba_modelo("MC", "Modelo Calculado (MC): SY = c * soma(E_unit), água calculada pelo SCS-CN",
+aba_modelo("MC", "Modelo Calculado (MC): SY = c * soma(E_unit), escoamento calculado pelo SCS-CN",
            "x = soma de E_unit sobre os 153.855 pixels, com o escoamento direto do SCS-CN (só chuva). É a previsão.",
            "x = soma de E_unit no MC (índice)", "O", "t", "t por unidade de E_unit")
-aba_modelo("MFM", "Modelo Forçado ao Medido (MFM): SY = c * soma(E_unit), água medida",
-           "x = soma de E_unit com o escoamento direto medido distribuído pelo padrão do SCS-CN. Não é previsão: mostra o desempenho com a água certa.",
+aba_modelo("MFM", "Modelo Forçado ao Medido (MFM): SY = c * soma(E_unit), escoamento direto medido",
+           "x = soma de E_unit com o escoamento direto medido distribuído pelo padrão do SCS-CN. Não é previsão: mostra o desempenho com o escoamento direto medido.",
            "x = soma de E_unit no MFM (índice)", "P", "t", "t por unidade de E_unit")
 aba_modelo("Regra_chuva", "Regra simples: SY = c * R (chuva do evento)",
            "Referência para o MC: usa só a chuva, como o MC.",
            "x = chuva do evento R (mm)", "F", "mm", "t por mm")
 aba_modelo("Regra_Vdir", "Regra simples: SY = c * V_dir (escoamento direto medido)",
-           "Referência para o MFM: usa a mesma água medida, sem a MUSLE.",
+           "Referência para o MFM: usa o mesmo escoamento direto medido, sem a MUSLE.",
            "x = escoamento direto medido V_dir (m³)", "L", "m3", "t por m³")
 aba_modelo("Regra_TR", "Regra simples: SY = c * TR (volume total medido)",
            "Só para comparação: usa o volume total, com a vazão de base.",
            "x = volume total TR (m³)", "I", "m3", "t por m³")
 
-# ================= IC_refeita =================
-wi = wb.create_sheet("IC_refeita")
-titulo(wi, "IC refeita: SY = alfa * (TR * Qpico)^beta * K * LS * C",
-       "Formulação concentrada da Iniciação Científica, com K, LS e C médios da bacia (células D29 a D31). alfa e beta: regressão de ln(SY/KLSC) em ln(D).")
-cols = [("Evento", ""), ("Sedimento medido (t)", "da aba Eventos"),
-        ("D = TR * vazão de pico (m³ * m³/s)", "= TR * Qpico (aba Eventos)"),
-        ("ln(D)", "= LN(D)"), ("ln(medido / KLSC)", "= LN(medido / (K*LS*C))"),
-        ("Simulado no ajuste (t)", "= alfa * D^beta * KLSC (alfa e beta dos 17 eventos)"),
-        ("Erro no ajuste (%)", "= (simulado / medido - 1) * 100"),
-        ("beta sem este evento", "inclinação da regressão sem o evento (SLOPE nos outros 16)"),
-        ("ln(alfa) sem este evento", "intercepto da regressão sem o evento"),
-        ("Simulado na validação cruzada (t)", "= EXP(ln alfa + beta * ln D) * KLSC"),
-        ("Erro na validação cruzada (%)", "= (simulado / medido - 1) * 100"),
-        ("Erro absoluto (%)", "= |erro|"),
-        ("Razão simulado / medido", "= simulado / medido"),
-        ("Dentro de fator 2?", "sim se a razão está entre 0,5 e 2"),
-        ("ln(simulado)", "= LN(simulado na validação cruzada)"),
+# ================= IC (valores originais) =================
+# Valores ORIGINAIS da IC (Vivarelli et al., 2025), sem recalibrar: ver Scripts/_ic_original.py.
+import sys as _sys
+_sys.path.insert(0, "Scripts")
+import _ic_original as ICO
+wi = wb.create_sheet("IC")
+titulo(wi, "IC (valores originais): Y = alfa * (D * qp)^beta * K * LS * C, alfa = 0,277 e beta = 0,807",
+       "Valores da planilha da IC (Drive, 'Cópia de Tabela Resumo', abas CLP Eventos e CLP Resultados Calibrados). Ajuste nos 17 eventos da própria IC, sem validação cruzada. A lista de eventos (24/11/2018 no lugar de 17/12/2018) e a carga medida diferem das do TCC: não comparar evento a evento.")
+cols = [("Evento da IC", ""), ("Data (início)", "dado da IC"), ("Volume D (m³)", "dado da IC (volume total, com a vazão de base)"),
+        ("Vazão de pico qp (m³/s)", "dado da IC"), ("Sedimento medido na IC (t)", "dado da IC"),
+        ("Sedimento simulado pela IC (t)", "dado da IC (alfa 0,277; beta 0,807)"),
+        ("Erro (%)", "= (simulado / medido - 1) * 100"), ("Erro absoluto (%)", "= |erro|"),
+        ("Razão simulado / medido", "= simulado / medido"), ("Dentro de fator 2?", "sim se a razão está entre 0,5 e 2"),
+        ("ln(medido)", "= LN(medido)"), ("ln(simulado)", "= LN(simulado)"),
         ("Posição do medido (1 = menor)", "ranking"), ("Posição do simulado (1 = menor)", "ranking")]
-header(wi, 4, cols, [8, 12, 16, 10, 12, 13, 11, 13, 13, 14, 12, 11, 11, 10, 11, 11, 11])
-KR = E1 + 7  # linha do K
+header(wi, 4, cols, [8, 12, 14, 12, 13, 13, 10, 10, 11, 10, 10, 10, 11, 11])
 for i in range(N):
-    r, e = E0 + i, E0 + i
-    wi.cell(r, 1, f"={EV('A', e)}"); wi.cell(r, 2, f"={EV('Q', e)}")
-    wi.cell(r, 3, f"={EV('I', e)}*{EV('H', e)}")
-    wi.cell(r, 4, f"=LN(C{r})"); wi.cell(r, 5, f"=LN(B{r}/$D${KR+3})")
-    wi.cell(r, 6, f"=$D${E1+4}*C{r}^$D${E1+3}*$D${KR+3}"); wi.cell(r, 7, f"=(F{r}/B{r}-1)*100")
-    # regressao sem o evento i, por somas (n = 16)
-    sx = f"(SUM($D${E0}:$D${E1})-D{r})"; sy = f"(SUM($E${E0}:$E${E1})-E{r})"
-    sxx = f"(SUMSQ($D${E0}:$D${E1})-D{r}^2)"; sxy = f"(SUMPRODUCT($D${E0}:$D${E1},$E${E0}:$E${E1})-D{r}*E{r})"
-    n = N - 1
-    wi.cell(r, 8, f"=({n}*{sxy}-{sx}*{sy})/({n}*{sxx}-{sx}^2)")
-    wi.cell(r, 9, f"=({sy}-H{r}*{sx})/{n}")
-    wi.cell(r, 10, f"=EXP(I{r}+H{r}*D{r})*$D${KR+3}")
-    wi.cell(r, 11, f"=(J{r}/B{r}-1)*100"); wi.cell(r, 12, f"=ABS(K{r})"); wi.cell(r, 13, f"=J{r}/B{r}")
-    wi.cell(r, 14, f'=IF(AND(M{r}>=0.5,M{r}<=2),"sim","não")'); wi.cell(r, 15, f"=LN(J{r})")
-    wi.cell(r, 16, f"=RANK(B{r},$B${E0}:$B${E1},1)+(COUNTIF($B${E0}:$B${E1},B{r})-1)/2")
-    wi.cell(r, 17, f"=RANK(J{r},$J${E0}:$J${E1},1)+(COUNTIF($J${E0}:$J${E1},J{r})-1)/2")
-for col, f in [(2, "t"), (3, "t"), (4, "ln"), (5, "ln"), (6, "t"), (7, "pct"), (8, "q"), (9, "q"),
-               (10, "t"), (11, "pct"), (12, "pct"), (13, "r"), (15, "ln")]:
+    r = E0 + i
+    wi.cell(r, 1, i + 1); wi.cell(r, 2, ICO.DATA[i]); wi.cell(r, 3, float(ICO.VOL_M3[i])); wi.cell(r, 4, float(ICO.QP_M3S[i]))
+    wi.cell(r, 5, float(ICO.Y_OBS[i])); wi.cell(r, 6, float(ICO.Y_SIM_CAL[i]))
+    wi.cell(r, 7, f"=(F{r}/E{r}-1)*100"); wi.cell(r, 8, f"=ABS(G{r})"); wi.cell(r, 9, f"=F{r}/E{r}")
+    wi.cell(r, 10, f'=IF(AND(I{r}>=0.5,I{r}<=2),"sim","não")')
+    wi.cell(r, 11, f"=LN(E{r})"); wi.cell(r, 12, f"=LN(F{r})")
+    wi.cell(r, 13, f"=RANK(E{r},$E${E0}:$E${E1},1)+(COUNTIF($E${E0}:$E${E1},E{r})-1)/2")
+    wi.cell(r, 14, f"=RANK(F{r},$F${E0}:$F${E1},1)+(COUNTIF($F${E0}:$F${E1},F{r})-1)/2")
+for col, f in [(3, "m3"), (4, "t1"), (5, "t1"), (6, "t1"), (7, "pct"), (8, "pct"), (9, "r"), (11, "ln"), (12, "ln")]:
     fmt_col(wi, col, E0, E1, f)
-wi.cell(E1 + 2, 1, "Coeficientes (17 eventos)").font = TIT
-par = [("beta (expoente)", f"=SLOPE(E{E0}:E{E1},D{E0}:D{E1})", "q"),
-       ("alfa (coeficiente)", f"=EXP(INTERCEPT(E{E0}:E{E1},D{E0}:D{E1}))", "q")]
-for k, (lab, f, nf) in enumerate(par):
-    r = E1 + 3 + k
-    wi.cell(r, 1, lab).font = B
-    wi.merge_cells(start_row=r, start_column=1, end_row=r, end_column=3)
-    c = wi.cell(r, 4, f); c.fill = RES_FILL; c.font = B; c.number_format = FMT[nf]
-wi.cell(KR - 1, 1, "Fatores médios da bacia usados pela IC").font = TIT
-for k, (lab, v) in enumerate([("K médio", 0.031), ("LS médio", 0.536), ("C médio", 0.267)]):
-    wi.cell(KR + k, 1, lab).font = B
-    wi.merge_cells(start_row=KR + k, start_column=1, end_row=KR + k, end_column=3)
-    wi.cell(KR + k, 4, v)
-wi.cell(KR + 3, 1, "KLSC = K * LS * C").font = B
-wi.merge_cells(start_row=KR + 3, start_column=1, end_row=KR + 3, end_column=3)
-wi.cell(KR + 3, 4, f"=D{KR}*D{KR+1}*D{KR+2}").number_format = "0.00000"
-rr = KR + 5
-wi.cell(rr - 1, 1, "Resultados").font = TIT
-res = [("Erro mediano na validação cruzada (%)", f"=MEDIAN(L{E0}:L{E1})", "pct"),
-       ("Eventos dentro de fator 2 (%)", f'=COUNTIF(N{E0}:N{E1},"sim")/{N}*100', "pct"),
-       ("NSE em escala log (validação cruzada)", f"=1-SUMXMY2(O{E0}:O{E1},LN(B{E0}:B{E1}))/DEVSQ(LN(B{E0}:B{E1}))", "r"),
-       ("NSE linear (validação cruzada; secundário)", f"=1-SUMXMY2(J{E0}:J{E1},B{E0}:B{E1})/DEVSQ(B{E0}:B{E1})", "r"),
-       ("Spearman (validação cruzada)", f"=CORREL(P{E0}:P{E1},Q{E0}:Q{E1})", "r")]
+rr = E1 + 3
+wi.cell(rr - 1, 1, "Resultados (ajuste nos 17 eventos da IC, sem validação cruzada)").font = TIT
+res = [("Erro mediano absoluto (%)", f"=MEDIAN(H{E0}:H{E1})", "pct"),
+       ("Eventos dentro de fator 2 (%)", f'=COUNTIF(J{E0}:J{E1},"sim")/{N}*100', "pct"),
+       ("NSE em escala log", f"=1-SUMXMY2(L{E0}:L{E1},K{E0}:K{E1})/DEVSQ(K{E0}:K{E1})", "r"),
+       ("NSE linear (secundário)", f"=1-SUMXMY2(F{E0}:F{E1},E{E0}:E{E1})/DEVSQ(E{E0}:E{E1})", "r"),
+       ("Spearman", f"=CORREL(M{E0}:M{E1},N{E0}:N{E1})", "r"),
+       ("Erro médio com sinal (%; positivo = simulado acima)", f"=AVERAGE(G{E0}:G{E1})", "pct"),
+       ("Menor erro (%)", f"=MIN(G{E0}:G{E1})", "pct"),
+       ("Maior erro (%)", f"=MAX(G{E0}:G{E1})", "pct")]
 icc = {}
 for k, (lab, f, nf) in enumerate(res):
     r = rr + k
     wi.cell(r, 1, lab).font = B
-    wi.merge_cells(start_row=r, start_column=1, end_row=r, end_column=3)
-    c = wi.cell(r, 4, f); c.fill = RES_FILL; c.font = B; c.number_format = FMT[nf]
-    icc[k] = f"IC_refeita!$D${r}"
-# NSE em log da IC: usa ln do medido da coluna auxiliar (evita formula de matriz)
-wi.cell(rr + 2, 4, f"=1-SUMXMY2(O{E0}:O{E1},R{E0}:R{E1})/DEVSQ(R{E0}:R{E1})")
-wi.cell(4, 18, "ln(medido)").font = B; wi.cell(4, 18).fill = CAB_FILL
-wi.cell(5, 18, "= LN(medido)").font = NOTA
-wi.cell(5, 18).data_type = "s"
-for i in range(N):
-    r = E0 + i
-    wi.cell(r, 18, f"=LN(B{r})").number_format = FMT["ln"]
+    wi.merge_cells(start_row=r, start_column=1, end_row=r, end_column=4)
+    c = wi.cell(r, 5, f); c.fill = RES_FILL; c.font = B; c.number_format = FMT[nf]
+    icc[k] = f"IC!$E${r}"
 wi.freeze_panes = "B6"
 
 # ================= Resumo =================
 wr = wb.create_sheet("Resumo")
-titulo(wr, "Resumo: desempenho na validação cruzada (17 eventos, calibração em log, carga total)",
+titulo(wr, "Resumo: desempenho na validação cruzada (17 eventos, calibração em log, carga total; IC: ajuste com valores originais)",
        "Todos os números vêm das outras abas. Erro mediano, fator 2, NSE em log e Spearman são as métricas principais; o NSE linear é secundário.")
 header(wr, 4, [("Modelo", ""), ("Informação medida usada", ""), ("Coeficiente c", "c com os 17 eventos"),
                ("Erro mediano (%)", "validação cruzada"), ("Dentro de fator 2 (%)", "validação cruzada"),
@@ -362,12 +328,12 @@ mods = [("MC (Modelo Calculado)", "chuva", "MC"), ("Regra SY = c * chuva", "chuv
         ("MFM (Modelo Forçado ao Medido)", "chuva e escoamento direto medido", "MFM"),
         ("Regra SY = c * V_dir", "escoamento direto medido", "Regra_Vdir"),
         ("Regra SY = c * TR", "volume total medido", "Regra_TR"),
-        ("IC refeita (concentrada)", "volume total e vazão de pico medidos", "IC")]
+        ("IC, valores originais (ajuste, sem validação cruzada; eventos da IC)", "volume total e vazão de pico medidos", "IC")]
 for i, (nome, info, aba) in enumerate(mods):
     r = 6 + i
     wr.cell(r, 1, nome).font = B; wr.cell(r, 2, info)
     if aba == "IC":
-        wr.cell(r, 3, "alfa e beta")
+        wr.cell(r, 3, "alfa 0,277; beta 0,807")
         vals = [icc[0], icc[1], icc[2], icc[4], icc[3]]
     else:
         c = RES[aba]
