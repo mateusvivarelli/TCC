@@ -220,7 +220,7 @@ A validação leave-one-out refaz apenas o coeficiente c. As escolhas da condiç
 
 ### 3.4.7 Métricas de desempenho
 
-Sejam O_n a carga medida e S_n a carga simulada no evento n, com n de 1 a N = 17, e Ō a média das cargas medidas. As métricas principais não dependem da variância dos dados e, por isso, não são dominadas por um único evento.
+Sejam O_n a carga medida e S_n a carga simulada no evento n, com n de 1 a N = 17, e O_med a média das cargas medidas. As métricas principais não dependem da variância dos dados e, por isso, não são dominadas por um único evento.
 
 O erro percentual absoluto de cada evento e a sua mediana sobre os eventos (MedAPE) são:
 
@@ -238,11 +238,11 @@ A eficiência de Nash-Sutcliffe (NSE; NASH; SUTCLIFFE, 1970) é calculada em esc
 
 [EQUAÇÃO] NSE_log = 1 - Σn [ln(O_n) - ln(S_n)]² / Σn [ln(O_n) - média(ln O)]²
 
-Vale 1 para um ajuste perfeito, 0 quando o modelo erra tanto quanto prever sempre a média dos logaritmos e é negativa quando erra mais. A versão linear, NSE = 1 - Σn (O_n - S_n)² / Σn (O_n - Ō)², é mostrada como medida secundária, porque é dominada pelo evento 15.
+Vale 1 para um ajuste perfeito, 0 quando o modelo erra tanto quanto prever sempre a média dos logaritmos e é negativa quando erra mais. A versão linear, NSE = 1 - Σn (O_n - S_n)² / Σn (O_n - O_med)², é mostrada como medida secundária, porque é dominada pelo evento 15.
 
-A correlação de ordem de Spearman (ρ) avalia se o modelo ordena os eventos corretamente, sem depender da magnitude. Sem empates, ela é:
+A correlação de ordem de Spearman (r_s) avalia se o modelo ordena os eventos corretamente, sem depender da magnitude. Sem empates, ela é:
 
-[EQUAÇÃO] ρ = 1 - 6 * Σn d_n² / [N * (N² - 1)]
+[EQUAÇÃO] r_s = 1 - 6 * Σn d_n² / [N * (N² - 1)]
 
 em que d_n é a diferença entre a posição do evento n na ordem dos medidos e na ordem dos simulados.
 
@@ -290,9 +290,9 @@ A contribuição de cada classe de uso e de solo foi calculada como a soma da er
 
 Para medir quanto do padrão espacial vem dos fatores fixos e quanto vem do escoamento (C31), usou-se o fato de que, em cada pixel, a erosão média se escreve como o produto de dois termos:
 
-[EQUAÇÃO] Ē_k = c * 11,8 * P * (K_k * LS_k * C_k) * G_k, com G_k = (1/17) * Σn (Q_k,n * pr,k,n * Apix)^0,56
+[EQUAÇÃO] E_med,k = c * 11,8 * P * (K_k * LS_k * C_k) * G_k, com G_k = (1/17) * Σn (Q_k,n * pr,k,n * Apix)^0,56
 
-O primeiro termo, K_k * LS_k * C_k, é fixo; o segundo, G_k, reúne a chuva e o número de curva de cada pixel (escoamento e pico local). Em escala logarítmica, ln Ē_k = constante + ln(K_k * LS_k * C_k) + ln G_k, e a variância de ln Ē_k entre os pixels com erosão se divide entre os dois termos. Calculou-se: (a) o R² da regressão de ln Ē_k em ln(K_k * LS_k * C_k), que é a fração da variação espacial explicada só pelos fatores fixos; (b) o R² da regressão de ln Ē_k em ln G_k, que é a fração explicada só pelo escoamento; e (c) a partição do R² total (igual a 1, pois a decomposição é exata) entre os dois termos pela média dos ganhos de R² nas duas ordens de entrada, que reparte a parcela comum. A mesma análise foi feita em escala linear, com o R² entre Ē_k e K_k * LS_k * C_k, que corresponde ao quadrado da correlação de Pearson. Os pixels com erosão nula (área urbanizada e corpos d'água) ficam fora dessa análise.
+O primeiro termo, K_k * LS_k * C_k, é fixo; o segundo, G_k, reúne a chuva e o número de curva de cada pixel (escoamento e pico local). Em escala logarítmica, ln E_med,k = constante + ln(K_k * LS_k * C_k) + ln G_k, e a variância de ln E_med,k entre os pixels com erosão se divide entre os dois termos. Calculou-se: (a) o R² da regressão de ln E_med,k em ln(K_k * LS_k * C_k), que é a fração da variação espacial explicada só pelos fatores fixos; (b) o R² da regressão de ln E_med,k em ln G_k, que é a fração explicada só pelo escoamento; e (c) a partição do R² total (igual a 1, pois a decomposição é exata) entre os dois termos pela média dos ganhos de R² nas duas ordens de entrada, que reparte a parcela comum. A mesma análise foi feita em escala linear, com o R² entre E_med,k e K_k * LS_k * C_k, que corresponde ao quadrado da correlação de Pearson. Os pixels com erosão nula (área urbanizada e corpos d'água) ficam fora dessa análise.
 
 > Notas: (1) C31, S19. (2) Números: todos "[a calcular no PC]" (precisam dos rasters). A correlação de Pearson de 0,77 (MC) e 0,76 (MFM) com K*C*LS calculada em 28/10 dá R² linear de cerca de 0,59 e 0,58 (só a conta 0,77² e 0,76²; não verificado). (3) Classes de declividade: são as usuais de relevo (plano a escarpado). Elas vêm de classificação da Embrapa que **não li**; por isso o texto não cita fonte. Se o usuário quiser citar, ler a fonte antes. (4) A partição pela média dos ganhos nas duas ordens é a ideia da decomposição de Lindeman, Merenda e Gold (LMG); não li a obra original, por isso o texto descreve o cálculo sem citar. (5) Script sugerido para o PC no roteiro K.
 
