@@ -5,3 +5,4 @@ N2: volume direto previsto (regressao na chuva),MUSLE espacializada,47.212131880
 N2: volume direto previsto (regressao na chuva),simples (sem MUSLE),46.28751017780242,70.58823529411765,0.48528630238447445,0.6053921568627452
 N3: volume direto medido (modelo forcado),MUSLE espacializada,20.59742085230797,94.11764705882352,0.8373070830993514,0.8308823529411766
 N3: volume direto medido (modelo forcado),simples (sem MUSLE),15.87030130331633,94.11764705882352,0.8489714475680781,0.8970588235294119
+N3: volume direto medido (modelo forcado),"IC concentrada (valores originais da IC, sem validacao cruzada)",22.461991391558715,100.0,0.9098116286311932,0.9264705882352943

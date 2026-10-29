@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from osgeo import gdal
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _ic_original as ICO
 from scipy.optimize import least_squares
 from scipy.stats import spearmanr
 
@@ -132,31 +134,34 @@ for nome, b, s in NIV:
         print(f"{nome.replace(chr(10),' '):<44} {tag:<26} {np.median(ape(v)):7.1f} {f2(v):7.0f} {nlog(v):8.3f} {spearmanr(SY, v)[0]:8.3f} | {extra}")
         rows.append(dict(nivel=nome.replace("\n", " "), modelo=tag, MedAPE=np.median(ape(v)), fator2=f2(v), NSE_log=nlog(v), Spearman=spearmanr(SY, v)[0]))
 print(f"{'referencia: SY = c * chuva':<44} {'':<26} {np.median(ape(ref)):7.1f} {f2(ref):7.0f} {nlog(ref):8.3f} {spearmanr(SY, ref)[0]:8.3f}")
+_m = ICO.metricas()
+rows.append(dict(nivel="N3: volume direto medido (modelo forcado)", modelo="IC concentrada (valores originais da IC, sem validacao cruzada)", MedAPE=_m["MedAPE"], fator2=_m["fator2"], NSE_log=_m["NSE_log"], Spearman=_m["Spearman"]))
+print("IC original:", _m)
 pd.DataFrame(rows).to_csv(os.path.join(FIG, "escada_gargalo.csv"), index=False, encoding="utf-8")
 
 # ---- figura
-NIV_FIG = [NIV[0], NIV[2]]   # figura do texto: so os dois modelos (N1 = calculado da chuva; N4 = forcado ao medido)
+NIV_FIG = [NIV[0], NIV[2]]   # figura do texto: N1 = calculado da chuva; N3 = forcado ao medido
+ICM = ICO.metricas()
 fig, ax = plt.subplots(1, 2, figsize=(11, 4.8))
 x = np.arange(len(NIV_FIG)); wd = 0.36
-cb, cs = "#1f5fa8", "#b8b8b8"
+cb, cs, ci = "#1f5fa8", "#b8b8b8", "#d98b1d"
 for k, (key, tit, fmt) in enumerate((("MedAPE", "Erro percentual mediano (menor é melhor)", "{:.0f}%"), ("fator2", "Eventos dentro de fator 2 (maior é melhor)", "{:.0f}%"))):
     a = ax[k]
-    vb = [np.median(ape(b)) if key == "MedAPE" else f2(b) for _, b, _ in NIV_FIG]
-    vs = [np.median(ape(s)) if key == "MedAPE" else f2(s) for _, _, s in NIV_FIG]
+    vb = [np.median(ape(b)) if key == "MedAPE" else f2(b) for _, b, _ in NIV_FIG[:2]]
+    vs = [np.median(ape(NIV_FIG[0][2])) if key == "MedAPE" else f2(NIV_FIG[0][2]), ICM[key]]
     r1 = a.bar(x - wd / 2, vb, wd, color=cb, label="MUSLE espacializada (só escoamento direto)")
-    r2 = a.bar(x + wd / 2, vs, wd, color=cs, label="Regra simples com o mesmo insumo (c * chuva ou c * volume direto)")
-    for rr in list(r1) + list(r2):
+    r2 = a.bar(x[0] + wd / 2, vs[0], wd, color=cs, label="Regra simples: c * chuva do evento")
+    r3 = a.bar(x[1] + wd / 2, vs[1], wd, color=ci, label="IC concentrada (valores originais da IC)")
+    for rr in list(r1) + list(r2) + list(r3):
         a.text(rr.get_x() + rr.get_width() / 2, rr.get_height() + 1, fmt.format(rr.get_height()), ha="center", fontsize=9)
-    a.axhline(np.median(ape(ref)) if key == "MedAPE" else f2(ref), color="#c0392b", ls="--", lw=1.2, label="Referência: SY = c * chuva")
     a.set_xticks(x); a.set_xticklabels(["Água calculada\nda chuva (previsão)", "Água forçada\nao medido"], fontsize=10)
     a.set_title(tit, fontsize=11)
     a.spines[["top", "right"]].set_visible(False)
     a.set_ylim(0, 112)
 h_, l_ = ax[0].get_legend_handles_labels()
 fig.legend(h_, l_, loc="lower center", ncol=3, frameon=False, fontsize=9, bbox_to_anchor=(0.5, 0.045))
-fig.suptitle("Quanto melhor a estimativa da água, melhor o sedimento: o gargalo é transformar chuva em escoamento", fontsize=12)
-fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN (CN-I). Forçada ao medido: escoamento direto medido (volume total menos a vazão de base). Sem termo de vazão de base.\n"
-         "Validação leave-one-out, calibração em log (um coeficiente), 17 eventos, λ = 0,05 com S convertido (Woodward), carga total de sedimentos.", ha="center", fontsize=7.5)
-fig.tight_layout(rect=(0, 0.11, 1, 0.95))
+fig.text(0.5, 0.005, "Calculada da chuva: escoamento direto pelo SCS-CN (CN-I). Forçada ao medido: escoamento direto medido (volume total menos a vazão de base).\n"
+         "MUSLE espacializada e regra simples: validação leave-one-out, calibração em log (um coeficiente), 17 eventos. IC: α = 0,277 e β = 0,807, ajustados nos próprios 17 eventos da IC, sem validação cruzada.", ha="center", fontsize=7.5)
+fig.tight_layout(rect=(0, 0.11, 1, 0.97))
 fig.savefig(os.path.join(FIG, "escada_gargalo.png"), dpi=150)
 print("figura:", os.path.join(FIG, "escada_gargalo.png"))

@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from osgeo import gdal
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _ic_original as ICO
 
 gdal.UseExceptions()
 sys.stdout.reconfigure(encoding="utf-8")
@@ -32,34 +34,35 @@ SY = np.array([float(r["SYY_t"]) for r in R_]); V = np.array([float(r["T_R_m3"])
 KLSC = 0.031 * 0.536 * 0.267
 ids = np.arange(N)
 
-# ---- IC refeita em LOO (lei de potencia, log) e referencia SY = c*chuva em LOO
+# ---- IC: usa-se SOMENTE os valores originais da IC (planilha do Drive, alfa 0,277 e beta 0,807); nao se refaz a IC.
+# ---- Referencia SY = c*chuva em LOO
 Dq = V * QP; ic = np.zeros(N); chuva = np.array([float(r["Chuva_evento_mm"]) for r in R_]); ch = np.zeros(N)
 for i in range(N):
-    m = ids != i; b, a = np.polyfit(np.log(Dq[m]), np.log(SY[m] / KLSC), 1); ic[i] = np.exp(a) * Dq[i] ** b * KLSC
+    m = ids != i
     ch[i] = np.exp(np.mean(np.log(SY[m]) - np.log(chuva[m]))) * chuva[i]
 B = sd.SY_calc_LOO_t.to_numpy(); F = sd.SY_forc_LOO_t.to_numpy()
 
 # ---- Figura 1: dispersao observado x simulado (log-log, faixa de fator 2)
 fig, ax = plt.subplots(2, 2, figsize=(10.5, 9.4), sharex=True, sharey=True); ax = ax.ravel()
 lim = np.array([10, 30000])
-for a_, (tit, sim, cor) in zip(ax, (("SY = c * chuva do evento\n(referência simples, só chuva)", ch, CINZA),
-                                    ("Modelo calculado: MUSLE espacializada,\nescoamento direto do SCS-CN (só chuva)", B, AZUL),
-                                    ("Modelo forçado: MUSLE espacializada,\nescoamento direto medido", F, VERM),
-                                    ("IC (concentrada), com volume total e\npico medidos", ic, LARANJA))):
+for a_, (tit, obs, sim, cor) in zip(ax, (("SY = c * chuva do evento\n(referência simples, só chuva)", SY, ch, CINZA),
+                                         ("Modelo calculado: MUSLE espacializada,\nescoamento direto do SCS-CN (só chuva)", SY, B, AZUL),
+                                         ("Modelo forçado: MUSLE espacializada,\nescoamento direto medido", SY, F, VERM),
+                                         ("IC (concentrada), valores originais da IC:\nvolume e pico medidos, sem validação cruzada", ICO.Y_OBS, ICO.Y_SIM_CAL, LARANJA))):
     a_.fill_between(lim, lim / 2, lim * 2, color="#e8eef6", label="faixa de fator 2")
     a_.plot(lim, lim, color="k", lw=0.8)
-    a_.scatter(SY, sim, c=cor, s=34, zorder=3, edgecolor="white", linewidth=0.5)
+    a_.scatter(obs, sim, c=cor, s=34, zorder=3, edgecolor="white", linewidth=0.5)
     for i in range(N):
-        a_.annotate(str(i + 1), (SY[i], sim[i]), fontsize=7, xytext=(3, 3), textcoords="offset points", color="#444")
-    r = sim / SY; dentro = 100 * np.mean((r >= 0.5) & (r <= 2))
+        a_.annotate(str(i + 1), (obs[i], sim[i]), fontsize=7, xytext=(3, 3), textcoords="offset points", color="#444")
+    r = sim / obs; dentro = 100 * np.mean((r >= 0.5) & (r <= 2))
     a_.set_xscale("log"); a_.set_yscale("log"); a_.set_xlim(lim); a_.set_ylim(lim)
     ticks = [10, 100, 1000, 10000]
     for eixo in (a_.xaxis, a_.yaxis):
         eixo.set_major_locator(matplotlib.ticker.FixedLocator(ticks)); eixo.set_major_formatter(matplotlib.ticker.FixedFormatter([f"{t:,}".replace(",", ".") for t in ticks]))
         eixo.set_minor_locator(matplotlib.ticker.NullLocator())
-    a_.set_title(tit, fontsize=10); a_.text(0.04, 0.93, f"dentro de fator 2: {dentro:.0f}%\nerro mediano: {np.median(100*np.abs(sim-SY)/SY):.0f}%", transform=a_.transAxes, va="top", fontsize=9)
+    a_.set_title(tit, fontsize=10); a_.text(0.04, 0.93, f"dentro de fator 2: {dentro:.0f}%\nerro mediano: {np.median(100*np.abs(sim-obs)/obs):.0f}%", transform=a_.transAxes, va="top", fontsize=9)
     a_.set_xlabel("Sedimento medido (t)")
-ax[0].set_ylabel("Sedimento simulado, validação leave-one-out (t)"); ax[2].set_ylabel("Sedimento simulado, validação leave-one-out (t)")
+ax[0].set_ylabel("Sedimento simulado, validação leave-one-out (t)"); ax[2].set_ylabel("Sedimento simulado, validação leave-one-out (t)\n(IC: ajuste nos próprios 17 eventos)")
 for a_ in ax[:2]:
     a_.set_xlabel("")
 fig.suptitle("Sedimento simulado x medido nos 17 eventos (números = evento)", fontsize=11)
