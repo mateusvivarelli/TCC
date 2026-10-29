@@ -2,8 +2,8 @@
 
 Instruções: `Notas Claude/tarefa_nuvem_30-10.md`. Branch: `claude/noite-30-10`. Legenda: `[ ]` a fazer, `[~]` em andamento (com horário UTC), `[x]` pronto.
 
-- [~] (início 21:17 UTC) A. plano_reestruturacao_30-10.md
-- [ ] B. ajustes_cap1_a_3_30-10.md
+- [x] A. plano_reestruturacao_30-10.md
+- [~] (início 21:21 UTC) B. ajustes_cap1_a_3_30-10.md
 - [ ] C. proposta_cap3_30-10.md
 - [ ] D. proposta_cap4_30-10.md
 - [ ] E. proposta_cap2_30-10.md
