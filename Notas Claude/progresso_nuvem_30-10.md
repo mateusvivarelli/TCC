@@ -12,7 +12,7 @@ Instruções: `Notas Claude/tarefa_nuvem_30-10.md`. Branch: `claude/noite-30-10`
 - [x] H. (sem leitura: rede bloqueada; ver registro) leitura_referencias/loteE_medicao_e_validacao.md
 - [x] I. perguntas_para_o_luis_30-10.md
 - [x] J. autoconferência
-- [~] (início 21:40 UTC) K. roteiro_aplicacao_doc_30-10.md
+- [x] K. roteiro_aplicacao_doc_30-10.md
 
 ## Registro
 - 29/10 (local): instruções criadas pela sessão do desktop; nada feito ainda.
@@ -27,3 +27,4 @@ Instruções: `Notas Claude/tarefa_nuvem_30-10.md`. Branch: `claude/noite-30-10`
   - Numeração: todas as remissões de seção, tabela e figura das propostas existem na estrutura nova (2.1 a 2.8; 3.1 a 3.4.9; 4.1 a 4.6; Tabelas 1 a 16 e A1; Figuras 1 a 11, A1 e A2).
   - Citações: cada proposta tem tabela de referências com nível de leitura (cap. 4 acrescentada agora). Obras não lidas no original (USDA-SCS 1972, Chow 1988, Williams 1975, Nash e Sutcliffe 1970, Lyne e Hollick 1979) e só resumo (Moore e Burch 1986, Eckhardt 2005, Murillo-Bermúdez 2023) já estavam no Doc; ficam marcadas e a decisão de "apud" vai para o roteiro K. Nenhuma obra do lote E citada (marcadores [REFERÊNCIA A LER]).
   - Não verificado: os números que dependem dos rasters (declividade, R² log, perda pelo limite Q <= P, descrição do mapa_06, que não abri).
+- 30/10 21:41 UTC: item K pronto (roteiro + script Scripts/_analise_mapa_declividade_r2_30-10.py, não testado: sem rasters). Todos os itens A a K concluídos; H sem leitura de obras novas (rede bloqueada).
