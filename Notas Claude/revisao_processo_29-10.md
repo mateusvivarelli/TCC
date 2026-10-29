@@ -1,12 +1,20 @@
 # Revisão independente do processo, dos resultados e do texto (29/10/2026)
 
 Revisora: sessão na nuvem, sem acesso ao usuário, ao Google Doc ou aos rasters. Branch `claude/noite-29-10`.
-Código das recomputações: `Scripts/revisao_29-10/` (`r1_recomputa.py`, `r1_eckhardt.py`, `r2_estatistica.py`, `r2_consistencia.py`).
+Código das recomputações: `Scripts/revisao_29-10/` (`r1_recomputa.py`, `r1_eckhardt.py`, `r2_estatistica.py`).
 Gravidade: **crítico** (muda uma conclusão ou um número), **importante** (erro ou risco que a banca notaria), **menor** (estilo ou detalhe).
 
 ## Resumo (os 5 problemas mais graves e a recomendação)
 
-(preenchido ao fim da R3)
+1. **Crítico (interpretação): o alvo contém o volume medido.** ln(volume) explica 88% da variância de ln(carga); SY = c*T_R, sem MUSLE, dá 17,6% de erro mediano, melhor que o MFM (20,6%). O MFM mostra o peso da água, não valida a fórmula de erosão nem o mapa (achados 8, 19). Reescrever a 5.3, a 5.4 e a conclusão 4 ("o limite é a água, e não a fórmula de erosão").
+2. **Importante: "equivalente", "iguala", "não custa precisão" (Resumo, Abstract, 5.4, 5.5, conclusão 5) são mais fortes que os dados.** Os testes só dizem "não se distinguem" (Wilcoxon p de 0,49 a 0,58; MFM melhor em 6 ou 7 de 17); o "16%" do Resumo é da IC refeita, não da publicada (achados 18, 23).
+3. **Importante: RI é o máximo entre os postos e R a média ponderada; RI/R passa de 1 nos eventos 1 e 12**, o que contradiz "fração da chuva na hora mais intensa" (achados 1, 25).
+4. **Importante: métodos descartados já no Doc (2.3: "+94% sem conversão", "-12% com λ = 0,20") e citações de obras não lidas** (USDA-SCS 1972, Chow 1988, Williams 1975, Nash e Sutcliffe 1970; só resumo: Moore e Burch, Eckhardt 2005); NRCS (2004) citado e ausente da lista (achados 35, 37, 38).
+5. **Importante: área de 137,8 km² (bacia) e 138,1 km² (pixels de cálculo) sem explicação; MFM não é exatamente o volume medido (limite Q <= P em eventos com f até 9,75; não verificado quanto)** (achados 2, 14).
+
+Conferido e certo: todos os números oficiais (c, LOO, métricas, volumes, IC refeita com Spearman 0,93, bootstrap de §32, Eckhardt 0,995/0,70, planilha da noite recalculada sem erro). Sensibilidade sem os eventos 15 e 17 não muda nenhuma conclusão.
+
+**Recomendação:** os números podem ir para o Doc como estão; antes de colar as propostas, (a) trocar a narrativa "a espacialização iguala/não custa" por "não se distingue, e o desempenho com a água medida vem do volume", (b) corrigir a definição de RI/R, (c) tirar da 2.3 as duas frases com configurações descartadas, (d) resolver as citações não lidas com "apud" e incluir o NRCS (2004), (e) explicar as duas áreas. Perguntas só o usuário responde: origem da coluna `Chuva_evento_mm` (pesos 0,307/0,693); por que o evento 1B (24/11/2018) ficou fora; se aceita manter as frases da 2.3 como exceção à regra 3.
 
 ---
 
@@ -164,3 +172,80 @@ Faltam:
 - **Contraste entre as duas estações chuvosas depende do evento 17** (achado 15).
 - **Mineração: 1,8% do sedimento em 0,0% da área, com C = 1 sem fonte** (`tab_classes_uso.md`; lote D). Frase: "A mineração, com C = 1 adotado sem fonte, responde por 1,8% do sedimento em poucos pixels."
 - **Área de cálculo maior que a da bacia** (achado 14).
+
+---
+
+## R3. Tese (o texto)
+
+Revisado: `doc_texto_completo_29-10.md` (Resumo, Abstract, seções 1 a 3 e REFERÊNCIAS; as seções 4 a 6 antigas não foram revisadas, como pedido) e as propostas `proposta_secao4.md`, `proposta_secao5.md`, `proposta_secao6.md` e `mapa_figuras_tabelas_secoes_4_a_6.md`. `leitura_referencias/loteD_fontes_K_C.md` não foi revisado a fundo (só usado como fonte dos achados sobre K e C).
+
+### R3.1 Erros factuais, números e inconsistências entre seções
+
+conferido: IC publicada (PDF `Aplicação da Equação Universal de Perda de Solo Modificada.docx.pdf`): α 0,277, β 0,807, erros de -60,01% a +37,14%, média -4,15% (proposta 5.5 certa).
+conferido: Tabela 2 e 3 do Doc contra a planilha e o CSV; 3.2 (199 a 3.829 t, média 1.403 t, soma 23.846 t); Tabela 4 (K médio 0,039 e C médio 0,050 refeitos pelas áreas das Tabelas 5 e 6); 2.3 (CN-I de 31 a 95 a partir de 52 a 98); 1.1 ("cerca de 42%" = 29,0 + 12,7).
+
+23. **Importante. Resumo e Abstract: "desempenho equivalente ao da formulação concentrada (erro mediano de 16%)".** Ver achado 18. Além do "equivalente", o leitor do Resumo entende que 16% é o erro da IC publicada. Sugestão: "Nessas condições, a espacialização não se distingue de uma formulação concentrada recalibrada com o volume e o pico medidos (erro mediano de 16%) e acrescenta um mapa de áreas críticas, que não pôde ser validado no espaço." No Abstract: "performs indistinguishably from a recalibrated lumped formulation".
+
+24. **Importante. Resumo e 1.2 prometem uso do mapa ("permite direcionar medidas de contenção").** O mapa não tem validação espacial e os C do campo e da lavoura não conferem com as fontes (lote D). Sugestão: "indica, em termos relativos, onde priorizar medidas de contenção, sob os valores de K e C adotados".
+
+25. **Importante. RI/R descrito como "fração da chuva que cai na hora mais intensa" (Doc 4.4 antigo e proposta 4.4).** Passa de 1 nos eventos 1 e 12 (achado 1). Corrigir a frase e a Tabela 7.
+
+26. **Importante. Área: 137,8 km² (Resumo, 3.1, Figura 1) e 138,1 km² (3.3, 4.2.1).** Achado 14.
+
+27. **Menor. Tabela 1 diz que Bt vem do "Filtro de Eckhardt (2005) aplicado à vazão horária"; a 2.4 diz que a série "foi fornecida junto com os dados" e é reproduzida pelo filtro.** Sugestão na Tabela 1: "série fornecida com os dados, reproduzida pelo filtro de Eckhardt (2005) (seção 2.4)".
+
+28. **Menor. Tabela 2: legenda "chuva ponderada (R)", mas a coluna R não é exatamente 0,307*P1 + 0,693*P2** (ev 16: 97,7 na tabela, 98,25 pela fórmula; achado 3). E as colunas "Q inicial" e "T chuva" não são usadas pelo modelo oficial (já apontado pela noite). Sugestão: tirar as duas colunas e explicar a origem de R.
+
+29. **Menor. Tabela 4 diz "área acumulada no SAGA/QGIS"; a proposta 4.2.2 diz trocar "(SAGA)" por "cálculo sobre o MDE em UTM"; a 2.6 diz "rampa"/"área de contribuição específica limitada a 200 m".** Três formas para a mesma coisa. Sugestão: usar sempre "área de contribuição específica limitada a 200 m" e uma única ferramenta (conferir em `_recalcular_ls_moore.py` qual foi usada: não verificado).
+
+30. **Menor. 2.2 diz que a MUSLE "dispensa a razão de entrega de sedimentos" (Neitsch et al., 2011); a 2.5 e a 4.5 dizem que c faz o papel de conectividade e absorve a razão de entrega.** A banca pode ver contradição. Sugestão (2.5): "Na escala da bacia, a MUSLE dispensa a razão de entrega; aplicada ao pixel, ela estima a erosão local, e a parte que chega ao exutório precisa de um fator, aqui o coeficiente c."
+
+31. **Menor. Notação diferente entre o Doc e as propostas:** Doc usa Qk, Eunit, Apix, SYobs (com índice k do pixel); as propostas usam Q, E_unit, A_pix, SY_obs, sem k. "Taxa de abstração inicial" (Resumo) e "razão de abstração inicial" (2.3, 4.2.3). "modelo forçado ao medido" (2.4, minúsculas) e "Modelo Forçado ao Medido (MFM)" (4.1). Sugestão: uma notação só (recomendo a do Doc, com o índice k, que deixa claro o que é por pixel) e "razão de abstração inicial" em todo o texto.
+
+32. **Menor. Siglas.** NSE é definido na 2.7 e de novo na 4.8 (proposta repete a explicação inteira); IC é "Iniciação Científica", e as notas usam "IC95%" para intervalo de confiança (a proposta 5 escreve por extenso: conferido, manter assim). MC e MFM só são definidos na 4.1, mas a 2.4 já fala em "modelo forçado ao medido": ok, sem sigla.
+
+33. **Menor. Remissões.** Proposta 4.2.2 cita "Tabelas 5 e 6" (certo); proposta 4.2.3 diz "A origem do CN e da conversão já está na Tabela 4 (3.3)": a Tabela 4 tem a origem do CN, não a conversão de Woodward. Proposta 5.3 cita um "teste intermediário" (regressão do volume na chuva, 47,2%) que não está descrito na seção 4 nem na Figura 8: resultado sem método (cortar ou descrever na 4.8).
+
+34. **Menor. Resultados sem conferência nos mapas.** Proposta 5.6.2 ("As áreas críticas se concentram em manchas na porção central e oeste da bacia e em algumas manchas pequenas ao sul") e conclusão 6 ("nas mesmas manchas da porção central e oeste") repetem o texto do modelo antigo; a própria sessão da noite diz que não abriu os mapas novos. Não verificado (sem rasters/imagens conferidas). Sugestão: o usuário olhar `mapa_07_sedimento_medio.png` antes de manter.
+
+### R3.2 Regras do usuário
+
+35. **Importante. Métodos descartados no Doc atual (seção 2.3), já aplicados:** "sem a conversão, o escoamento calculado seria superestimado em 94%" (λ 0,05 sem converter) e "(viés de +3%, contra -12% com λ = 0,20)". As duas frases apresentam configurações testadas e descartadas, o que a regra 3 proíbe (a proposta 4.2.3 evitou de propósito a mesma frase dos 94%). Sugestão: "Neste trabalho adotou-se λ = 0,05 com S convertido por essa relação, porque com ela o volume calculado no conjunto dos eventos ficou próximo do escoamento direto medido (viés de +3%)." e cortar a frase dos 94%. Decidir com o usuário (ele aprovou a 2.3; pode ter aceitado a exceção).
+
+36. **Menor. "λ = 0,20" na proposta 4.2.3 e na 5.7 (Brandão).** Uso como valor de definição do CN tabelado e como resultado da literatura; não é método do TCC. conferido: aceitável; a noite já deixou a alternativa de redação.
+
+37. **Importante. Citações de obras não lidas (regra das citações).** Pelos próprios relatórios de leitura, não foram acessados: USDA-SCS (1972) (citado na 2.3 e nas propostas 4.2.3 e 4.3), Chow, Maidment e Mays (1988) (2.3, 2.6, 3.3, 4.2.3), Williams (1975) (1.1, 2.2, 4.4), Nash e Sutcliffe (1970) (2.7, 4.8); só resumo: Moore e Burch (1986) (2.6, Tabela 4, 4.2.2) e Eckhardt (2005) (2.4, Tabela 1). Sugestão: usar "apud" (NBR 10520) com a fonte lida, por exemplo "Williams (1975 apud NEITSCH et al., 2011)", "(USDA-SCS, 1972 apud NRCS, 2004)", ou trocar pela fonte lida (NEH-630 para a equação do SCS-CN e as conversões de AMC, se a tabela do cap. 10 tiver as conversões: não verificado). Para o LS, a própria noite sugere conferir se os expoentes 0,4 e 1,3 são de Moore e Burch (1986) ou Moore e Wilson (1992).
+
+38. **Importante. Referência citada e ausente da lista:** NRCS (2004), NEH Parte 630, cap. 10 (propostas 4.2.3 e 5.7). Também ausentes, se o usuário adotar as tabelas de K e C com fonte verificada do lote D: as fontes dos valores de K e C (hoje as Tabelas 5 e 6 só citam "valor da IC"). Lista sem citação: nenhuma (conferidas as 26 entradas contra o texto das seções 1 a 3 e as propostas).
+
+39. **Menor. ABNT nas chamadas.** O Doc usa caixa alta dentro dos parênteses ("(HAO et al., 2022)", "(NASH; SUTCLIFFE, 1970)"); as propostas usam caixa baixa ("(Valle Junior; Rodrigues; Oliveira, 2019)", "(Nash; Sutcliffe, 1970)", "(Vivarelli et al., 2025)"). Escolher um padrão (a NBR 10520:2023 aceita maiúsculas e minúsculas; conferir o guia da FEC) e aplicar a tudo. Na 2.3 do Doc aparece "Valle Junior et al. (2019)" e, na mesma seção, "Valle Junior, Rodrigues e Oliveira (2019)": com três autores, a NBR 10520:2023 pede os três nomes.
+
+40. **Menor. ABNT na lista.** USDA-SCS: entidade governamental vai pela jurisdição ("UNITED STATES. Department of Agriculture. Soil Conservation Service."); Vivarelli et al. (2025): falta indicar onde está disponível (relatório PIBIC ou anais); Chow et al.: faltam páginas totais (opcional). Baert et al. (2026), Catena v. 274: volume e artigo não conferidos (não verificado). Espaços no fim de várias linhas (cosmético).
+
+41. **Menor. Caracteres.** Seções 1 a 3 e propostas: nenhum caractere fora dos permitidos (fora a epígrafe, que é citação, e "Köppen", nome próprio). `tab_fator_K.md` usa "t·h·MJ⁻¹·mm⁻¹" (já apontado pela noite; a Tabela 5 do Doc já usa "t h MJ-1 mm-1").
+
+42. **Menor. Figuras e legendas.** As legendas do Doc estão abaixo das figuras e sem "Fonte:"; a ABNT (NBR 14724) pede identificação acima e fonte abaixo; o mapa da noite já propõe isso para as Figuras 4 a 12, mas as Figuras 1 a 3 e as Tabelas 1 a 6 do Doc também precisam de "Fonte:" (Tabela 4: "Fonte: elaborado pelo autor com dados de CONSÓRCIO PROFILL-RHAMA (2020), ANA (2024) e USGS"). Imagens com texto de método descartado (`escada_gargalo.png`, `mapa_07`): já apontado pela noite; confirmo a necessidade de regerar.
+
+### R3.3 Clareza: os 10 piores trechos e reescritas curtas
+
+1. **Resumo, final** ("O gargalo está, portanto, em transformar chuva em escoamento. Nessas condições, a espacialização tem desempenho equivalente..."). Proposta: "O limite está, portanto, na conversão da chuva em escoamento. Com a água medida, a espacialização não se distingue de uma formulação concentrada recalibrada (erro mediano de 16%) nem de uma regra proporcional ao volume, e acrescenta um mapa relativo das áreas críticas."
+2. **2.3, parágrafo de λ (Woodward, Brandão, Valle Junior), 5 frases e 3 estudos.** Proposta: dividir em dois: (a) "O valor padrão é λ = 0,20, mas estudos com muitos eventos encontraram valores menores: Woodward et al. (2003) ... ; Brandão et al. (2025) ... ; Valle Junior, Rodrigues e Oliveira (2019) ..."; (b) "Os mesmos estudos mostram limites: ..." (clima úmido, NSE baixo, CN calibrado junto).
+3. **2.6, parágrafo único que mistura IDW, K, C, LS (com As) e CN.** Proposta: um parágrafo por fator, cada um com uma frase de "o que é" e uma de "de onde vem".
+4. **2.3, "A relação é uma regressão entre valores de S ajustados a bacias norte-americanas, para chuvas de pelo menos 25,4 mm. Na bacia estudada, 8,4% dos pixels..."** Proposta: "A relação foi ajustada a bacias dos EUA, com chuvas de pelo menos 25,4 mm e CN de 35 a 100. Aqui, 8,4% dos pixels têm CN-I abaixo de 35, e os eventos 1 e 12 têm menos de 25,4 mm de chuva: nesses casos, a relação é extrapolada."
+5. **Proposta 4.2.3, parágrafo do CN-I (NEH-4, estação de crescimento, 35,6 mm, NEH-630, r = 0,37).** Proposta: "Adotou-se a condição seca (CN-I) para os 17 eventos, porque com ela o volume calculado no conjunto ficou próximo do medido. O critério antigo da chuva dos 5 dias anteriores (USDA-SCS, 1972) coloca 13 dos 17 eventos nessa condição, mas esse critério foi abandonado pelo NRCS (2004) e, aqui, a chuva antecedente quase não se relaciona com o escoamento medido (r = 0,37)."
+6. **Proposta 4.4, "Em palavras: ..."** Proposta: "Q/1000 * A_pix é o volume escoado no pixel (m³). A razão RI/R mede quão concentrada no tempo foi a chuva do evento: é maior quando a hora mais intensa tem uma parte grande da chuva. A divisão por 3.600 passa de horas para segundos."
+7. **Proposta 4.4, parágrafo do E_unit ("índice relativo... fora da faixa... Q em mm...").** Proposta: "Como a fórmula de Williams foi ajustada para bacias inteiras, o valor calculado num pixel de 897 m² não é uma massa em toneladas: é um índice de erosão (E_unit). O coeficiente c (seção 4.5) converte a soma desses índices em toneladas, e absorve também as escolhas de unidade (Q em mm)."
+8. **Proposta 4.5, item do MFM (uma frase com f, V_SCS, min e justificativa).** Proposta: "No MFM, o volume de escoamento direto de cada evento é o medido. O SCS-CN só diz onde ele cai: o escoamento de todos os pixels é multiplicado pelo mesmo fator, f = V_dir / V_SCS, e limitado à chuva do pixel."
+9. **Proposta 5.5, dois últimos parágrafos.** Proposta: "Com a água medida, MFM, IC refeita e SY = c * V_dir ficam entre 16% e 21% de erro mediano e não se distinguem com 17 eventos. A IC refeita não é previsão (usa o hidrograma do próprio evento) e não gera mapa; o MFM gera o mapa, mas também depende do volume medido."
+10. **Proposta 5.7, "Razão de abstração inicial" (5 estudos e números num parágrafo).** Proposta: começar pela conclusão ("o λ = 0,05 convertido foi escolhido pelo volume desta bacia e não é consenso"), depois um estudo por frase, e mover a frase dos 8,4% para o parágrafo das limitações de faixa (junto com os eventos abaixo de 25,4 mm).
+
+### R3.4 Cobertura dos objetivos (1.3)
+
+- Objetivo 1 (escoamento e pr por pixel): entregue (4.3, 4.4, Figura 10). conferido.
+- Objetivo 2 (rotina em Python/SIG): entregue só na conclusão 1; **a seção 4 não descreve a rotina** (linguagem, bibliotecas, onde está o código, o que é automático). Sugestão: um parágrafo curto na 4.1 ou um apêndice: "Os cálculos foram feitos em Python (NumPy, pandas, GDAL), num script que lê os rasters e as séries, calcula os 17 eventos e gera tabelas e mapas; o QGIS foi usado na preparação dos rasters."
+- Objetivo 3 (validar por validação cruzada com métricas robustas): entregue (4.7, 4.8, Tabela 12). Ressalva: "validar" é forte para LOO de um coeficiente com escolhas feitas nos mesmos eventos; a 5.7 já declara.
+- Objetivo 4 (comparar com modelos simples e IC, "verificar se a espacialização custa precisão"): entregue, mas a resposta honesta é "não se mostrou pior com 17 eventos", não "não custa" (achado 18).
+- **Objetivo 5 (identificar o fator que mais limita: escoamento ou erosão): entregue pela metade.** O MC mostra que o escoamento limita; a parte da erosão não foi isolada, porque com a água medida o desempenho vem do volume (achado 8). A conclusão 4 afirma "e não a fórmula de erosão": reescrever (achado 19).
+- Objetivo 6 (mapear áreas críticas e contribuição por classe): entregue (5.6, Tabelas 13 e 14), sem validação espacial (declarado).
+- Entregue sem objetivo: a análise da concentração por m³ (variação entre estações, evento 17) e a sensibilidade da separação da base: cabem na discussão, sem objetivo próprio. conferido: nada a mudar.
+- 1.2 promete "separar duas fontes de erro, a estimativa da água e a fórmula de erosão": mesma ressalva do objetivo 5.
