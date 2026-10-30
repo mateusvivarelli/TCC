@@ -28,3 +28,4 @@ Instruções: `Notas Claude/tarefa_nuvem_30-10.md`. Branch: `claude/noite-30-10`
   - Citações: cada proposta tem tabela de referências com nível de leitura (cap. 4 acrescentada agora). Obras não lidas no original (USDA-SCS 1972, Chow 1988, Williams 1975, Nash e Sutcliffe 1970, Lyne e Hollick 1979) e só resumo (Moore e Burch 1986, Eckhardt 2005, Murillo-Bermúdez 2023) já estavam no Doc; ficam marcadas e a decisão de "apud" vai para o roteiro K. Nenhuma obra do lote E citada (marcadores [REFERÊNCIA A LER]).
   - Não verificado: os números que dependem dos rasters (declividade, R² log, perda pelo limite Q <= P, descrição do mapa_06, que não abri).
 - 30/10 21:41 UTC: item K pronto (roteiro + script Scripts/_analise_mapa_declividade_r2_30-10.py, não testado: sem rasters). Todos os itens A a K concluídos; H sem leitura de obras novas (rede bloqueada).
+- 30/10 05:31 UTC: nova sessão agendada encontrou todos os itens A a K já concluídos [x]; nada a fazer, encerrada.
