@@ -266,6 +266,28 @@ fig.suptitle("Da chuva ao sedimento no evento 11: etapas espaciais do modelo", f
 fig.tight_layout(rect=(0, 0, 1, 0.97)); fig.savefig(os.path.join(OUT, "mapa_08_evento11.png"), dpi=170); plt.close(fig)
 print("mapa 8 ok")
 
+# ---- Apendice A: as mesmas etapas em duas figuras de pagina (paineis empilhados, maiores)
+def empilha(paineis, nome, titulo, texto=None, altura=None):
+    n = len(paineis) + (1 if texto else 0)
+    fig, axs = plt.subplots(n, 1, figsize=(6.6, altura or 2.9 * n))
+    axs = np.atleast_1d(axs)
+    for ax, (arr, cm, tit, rot, pc) in zip(axs, paineis):
+        arr = np.where(valido, arr, np.nan)
+        im = mostra(ax, arr, cm, vmin=np.nanmin(arr), vmax=np.nanpercentile(arr, pc) if pc else np.nanmax(arr)); contorno(ax)
+        moldura(ax, titulo=tit, km=5); cb = plt.colorbar(im, ax=ax, fraction=0.03, pad=0.01); cb.set_label(rot, fontsize=8); cb.ax.tick_params(labelsize=7)
+    if texto:
+        axs[-1].axis("off"); axs[-1].text(0.02, 0.95, texto, fontsize=9, transform=axs[-1].transAxes, va="top", linespacing=1.5)
+    fig.suptitle(titulo, fontsize=10, y=0.995)
+    fig.tight_layout(rect=(0, 0, 1, 0.985)); fig.savefig(os.path.join(OUT, nome), dpi=170); plt.close(fig)
+
+
+empilha(pan[:3], "mapa_08a_evento11_chuva_retencao_escoamento.png", "Evento 11: chuva, retenção e escoamento direto")
+txt11 = (f"Evento 11 (04 a 08/07/2019)\nChuva ponderada: {EV[10]['Chuva_evento_mm']:.1f} mm\nIntensidade máxima em 60 min: {EV[10]['Intensidade_60min_mm/h']:.1f} mm/h\n"
+         f"Volume total medido: {EV[10]['T_R_m3']/1e6:.2f} milhões de m³\nSedimento medido: {EV[10]['SYY_t']:,.0f} t\n\n"
+         f"MC (validação cruzada): {SD.loc[11, 'SY_calc_LOO_t']:,.0f} t\nMFM (validação cruzada): {SD.loc[11, 'SY_forc_LOO_t']:,.0f} t").replace(",", "#").replace(".", ",").replace("#", ".")
+empilha(pan[3:5], "mapa_08b_evento11_erosao_sedimento.png", "Evento 11: índice de erosão e sedimento estimado", texto=txt11, altura=8.6)
+print("mapas A1 e A2 ok")
+
 # ================================================================= FLUXOGRAMA
 fig, ax = plt.subplots(figsize=(12, 8.6)); ax.set_xlim(0, 12.5); ax.set_ylim(-1.2, 7.75); ax.axis("off")
 
