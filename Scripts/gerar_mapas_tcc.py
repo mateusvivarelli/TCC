@@ -157,7 +157,7 @@ cores_solo = {"Argissolos Vermelho-Amarelos": "#d95f02", "Cambissolos Háplicos"
               "Afloramento Rochoso": "#666666", "Área Urbana": "#bdbdbd"}
 cores_uso = {"Mata Nativa": "#1b7837", "Silvicultura": "#7fbc41", "Campo": "#d9ef8b", "Lavoura Temporária": "#fdae61",
              "Solo exposto": "#a6611a", "Mineração": "#5e3c99", "Afloramento Rochoso": "#666666", "Área Urbanizada": "#bdbdbd", "Corpos D'Água": "#4575b4"}
-fig, axs = plt.subplots(1, 2, figsize=(13, 5.4))
+fig, axs = plt.subplots(1, 2, figsize=(13, 4.6))
 for ax, gdf, camp, cores, tit in ((axs[0], ped_c, "Subordem", cores_solo, "Classes de solo (mapa pedológico)"), (axs[1], uso_c, "CLASSE", cores_uso, "Uso e cobertura do solo")):
     pat = []
     for cl, cor in cores.items():
@@ -167,9 +167,8 @@ for ax, gdf, camp, cores, tit in ((axs[0], ped_c, "Subordem", cores_solo, "Class
             pat.append(mpatches.Patch(color=cor, label=f"{cl} ({100*sel.geometry.area.sum()/area_bac:.1f}%)".replace(".", ",")))
     contorno(ax, "k", 1.0); moldura(ax, titulo=tit, km=5)
     ax.legend(handles=pat, loc="upper center", bbox_to_anchor=(0.5, -0.17), ncol=2, fontsize=7.5, framealpha=0.95, title="Legenda (% da área da bacia)", title_fontsize=8)
-fig.suptitle("Solo e uso do solo na área de estudo", fontsize=11, y=0.98)
-fig.text(0.01, 0.005, "Fonte: Plano de Bacias (Consórcio Profill-Rhama, 2020), conforme a IC. Recorte pela máscara da bacia.", fontsize=7)
-fig.tight_layout(rect=(0, 0.02, 1, 0.95)); fig.savefig(os.path.join(OUT, "mapa_02_solo_uso.png"), dpi=170); plt.close(fig)
+# sem titulo geral nem fonte na imagem: o titulo e a fonte vao na legenda da figura no texto; bbox tight evita cortar a legenda
+fig.tight_layout(); fig.savefig(os.path.join(OUT, "mapa_02_solo_uso.png"), dpi=170, bbox_inches="tight", pad_inches=0.08); plt.close(fig)
 print("mapa 2 ok")
 
 # ================================================================= MAPA 3: K, C, LS, CN
@@ -214,9 +213,9 @@ multiplos([os.path.join(BASE, f"Evento {n}", f"ChuvaIDW{n}.tif") for n in range(
 multiplos([os.path.join(BASE, f"Evento {n}", f"Qdir{n}_l05w.tif") for n in range(1, N + 1)], "PuBuGn", "Escoamento direto (mm)",
           "Escoamento direto calculado pelo SCS-CN (CN-I, λ = 0,05 com S convertido) em cada evento", "mapa_05_escoamento_eventos.png", vmin=0, gamma=0.5,
           nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados. Escala gráfica de 5 km; norte para cima.")
-multiplos([os.path.join(BASE, f"Evento {n}", f"SY{n}_l05w.tif") for n in range(1, N + 1)], "YlOrRd", "Sedimento das encostas (kg por pixel)",
-          "Sedimento produzido nas encostas em cada evento (MC)", "mapa_06_sedimento_eventos.png", vmin=0, fator=1000.0, gamma=0.5,
-          nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados.\nSedimento das encostas, c * E_unit (modelo só com escoamento direto). Escala gráfica de 5 km; norte para cima.")
+multiplos([os.path.join(BASE, f"Evento {n}", f"SY{n}_l05w.tif") for n in range(1, N + 1)], "YlOrRd", "Sedimento estimado por pixel (kg)",
+          "Sedimento estimado em cada pixel em cada evento (MC)", "mapa_06_sedimento_eventos.png", vmin=0, fator=1000.0, gamma=0.5,
+          nota="Escala comum a todos os eventos, com realce dos valores baixos (raiz quadrada); valores acima do percentil 99,5 saturados.\nSedimento estimado c * E_unit (MC). Escala gráfica de 5 km; norte para cima.")
 print("mapas 4-6 ok")
 
 # ================================================================= mapas medios (gerados por calcular_sy_lambda005_woodward.py)
@@ -225,7 +224,7 @@ SD = pd.read_csv(os.path.join(DI, "comparacao_SY_lambda005_woodward.csv")).set_i
 
 # ================================================================= MAPA 7: sedimento medio e areas criticas
 fig, axs = plt.subplots(2, 2, figsize=(13, 8))
-for col, (arr, nome) in enumerate(((SYc_mean, "MC (água calculada pelo SCS-CN, só chuva)"), (SYf_mean, "MFM (escoamento direto forçado ao medido)"))):
+for col, (arr, nome) in enumerate(((SYc_mean, "MC (escoamento calculado pelo SCS-CN)"), (SYf_mean, "MFM (escoamento direto forçado ao medido)"))):
     v = arr[np.isfinite(arr)]; vmax = np.percentile(v * 1000, 99.5)
     im = mostra(axs[0, col], arr * 1000, "YlOrRd", vmin=0, vmax=vmax); contorno(axs[0, col])
     moldura(axs[0, col], titulo=f"Sedimento médio dos 17 eventos\n{nome}", km=5)
@@ -238,7 +237,7 @@ for col, (arr, nome) in enumerate(((SYc_mean, "MC (água calculada pelo SCS-CN, 
                        loc="lower right", fontsize=7, framealpha=0.92)
 a_ = SYc_mean[valido]; b_ = SYf_mean[valido]
 fig.suptitle("Sedimento médio e áreas críticas (correlação entre os dois mapas: r = " + f"{np.corrcoef(a_, b_)[0,1]:.2f}".replace(".", ",") + ")", fontsize=11, y=1.0)
-fig.text(0.01, 0.005, "Modelo só com escoamento direto (sem termo de vazão de base). Áreas críticas = pixels acima do percentil 95 de cada mapa. Valores em kg por pixel de 897 m².", fontsize=7)
+fig.text(0.01, 0.005, "Áreas críticas = pixels acima do percentil 95 de cada mapa. Valores em kg por pixel de 897 m².", fontsize=7)
 fig.tight_layout(rect=(0, 0.015, 1, 0.97)); fig.savefig(os.path.join(OUT, "mapa_07_sedimento_medio.png"), dpi=170); plt.close(fig)
 q1, q2 = np.nanpercentile(SYc_mean[valido], 95), np.nanpercentile(SYf_mean[valido], 95)
 print(f"mapa 7 ok | r(calculado, forcado) = {np.corrcoef(a_, b_)[0,1]:.3f} | areas criticas coincidentes = {100*np.sum((a_>=q1)&(b_>=q2))/np.sum(a_>=q1):.1f}%")
@@ -251,7 +250,7 @@ q11, _ = le(os.path.join(pastas, "Qdir11_l05w.tif")); e11, _ = le(os.path.join(p
 fig, axs = plt.subplots(2, 3, figsize=(14, 7.2))
 pan = [(p11, "Blues", "Chuva do evento (IDW)", "mm", None), (Sw, "YlOrBr", "Retenção S0,05 (CN-I, convertida)", "mm", None),
        (q11, "PuBuGn", "Escoamento direto (SCS-CN, λ = 0,05)", "mm", None), (e11 * 1000, "YlOrRd", "Índice de erosão E_unit (Williams)", "kg por pixel, sem calibrar", 99.5),
-       (s11 * 1000, "YlOrRd", "Sedimento das encostas (c * E_unit)", "kg por pixel", 99.5), (None, None, None, None, None)]
+       (s11 * 1000, "YlOrRd", "Sedimento estimado (c * E_unit)", "kg por pixel", 99.5), (None, None, None, None, None)]
 for ax, (arr, cm, tit, rot, pc) in zip(axs.ravel(), pan):
     if arr is None:
         ax.axis("off"); continue
@@ -268,7 +267,7 @@ fig.tight_layout(rect=(0, 0, 1, 0.97)); fig.savefig(os.path.join(OUT, "mapa_08_e
 print("mapa 8 ok")
 
 # ================================================================= FLUXOGRAMA
-fig, ax = plt.subplots(figsize=(12, 8.6)); ax.set_xlim(0, 12); ax.set_ylim(-1.2, 7.7); ax.axis("off")
+fig, ax = plt.subplots(figsize=(12, 8.6)); ax.set_xlim(0, 12.5); ax.set_ylim(-1.2, 7.75); ax.axis("off")
 
 
 def caixa(xc, y, w, h, txt, cor, fs=9):
@@ -286,10 +285,10 @@ caixa(C1, 6.6, W, 0.85, "Chuva horária\nnos 2 postos (17 eventos)", ent)
 caixa(C2, 6.6, W, 0.85, "Mapas de solo, uso e relevo\n→ CN-I, K, C e LS (raster de 30 m)", ent)
 caixa(C3, 6.6, W, 0.85, "Medições no exutório:\nvazão, sedimento e vazão de base", obs)
 caixa(C1, 5.2, W, 0.85, "Interpolação IDW\n→ chuva P em cada pixel", pro)
-caixa(C2, 5.2, W, 0.85, "SCS-CN (CN-I; λ = 0,05 com S\nconvertido) → escoamento direto Q do pixel", pro)
-caixa(C3, 5.2, W, 0.85, "Sedimento medido SY_obs = Σ Q*CSS\nescoamento direto medido = T_R - ΣBt", obs)
-caixa(C2, 3.8, W + 0.2, 0.85, "pr = Q*(RI/R)  e  E_unit = 11,8*(Q*pr*A)^0,56*K*LS*C\n(erosão local do pixel, índice relativo)", pro, 7.5)
-caixa(C3, 3.8, W, 0.85, "Modelo forçado: Q do pixel\nreescalado para o escoamento\ndireto medido do evento", pro, 8.5)
+caixa(C2, 5.2, W, 0.85, "SCS-CN (CN-I; λ = 0,05,\nS convertido) → escoamento\ndireto Q do pixel (MC)", pro, 8.5)
+caixa(C3, 5.2, W, 0.85, "Sedimento medido SY_obs = Σ Q*CSS\nescoamento direto medido\nVdir = T_R - ΣBt*3600", obs, 8.5)
+caixa(C2, 3.8, W + 0.2, 0.85, "pr = Q*(RI/R)\nE_unit = 11,8*(Q*pr*A)^0,56*K*LS*C\n(erosão local do pixel, índice relativo)", pro, 8)
+caixa(C3, 3.8, W, 0.85, "MFM: Q do pixel reescalado\npara o escoamento direto\nmedido do evento", pro, 8.5)
 caixa(C2, 2.4, W, 0.85, "Soma de E_unit sobre os pixels", pro)
 caixa(6.4, 0.7, 8.2, 1.0, "SY = c * ΣE_unit\nc ajustado em escala logarítmica contra SY_obs; validação leave-one-out", res)
 caixa(3.0, -0.9, 4.6, 0.8, "Mapa de áreas críticas\n(c * E_unit em cada pixel)", res, 8.5)
@@ -301,7 +300,7 @@ for (x0, y0, x1, y1) in ((C1, 6.6, C1, 6.05), (C2, 6.6, C2, 6.05), (C3, 6.6, C3,
 # alvo da calibracao: linha tracejada pela margem direita ate a caixa da equacao
 ax.plot([C3 + W / 2, 11.85, 11.85], [5.62, 5.62, 1.2], ls="--", lw=1.3, color="#7a3b16", zorder=2)
 seta(11.85, 1.2, 10.5, 1.2, ls="--")
-ax.text(11.75, 3.6, "alvo da calibração", rotation=90, fontsize=8, color="#7a3b16", ha="right", va="center")
-fig.suptitle("Fluxograma do método (azul: entradas; amarelo: cálculos; laranja: dados medidos usados como alvo ou, no modelo forçado, como entrada; verde: resultados)", fontsize=9.5, y=0.97)
+ax.text(11.97, 3.4, "alvo da calibração", rotation=90, fontsize=8, color="#7a3b16", ha="left", va="center")
+ax.text(6.25, 7.65, "Azul: entradas; amarelo: cálculos; laranja: dados medidos (alvo da calibração e, no modelo forçado, entrada); verde: resultados", ha="center", va="bottom", fontsize=8.5)
 fig.savefig(os.path.join(OUT, "fig_fluxograma.png"), dpi=170, bbox_inches="tight"); plt.close(fig)
 print("fluxograma ok")
