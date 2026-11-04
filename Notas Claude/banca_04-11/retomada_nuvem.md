@@ -16,3 +16,9 @@ O usuário precisou desligar o notebook. Os subagentes da banca rodaram no noteb
 
 ## Regras
 Ver `LEIAME_tarefa.md` e `Notas Claude/memoria_claude/`. Não editar o Google Doc sem o usuário pedir. Trabalho mais recente: este branch, que parte de `claude/noite-30-10`; o `main` está em 28/10.
+
+## Concluído na nuvem (04/11/2026, tarde)
+- Arquivos 1 a 3: "Falta fazer" atualizado; contas incorporadas às perguntas A4, A6, A8, A12, A13, A14, A15, A17 e A21.
+- `4_respostas_e_faq.md`: feito (28 temas cobrindo A1 a A25 e B1 a B25, 15 perguntas frequentes, tabela de classificação, lista para o orientador e contas para o PC).
+- Script novo: `Scripts/banca_04-11/calc5_planilha_nuvem.py` (rodar com `python3 calc5_planilha_nuvem.py <pasta do repositório>`): BFImax, evento 17 hora a hora, vazão no início das janelas, defasagem CSS x vazão.
+- Continua dependendo dos rasters: tudo marcado "não recalculado".

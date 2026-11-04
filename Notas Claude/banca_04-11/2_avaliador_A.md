@@ -1,12 +1,12 @@
 # Banca simulada: parecer e perguntas do Avaliador A (hidrologia e hidrossedimentologia)
 
-Versão analisada: `TCC_Texto/TCC_versao_04-11.pdf`. Estado deste arquivo: gravação parcial, com as perguntas completas. Ver "Falta fazer" no fim.
+Versão analisada: `TCC_Texto/TCC_versao_04-11.pdf`. Estado deste arquivo: perguntas completas, com as contas incorporadas na retomada na nuvem (04/11). O que ficou em aberto está em "Falta fazer", no fim.
 
 ## (a) O que foi lido
 
 - Lido inteiro, pelo texto marcado por página (`Notas Claude/doc_texto_pdf_paginas_04-11.txt`): resumo, capítulos 1 a 5, referências e Apêndice A (68 páginas). As páginas citadas abaixo são as do PDF.
 - Não lidos, como pedido: `1_revisao_texto.md`, `3_avaliador_B.md`, `revisao_processo_29-10.md`, `revisao_independente_03-11.md`.
-- Figuras: AINDA NÃO ABERTAS. Só li as legendas. Nada abaixo depende de leitura visual das figuras.
+- Figuras: na primeira leitura só as legendas. Na retomada (nuvem, 04/11) foram vistas a 200 dpi as Figuras 7 e 8 (PDF p. 46 e 47). Nada abaixo depende de leitura visual das outras figuras.
 - Conferido depois da primeira leitura, só para testar dúvidas: `Notas Claude/relatorio_checagens_base_alvo_woodward_27-10.md` (parte inicial), `Notas Claude/resumo_modelo_completo.md` (passos 2 e 3), `Notas Claude/teste_cn_calibrado.md` (parte inicial), `Notas Claude/perguntas_para_o_luis_30-10.md` (item 2), `Notas Claude/leitura_referencias/loteA_...md` (Hao e Baert) e `loteB_...md` (Moore e Burch).
 - Contas à mão: feitas com as Tabelas 2, 3, 11 e 12 e os valores do texto. Cada uma está indicada como "conta minha".
 - Literatura: os originais NÃO foram reabertos. O que digo de Hao e de Baert vem da nota do lote A. Onde cito algo de memória, está escrito "de memória, não conferido". Rasters: não recalculado.
@@ -44,6 +44,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "S médio de 490 mm para chuva média de 63 mm. Nessa faixa, Q é quase P²/S. Foi o SCS-CN que errou a forma da curva, ou foi você quem colocou a bacia na parte mais curva da equação para acertar o total?"
 - **Local:** seção 3.4.1.3 (p. 31 e 32), seção 4.1 (p. 43 e 44: "A forma da curva do método não parece corresponder"), seção 4.2 (p. 48), Conclusões (p. 60).
 - **Por que importa:** o trabalho generaliza para o método ("a passagem pelo SCS-CN piora a estimativa", p. 50), mas só uma configuração foi avaliada no texto. Um CN maior deixa a curva mais próxima de uma reta na faixa de chuva. O total só bate porque erros de sinais opostos se compensam, como o próprio texto diz. As notas indicam que formas calibradas viram quase um coeficiente de escoamento constante (`teste_cn_calibrado.md`, item 3), mas isso não está no TCC.
+- **Conta minha (Tabelas 2 e 3, em log contra R):** a inclinação de V_SCS é 2,58 (R² 0,99), e a de Vdir é 1,17 (R² 0,57). Ou seja, o modelo faz o volume crescer com a chuva elevada a 2,6, e a bacia, com a chuva elevada a cerca de 1,2. É a forma P²/S aparecendo nos números.
 - **Boa resposta:** separar três coisas: equação, CN tabelado e configuração. Mostrar a inclinação de V_SCS contra R em escala log comparada à de Vdir contra R. Trazer o teste de CN calibrado, com a ressalva de que, nas notas, ele não superou a regressão simples com a chuva. Restringir a frase a "nesta configuração e com estes dados".
 - **Gravidade:** pode comprometer.
 
@@ -58,6 +59,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "Seus eventos foram escolhidos por terem pico de pelo menos 10 m³/s, certo? Então uma chuva pequena só entra na amostra se tiver respondido muito. Isso não explica, ao menos em parte, a correlação de -0,01 e a subestimação dos eventos pequenos?"
 - **Local:** seção 2.5 (p. 18, critério de 10 m³/s, citado só como trabalho anterior); seção 3.2 (p. 23, sem critério de seleção); seção 4.1 (p. 43 e 44); Conclusões (p. 60). Ver também o ponto do LEIAME: pico de 12,48 m³/s em 24/11/2018, que fica fora da lista, depois do fim do evento 1.
 - **Por que importa:** selecionar pela resposta trunca a amostra. Em uma amostra assim, a relação entre coeficiente de escoamento e chuva fica distorcida. A conclusão "a fração da chuva que escoa não cresce com a chuva" pode ser, em parte, artefato. Os eventos 1, 4, 7 e 10, os mais subestimados, são justamente os candidatos a esse efeito.
+- **Conferido na planilha:** `eventos_processados_manuais.xlsx` e `eventos_definidos_artigo_I4SDWI_corrigido.xlsx` listam um evento "1B", de 24/11/2018 16h a 26/11/2018 21h, com pico de 12,484 m³/s e volume total de 1.391 mil m³, maior que o do evento 1 ("1A", 409 mil m³). Ele está na lista de partida e foi tirado depois. O motivo não está nas notas consultadas.
 - **Boa resposta:** declarar o critério e a lista de eventos excluídos na seção 3.2. Levantar as chuvas grandes do período que não passaram do limite e ver o volume delas. Reconhecer o viés e explicar por que 24/11/2018 ficou de fora.
 - **Gravidade:** pode comprometer.
 
@@ -71,7 +73,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 ### A8. "Medido" e "superficial": de onde vem o seu Vdir?
 - **Pergunta:** "Você escreve 'escoamento superficial direto medido'. Ele não é medido, sai de um filtro, e o filtro não sabe se a água veio pela superfície. Quem gerou a coluna Bt? Com que critério? E se BFImax não for 0,70, o seu +3% continua existindo?"
 - **Local:** seção 3.2 (p. 24), Tabela 1 (p. 23), Tabela 3 ("estimado", p. 25) contra Tabela 7 ("medido", p. 30), seção 3.4.1.3 (p. 32), seção 4.6 (p. 58).
-- **Por que importa:** a separação é o alvo do critério que escolheu CN-I e λ, portanto o erro se propaga para toda a hidrologia. Usando as frações ΣVdir/ΣTR de `relatorio_checagens...27-10.md`, conta minha sobre V_SCS = 15.702 mil m³: viés de cerca de -11% com BFImax 0,58, de +3% com 0,70, de +21% com 0,80. O texto não traz essa sensibilidade, embora o MFM tenha se mostrado estável nela. Nas notas consultadas, 0,25 não foi testado, e é o valor que a seção 4.6 aponta como mais próximo da geologia. `perguntas_para_o_luis_30-10.md` registra que o cabeçalho do arquivo do orientador diz 0,58, enquanto a série se reproduz com 0,70. Além disso, a = 0,995 por hora equivale a 0,887 por dia, ou tempo característico de cerca de 8 dias (conta minha): é rápido para água subterrânea, e o texto não mostra análise de recessão.
+- **Por que importa:** a separação é o alvo do critério que escolheu CN-I e λ, portanto o erro se propaga para toda a hidrologia. Usando as frações ΣVdir/ΣTR de `relatorio_checagens...27-10.md`, conta minha sobre V_SCS = 15.702 mil m³: viés de cerca de -11% com BFImax 0,58, de +3% com 0,70, de +21% com 0,80. O texto não traz essa sensibilidade, embora o MFM tenha se mostrado estável nela. Nas notas consultadas, 0,25 não foi testado, e é o valor que a seção 4.6 aponta como mais próximo da geologia. Conta minha, nesta revisão (filtro de Eckhardt com a = 0,995 sobre a vazão da planilha, nas 17 janelas): com BFImax 0,70 a soma de Vdir dá 15.225 mil m³ (a coluna Bt dá 15.263, igual à Tabela 3), e com 0,25 dá 24.571 mil m³, 85% do volume total; o viés de V_SCS passaria de +3% para -36%. `perguntas_para_o_luis_30-10.md` registra que o cabeçalho do arquivo do orientador diz 0,58, enquanto a série se reproduz com 0,70. Além disso, a = 0,995 por hora equivale a 0,887 por dia, ou tempo característico de cerca de 8 dias (conta minha): é rápido para água subterrânea, e o texto não mostra análise de recessão.
 - **Boa resposta:** dizer "estimado" e usar "escoamento rápido" ou "direto", sem "superficial". Informar a origem de Bt e a dúvida entre 0,58 e 0,70. Mostrar a tabela de sensibilidade, incluindo 0,25. Explicar que o MFM é estável porque c absorve um fator parecido entre eventos, mas que a escolha do CN não é estável. Mencionar fluxo subsuperficial em solos de encosta sobre embasamento cristalino.
 - **Gravidade:** pode comprometer.
 
@@ -100,6 +102,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "Qual foi a maior turbidez usada na curva? Que fração da carga de cada evento vem de leituras acima dela? Com a turbidez de uma leitura por hora, em uma estação de tratamento e não na seção, qual é o erro da sua carga? Ele é menor que os 21% que você comemora?"
 - **Local:** seção 2.5 (p. 17 e 18), seção 3.2 (p. 23), Tabela 1, seção 4.6 (p. 58): "muito acima"; seção 4.3 (p. 51).
 - **Por que importa:** SYobs é tratado como verdade, sem barra de erro. O texto não informa número de amostras, R², faixa de ajuste nem o valor máximo de turbidez. Se a incerteza da carga for da ordem de 20% a 30%, diferenças entre modelos ficam abaixo do ruído da medição. A coleta em um ponto, a defasagem entre o rio e a estação, a matéria orgânica de esgoto na turbidez e a falta de arraste de fundo e areia também pesam: a MUSLE estima sedimento total, e a turbidez vê sobretudo os finos.
+- **Conferido na planilha:** a planilha tem a concentração (CSS), e não a turbidez, por isso a faixa de turbidez não pôde ser conferida. A maior CSS da série é 4.844 mg/L (19/03/2021); dentro dos eventos, 4.602 mg/L (evento 12) e 4.227 mg/L (evento 17). Nos 17 eventos não há hora sem CSS.
 - **Boa resposta:** citar os números da curva de Murillo-Bermúdez et al. (2023). Calcular a parcela da carga fora da faixa em cada evento. Propagar a incerteza da curva até a carga. Dizer onde fica a captação em relação à estação de vazão. Chamar o dado de "carga estimada".
 - **Gravidade:** importante.
 
@@ -107,6 +110,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "No evento 17, os dois postos concordam (68 e 65 mm), o que é raro na sua série, a intensidade é alta, a bacia vem de duas semanas muito chuvosas, e mesmo assim o coeficiente de escoamento é de cerca de 5%, um dos menores. A concentração média é de cerca de 1.940 mg/L, mais que o dobro da média geral de 824 mg/L. Como você explica isso, e que dado fecharia a dúvida?"
 - **Local:** seção 4.3 (p. 51), seção 4.6 (p. 58), Tabelas 2, 3 e 11. Os valores 1.940 e 824 mg/L e o coeficiente são conta minha, com carga/TR e Vdir/(R * A).
 - **Por que importa:** o texto usa 3.806 mg/L, que é carga dividida por Vdir: não é concentração física e exagera o contraste. As duas explicações dadas (curva fora da faixa, obra ou deslizamento) são hipóteses sem teste. O volume baixo também merece suspeita, pois chuva, vazão e janela podem ter problema no evento.
+- **Conferido hora a hora na planilha (20 a 22/02/2020):** a chuva cai entre 16h e 18h de 20/02 (DBT5 18,8 + 43,0 + 2,0 mm; Campo Limpo 7,0 + 34,8 + 18,4 mm). A CSS sobe de 83 para 705 mg/L às 18h e para 4.227 mg/L às 19h, com a vazão ainda em 2,0 m³/s. A vazão só sobe às 20h (4,6) e chega ao pico às 21h (21,4 m³/s). A CSS fica entre 3.742 e 4.227 mg/L por seis horas seguidas, como um patamar. Duas leituras possíveis, nenhuma testada: (1) sedimento de uma fonte perto do ponto de coleta (área urbana, obra, margem) chegando antes da onda de cheia; (2) defasagem de relógio entre a série de turbidez e a de vazão, ou limite do sensor. Nos outros eventos o pico de CSS também vem antes do de vazão (12 de 17, quase sempre 2 h no caso dos picos rápidos), então a antecipação não é exclusiva do evento 17; o patamar alto é. Chuva nos 14 dias antes: 96 mm (DBT5) e 150 mm (Campo Limpo).
 - **Boa resposta:** olhar hora a hora turbidez, vazão e chuva. Verificar se a turbidez saturou. Procurar imagens, notícias e registros de obra ou deslizamento em fevereiro de 2020. Usar "carga por volume direto", e não "concentração". Manter o evento e mostrar os resultados com e sem ele, como já fez.
 - **Gravidade:** importante.
 
@@ -114,6 +118,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "O MFM superestima os eventos 1 a 6 e subestima os eventos 14 a 17. Isso é um sinal no tempo. Por que então você usou leave-one-out, que supõe eventos trocáveis, em vez de calibrar em 2018-2019 e prever 2020?"
 - **Local:** seção 4.3 (p. 51), seção 3.4.6 (p. 36 e 37). Entre os eventos 10 e 12 há nove meses, com um único evento, o 11, em julho.
 - **Por que importa:** uma deriva quebra a hipótese da validação. A causa pode estar no sensor, na curva, na bacia (uso, obras) ou no início de estação chuvosa. O contraste de 1.450 para 1.700 mg/L é dado sem teste de significância e sem o evento 17, e com poucos eventos pode ser ruído. O CN de 2022 e o C de 2020 também não acompanham essas mudanças.
+- **Conta minha (Tabelas 2, 3 e 12):** o erro em log do MFM tem Spearman de -0,68 com a ordem dos eventos (p = 0,002). Calibrando c nos eventos 1 a 11 e prevendo os eventos 12 a 17: MFM com erro mediano de 16,9% e razão mediana simulado/medido de 0,83; regra com Vdir, 27,2% e 0,79. No sentido inverso (12 a 17 para 1 a 11), o MFM erra 37,7% (razão 1,38). Carga por Vdir: 1.455 mg/L nos eventos 1 a 11 contra 1.685 mg/L nos eventos 12 a 16, com p = 0,30 (t) e 0,18 (Mann-Whitney). Ou seja, a tendência é clara, mas a diferença entre os dois grupos não é distinguível com tão poucos eventos.
 - **Boa resposta:** fazer o teste de divisão temporal. Testar a diferença entre grupos. Verificar datas de manutenção e troca do turbidímetro. Comparar a relação turbidez x CSS por período. Dizer o que um c por estação custaria em graus de liberdade.
 - **Gravidade:** importante.
 
@@ -121,6 +126,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "Sua janela vai até 149 horas, e 14 dos 17 eventos passam de 48 horas. O SCS-CN trata isso como uma única chuva, sem recuperação de abstração entre os pulsos. A superestimativa dos eventos grandes não vem daí?"
 - **Local:** Tabela 2 (p. 24), seção 3.4.2 (p. 33), seção 4.1 (p. 43), seção 4.6 (p. 57). Contagem é conta minha.
 - **Por que importa:** o texto trata a delimitação como limitação sem estimativa, e explica o erro pela forma da curva. Há uma explicação alternativa testável. O inverso também ocorre: uma janela que começa na recessão de evento anterior atribui ao evento um volume sem chuva correspondente, o que pode inflar Vdir nos eventos pequenos, como o evento 10 (1.236 mil m³ com 25,8 mm, contra 409 mil m³ com 23,4 mm no evento 1).
+- **Conferido na planilha (vazão no início de cada janela, menos a base Bt):** em 13 eventos a vazão inicial está a menos de 0,7 m³/s da base. Nos eventos 5 e 10 a janela começa na recessão do evento anterior: 2,0 e 1,2 m³/s acima da base; no evento 10, a vazão inicial é 35% do pico. Conta minha a favor do aluno: a razão V_SCS/Vdir tem correlação de 0,79 com ln R e só 0,37 com a duração, então a duração da janela não é a explicação principal do erro de volume.
 - **Boa resposta:** rodar o SCS-CN por pulso de chuva nas janelas longas. Relacionar a razão calculado/medido com a duração. Quantificar a vazão no início da janela. Ter um critério objetivo de início e fim, e medir a sensibilidade a ele.
 - **Gravidade:** importante.
 
@@ -135,6 +141,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "Um pixel de 30 m tem tempo de concentração de minutos, e sua intensidade é de uma hora, de um único valor para a bacia, tirada do posto mais intenso. No evento 12, RI/R dá 1,38. O que é pr? Se o único papel dele é multiplicar cada evento por (RI/R)^0,56, ele melhorou alguma coisa em relação a SY = c * Vdir?"
 - **Local:** seções 2.6 e 3.4.3 (p. 18, 33 e 34), seção 4.3 (p. 50), seção 4.6 (p. 58).
 - **Por que importa:** o texto já diz que pr não traz informação espacial. Entre eventos, a diferença entre MFM e regra com o volume é o expoente 1,12 e o termo RI/R, e o MFM não ganhou. O expoente 1,12 é maior que o observado (0,94), e os coeficientes de Williams são mantidos fora da faixa de ajuste só para dar um índice.
+- **Conta minha:** ln(carga/Vdir) contra ln(RI/R) tem r = 0,28 (p = 0,28): o termo de intensidade quase não explica a carga por volume. Mesmo assim, ele pode mudar um evento em até 3,35 vezes. Em validação cruzada, c * Vdir^1,12 dá 17,3% de erro mediano, e c * Vdir^1,12 * (RI/R)^0,56 dá 22,3%: o termo de intensidade piora um pouco.
 - **Boa resposta:** chamar pr de índice de concentração temporal. Testar se o resíduo de carga/volume se relaciona com RI/R. Corrigir R e RI para mesma base (mesmo posto ou mesma média). Dizer que a escolha de manter 11,8 e 0,56 é consequência de seguir Hao, e o que mudaria com expoente calibrado.
 - **Gravidade:** importante.
 
@@ -163,6 +170,7 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 - **Pergunta:** "Quanto acerta um modelo que prevê sempre a mesma carga? Sem esse número, 82% dentro de fator 2 é bom ou é fácil? E 'não se explica pelo acaso', com p = 0,02 e 17 eventos, em uma comparação escolhida depois de ver os dados, é uma frase que você sustenta?"
 - **Local:** Tabela 13 (p. 49), seção 4.3 (p. 49 e 50), seção 3.4.7 (p. 37 e 38), Conclusões (p. 60).
 - **Por que importa:** a amplitude de carga é de cerca de 19 vezes, e um fator 2 é um critério folgado (cobre uma faixa de 4 vezes). Sem referência nula, as métricas não têm escala. O limite inferior do intervalo (+3,1 pontos) é pouco acima de zero, e várias comparações foram feitas.
+- **Conta minha (leave-one-out, Tabela 12):** prever sempre a mesma carga (média geométrica dos outros 16) dá erro mediano de 38,5%, 70,6% dentro de fator 2 (12 de 17) e NSE log de -0,13. O erro mediano da constante é menor que o da regra da chuva (41,9%), que ganha em fator 2 (82%) e em NSE log (0,53); no teste pareado, regra da chuva e constante não se distinguem (p = 0,22). O MC (81%; 35%) é pior que a constante. O MFM e a regra com Vdir ganham da constante (p = 0,03 e 0,005).
 - **Boa resposta:** incluir o modelo constante na Tabela 13, com leave-one-out. Mostrar o ganho em relação a ele. Relatar as comparações feitas e trocar a frase por "o intervalo e o teste indicam diferença, com n = 17".
 - **Gravidade:** importante.
 
@@ -215,19 +223,16 @@ O ponto fraco é que a conclusão central vai além do que o desenho permite. "O
 
 ## Falta fazer
 
-Já lido: o texto inteiro do TCC e as notas listadas em (a).
+Atualizado na retomada na nuvem (04/11, tarde).
 
-Contas já feitas, ainda não incorporadas às perguntas (feitas com as Tabelas 2, 3, 11 e 12, com valores arredondados; rasters não recalculados):
-- A21, modelo nulo (carga constante, leave-one-out): erro mediano de 38,5%, 70,6% dentro de fator 2, NSE log de -0,13. O erro mediano é menor que o da regra com a chuva (41,9%), embora a regra ganhe em fator 2 e em NSE log.
-- A4, inclinação em log contra R: V_SCS 2,58 (R² 0,99); Vdir 1,17 (R² 0,57).
-- A14, calibrando nos eventos 1 a 11 e prevendo os eventos 12 a 17: MFM com erro mediano de 16,9% e razão média geométrica de 0,78; SY = c * Vdir com 27,2% e 0,76. Tendência do erro do MFM com a ordem dos eventos: Spearman de -0,68 (p = 0,002). Carga por Vdir nos eventos 1 a 11 contra 12 a 16: 1.455 e 1.685 mg/L, com p = 0,30 (t) e p = 0,18 (Mann-Whitney), ou seja, a diferença entre as médias não é distinguível, embora a tendência seja.
-- A17, ln(carga/Vdir) contra ln(RI/R): r = 0,28 (p = 0,28). O termo RI/R pode mudar um evento em até 3,35 vezes.
-- A6: `eventos_processados_manuais.xlsx` e `eventos_definidos_artigo_I4SDWI_corrigido.xlsx` têm um evento "1B", de 24/11/2018 16h a 26/11/2018 21h, com pico de 12,484 m³/s, fora dos 17 eventos do texto. O motivo da exclusão não foi conferido.
-- A8: o cabeçalho de `serie_Q_Qb_Qquick_Eckhardt_orientador.xlsx` diz "alpha=0.995, BFImax=0.58", confirmado na planilha.
+**Feito na retomada:**
+- Contas incorporadas às perguntas A4, A6, A14, A17 e A21 (scripts `Scripts/banca_04-11/calc1.py`, rodado de novo na nuvem com os mesmos resultados).
+- Conferido na planilha: CSS máxima e ausência de falhas nos eventos (A12), evento 17 hora a hora (A13), vazão no início das janelas (A15), BFImax = 0,25 (A8).
+- Figuras 7 e 8 vistas a 200 dpi.
 
-Falta:
-- Abrir as figuras no PDF: nenhuma foi aberta, só as legendas foram lidas.
-- Incorporar as contas acima às perguntas A4, A6, A14, A17 e A21.
-- Conferir na planilha: faixa de turbidez e parcela da carga (A12), hora a hora do evento 17 (A13), vazão no início das janelas (A15), BFImax = 0,25 (A8).
-- Conferir nos originais o que hoje vem só das notas (Hao, Baert) ou da memória (limite de validade de LS, A23).
-- Revisar as páginas citadas: foram tiradas do texto marcado por página, sem conferência no PDF.
+**Continua em aberto:**
+- Faixa de turbidez (NTU) da curva: a planilha só tem CSS. Depende do orientador (curva e amostras de Murillo-Bermúdez et al., 2023).
+- Demais figuras (1 a 6, 9 a 11, A1 e A2) não abertas por este avaliador; foram vistas pelo revisor do texto e pelo Avaliador B.
+- Conferir nos originais o que vem só das notas (Hao, Baert) ou da memória (limite de validade de LS, A23).
+- Páginas citadas: tiradas do texto marcado por página (numeração do PDF), sem conferência uma a uma.
+- Não recalculado (depende dos rasters): embaralhamento de K, C e LS (A2), mapa com chuva uniforme (A10), sensibilidade de C e K (A19), parcela do volume gerada em pixels urbanos (A22), limites de 100 e 400 m (A23), 1%, 5% e 10% (A24).

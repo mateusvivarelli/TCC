@@ -358,10 +358,15 @@ Li essa revisão e `alteracoes_doc_03-11.md` depois da minha primeira leitura.
 
 ## Falta fazer
 
-O relatório está completo nas seções (a) a (d). Ficou sem conferir, por causa do desligamento do notebook:
+Atualizado na retomada na nuvem (04/11, tarde).
 
-1. Figura 7, eventos 13 a 17, e metade inferior da Figura 8, em ampliação (vistas só no tamanho da página).
-2. Páginas 2 a 4 das Referências como imagem (negrito e alinhamento; o texto delas foi lido).
-3. Referências sem DOI, na fonte; números de Avanzi e o NSE de 0,66 de Valle Junior.
-4. Pontos marcados "(ABNT, de memória)", na norma.
-5. Regulamento de 2023: só busca por termos, sem leitura inteira.
+**Feito na retomada:**
+1. Figura 7, eventos 13 a 17, vista a 200 dpi (PDF p. 46): o padrão confere com o texto (oeste mais escuro; evento 15 o mais intenso). Nada a acrescentar a M8 e M18.
+2. Metade inferior da Figura 8 (PDF p. 47), a 200 dpi: no painel da IC, o evento 12 aparece com carga medida de cerca de 130 t, e nos outros três painéis, em 211 t. Ou seja, o eixo "Sedimento medido" do painel da IC usa as cargas da IC, e não as do TCC. Isso reforça C3: a legenda deve dizer que o painel da IC tem outra lista de eventos e outras cargas.
+3. NSE de 0,66 de Valle Junior: está em `leitura_referencias/loteA...md` (linha sobre Q = C * P, com C médio de 0,025, R² 0,71 e NSE 0,66). Conferido só na nota, não no original.
+
+**Continua em aberto:**
+- Páginas 2 a 4 das Referências como imagem (negrito e alinhamento; o texto delas foi lido).
+- Referências sem DOI, na fonte; números de Avanzi (14,96; 0,59; 286 ha): não achados nas notas.
+- Pontos marcados "(ABNT, de memória)": conferir na norma, que não está no repositório.
+- Regulamento de 2023: só busca por termos.

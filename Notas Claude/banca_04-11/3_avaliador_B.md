@@ -268,12 +268,16 @@ O c obtido dos totais da Tabela 12 muda bastante conforme o período, ao contrá
 
 ## Falta fazer
 
-**Já feito:** leitura do texto inteiro; todas as figuras vistas; contas sobre tabelas e planilha; as 25 perguntas, as 5 mais difíceis e os elogios.
+Atualizado na retomada na nuvem (04/11, tarde).
 
-**Ficou em aberto:**
-1. Confirmar nos rasters a origem dos blocos de CN (B8) e tudo que está marcado "não recalculado": placebo, chuva uniforme, sobreposição com K * LS * C, fração da erosão nos 5% críticos, fração de pixels no limite de 200 m e valores alternativos de K e C.
+**Feito na retomada:**
+- Item 3 (+1,6 contra +1,4): resolvido. Rodando de novo `Scripts/banca_04-11/calc1.py` com as Tabelas 2, 3 e 12, a mediana dá +1,4 e o intervalo -5,6 a +10,4, com p = 0,52 e 6 de 17. A diferença para o +1,6 e -5,5 do texto vem do arredondamento das tabelas impressas (o texto usou valores sem arredondar). Não é erro do texto.
+- Item 6 (revisão final): números deste arquivo conferidos contra a nova rodada do script; não achei divergência.
+- Evento 17 hora a hora, conferido na planilha (útil para B23): a CSS chega a 4.227 mg/L às 19h de 20/02/2020, uma hora antes de a vazão começar a subir, e fica num patamar de 3.742 a 4.227 mg/L por seis horas. Ver A13 no arquivo do Avaliador A.
+- BFImax 0,25 (B17): com o filtro de Eckhardt (a = 0,995), a fração direta seria 0,85 e o viés de V_SCS, -36%.
+
+**Continua em aberto:**
+1. Tudo o que depende dos rasters: não recalculado (origem dos blocos de CN, placebo, chuva uniforme, sobreposição com K * LS * C, fração da erosão nos 5% críticos, fração de pixels no limite de 200 m, valores alternativos de K e C).
 2. Conferir no original a afirmação "de memória" da B19 e os expoentes de Moore e Burch (1986).
-3. Conferir por que o texto traz +1,6 [-5,5; +10,4] para MFM contra Vdir e eu obtive +1,4 [-5,6; +10,4]; provável arredondamento das tabelas.
-4. Não fiz validação aninhada; não testei os quatro eventos de 2020-2021 (só os localizei) e não li o resto do relatório de checagens depois da seção c2.
-5. Os intervalos de Spearman da B12 são aproximados (transformação de Fisher com fator 1,06).
-6. Revisão final de ortografia e de citações de página deste arquivo, que foi fechado às pressas porque o notebook ia ser desligado.
+3. Validação aninhada e teste nos quatro eventos de 2020-2021: não feitos.
+4. Intervalos de Spearman da B12: aproximados.
