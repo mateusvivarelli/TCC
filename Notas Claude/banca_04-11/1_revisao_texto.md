@@ -7,19 +7,19 @@
 - Lido por inteiro: o texto das 68 páginas (`Notas Claude/doc_texto_pdf_paginas_04-11.txt`) e `Notas Claude/entrega_tfc_regras.md`.
 - Sumário conferido por script contra os títulos no PDF.
 - Não feito ainda: ver figuras e equações no PDF (as páginas foram convertidas em imagem, mas ainda não examinadas); `Normas FECFAU/` no original; `leitura_referencias/`; revisão de 03/11.
-- As contas abaixo são à mão, a partir das tabelas do próprio texto. O script de recálculo ainda não rodou (falta a biblioteca scipy; vou refazê-lo sem ela).
+- O script de recálculo já rodou sobre as Tabelas 2, 3, 11 e 12; ele retirou um achado e corrigiu uma conta minha (itens 4 e 29). O detalhe entra no relatório final.
 
 ## (b) Achados até agora (preliminares)
 
 ### Crítico
 
-1. **Sumário (p. 9 do PDF, sem número impresso).** Conferido por script: 31 das 43 entradas têm a página errada, de "2. FUNDAMENTAÇÃO TEÓRICA" em diante. Só estão certas as da seção 1 e as de 2.2, 2.4, 2.5 e 2.6. Exemplos (sumário / real): seção 2, 11 / 12; 2.3, 13 / 14; 3, 20 / 21; 3.4.2, 30 / 32; 3.4.8, 36 / 38; 4, 39 / 41; 4.3, 45 / 48; 5, 57 / 59; Referências, 59 / 61; Apêndice A, 63 / 65. Correção: atualizar o sumário depois da última edição.
+1. **Sumário (p. 9 do PDF, sem número impresso).** Conferido por script: 33 das 43 entradas têm a página errada, de "2. FUNDAMENTAÇÃO TEÓRICA" em diante. Só estão certas as da seção 1 e as de 2.2, 2.4, 2.5 e 2.6. Exemplos (sumário / real): seção 2, 11 / 12; 2.3, 13 / 14; 3, 20 / 21; 3.4.2, 30 / 32; 3.4.8, 36 / 38; 4, 39 / 41; 4.3, 45 / 48; 5, 57 / 59; Referências, 59 / 61; Apêndice A, 63 / 65. Correção: atualizar o sumário depois da última edição.
 2. **Pré-textuais (p. 3 a 5 do PDF).** A p. 3 do PDF está em branco, e Dedicatória e Agradecimentos só têm o título. A folha de aprovação, obrigatória no modelo da biblioteca (`entrega_tfc_regras.md`, seção 4), não aparece. Correção: incluir a folha de aprovação; preencher ou retirar as páginas opcionais.
 3. **Conclusões, p. 60.** Trecho: "A comparação demonstra que a espacialização não se mostrou pior, e acrescenta o mapa". A seção 4.3 (p. 50) diz que "a comparação é só indicativa". O texto se contradiz. Sugestão: "A comparação indica apenas que, com o escoamento medido, a espacialização chega a um erro da mesma ordem; ela acrescenta o mapa de onde a erosão é produzida."
 
 ### Importante
 
-4. **Seção 4.3, p. 50.** Trecho: "em média, maior nos eventos 12 a 16 (cerca de 1.700 mg/L, sem o evento 17) do que nos eventos 1 a 11 (cerca de 1.450 mg/L)". Pela Tabela 3: média simples de cerca de 1.684 e 1.364 mg/L; razão entre as somas de cerca de 1.571 e 1.449 mg/L. Os valores do texto parecem misturar as duas contas. Sugestão: usar uma só conta nos dois grupos e dizer qual é. Confirmar qual foi a usada.
+4. **ACHADO RETIRADO (erro meu).** A versão anterior deste relatório dizia que os valores de 1.700 e 1.450 mg/L da seção 4.3 misturavam duas contas. Errei a soma à mão. O script mostra média simples de 1.685 mg/L (eventos 12 a 16) e 1.455 mg/L (eventos 1 a 11): o texto está certo. Quem leu a versão anterior deve desconsiderar aquele item.
 5. **Seção 4.6, p. 57.** Trecho: "quase o dobro da dos demais". A seção 4.3 dá 3.806 mg/L contra 1.085 a 2.088 mg/L: cerca de 1,8 vez o maior valor e cerca de 2,5 vezes a média simples dos outros 16. Sugestão: "cerca de 1,8 vez a maior entre os demais eventos".
 6. **Seção 4.3, p. 48 e 49, contra a seção 3.4.7.** O teste de Wilcoxon pareado é usado nos resultados, mas o método só descreve o bootstrap. Sugestão: acrescentar à seção 3.4.7: "A diferença foi avaliada também pelo teste de Wilcoxon pareado." Na mesma linha, "NSE linear" e "erro médio com sinal" (p. 49 e 50) aparecem sem definição na seção 3.4.7.
 7. **Seção 3.1, p. 21, contra as seções 4.1 (p. 44) e 4.4 (p. 51).** A seção 3.1 diz que "a cabeceira tende a estar na porção mais chuvosa da sub-bacia"; as outras dizem que a cabeceira "recebe menos chuva" na maioria dos eventos. Pela Tabela 2, DBT5 registra menos que Campo Limpo em 13 de 17 eventos. Sugestão: dizer que a seção 3.1 trata da média anual regional e que, nos 17 eventos, os postos mostram o contrário.
@@ -48,6 +48,8 @@
 27. **Abstract, p. 8 do PDF.** "Local erosion followed Hao et al." pede "was computed following"; "hit rate" é informal; "calibrated on a logarithmic scale" repete "scale" logo depois de "scale coefficient"; "modelling" (britânico) convive com "watersheds" e "baseflow". Sugestão: revisar esses pontos.
 28. **Referências, formato.** Autores listados por inteiro em SADEGHI et al. e MURILLO-BERMÚDEZ et al. (2023), e com "et al." nas demais de muitos autores: uniformizar. SILVA, T. S. tem endereço sem "Acesso em". Espaço entre entradas irregular nas p. 63 e 64. A citação (ANA, 2024) não coincide com a entrada, que começa por "AGÊNCIA NACIONAL": acrescentar a sigla à entrada.
 
+29. **Seção 2.3, p. 15.** "S0,05 = 0,8189 * S0,20^1,15": a conta dá 1,33 * 25,4^(-0,15) = 0,8187. O modelo usa a forma da seção 3.4.1.3, que está certa. Sugestão: trocar para 0,8187.
+
 ## (c) O que está bom (conferido à mão até agora)
 
 - Citações e lista: pela leitura, todas as obras citadas têm entrada, salvo USGS, e todas as entradas são citadas. Falta conferir por busca automática.
@@ -55,7 +57,7 @@
 - Somas de área e de contribuição das Tabelas 14 a 16 fecham em 100%, e as frases da seção 4.5 batem com elas.
 - A partição 37,1 e 62,9 (34,0 e 66,0) confere com os R² informados.
 - As métricas do volume na seção 4.1 (46%, 54%, 11 de 17) e os erros do MC e do MFM (81%, 21%, 6 e 16 eventos em fator 2, 10 e 7 eventos por sentido) batem com as Tabelas 11 e 12.
-- A conversão de Woodward para milímetros (0,8189), as faixas de CN-I e S e as contas principais do Apêndice A estão coerentes.
+- As faixas de CN-I e S e as contas principais do Apêndice A estão coerentes. **Correção:** a versão anterior dava 0,8189 como certo, mas 1,33 * 25,4^(-0,15) = 0,8187 (ver achado novo abaixo).
 - Resumo em parágrafo único, abaixo do limite de 500 palavras (cerca de 260 palavras na página).
 
 ## (d) Resumo
@@ -64,7 +66,7 @@ Será escrito no relatório final.
 
 ## Falta fazer
 
-1. Recalcular por script, a partir das Tabelas 2, 3, 11 e 12: NSE, Spearman, modelos simples, Wilcoxon, bootstrap, correlações (0,96; 91%; -0,01), variâncias (0,66; 0,08; 88%), expoente 0,94, 48,7% do evento 15, e os casos "sem o evento 17" e "sem o evento 15".
+1. Recálculo por script: feito; falta passar o resultado completo para o relatório e checar o R do evento 16 (a média ponderada dá 98,2 mm, a Tabela 2 diz 97,7 mm).
 2. Conferir a linha da IC na Tabela 13 (22,5%; 100%; 0,91; 0,93) e o arredondamento 22,5% para 22% no Resumo, usando `Planilhas/`.
 3. Examinar figuras e equações no PDF (legibilidade, coerência com o texto; localização da mancha urbana: "centro-sul" na seção 4.1 e "perto do exutório" na seção 4.5).
 4. Ler o original de `Normas FECFAU/` (regulamento e normalização).
