@@ -1,5 +1,5 @@
 - [Orientador: vazão de base fora do sedimento](orientador-vazao-de-base-sedimento.md) — base removida em 26/10; usuário decidiu usar Woodward (27/10)
-- [Pendências 27/10: edição do Doc](project_pendencias_27-10.md) — o que foi aplicado, o que falta, subagentes de referências
+- [Pendências da edição do Doc](project_pendencias_27-10.md) — ler o fim primeiro: trabalho mais recente em origin/claude/noite-30-10 (03/11), não em main
 - [Ler referências novas](feedback_ler_referencias_novas.md) — toda referência nova: ler, resumir conteúdo e uso
 - [Editar o Doc só quando pedir](feedback_editar_doc_so_quando_pedir.md) — mostrar proposta no chat; não trocar texto escrito pelo usuário
 - [Caracteres de teclado](feedback_caracteres_teclado.md) — * e - no lugar de · e −; especiais só λ α β
