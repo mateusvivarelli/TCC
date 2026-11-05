@@ -32,7 +32,7 @@ lim = np.array([10, 30000])
 for a_, (tit, obs, sim, cor) in zip(ax, (("Modelo simples com a chuva do evento\n(SY = c * chuva; só chuva)", SY, ch, CINZA),
                                          ("Modelo calculado: MUSLE espacializada,\nescoamento direto do SCS-CN (só chuva)", SY, B, AZUL),
                                          ("Modelo forçado: MUSLE espacializada,\nescoamento direto medido", SY, F, VERM),
-                                         ("IC (concentrada), valores originais da IC:\nvolume e pico medidos, sem validação cruzada", ICO.Y_OBS, ICO.Y_SIM_CAL, LARANJA))):
+                                         ("Modelo concentrado (Vivarelli et al., 2025), valores originais:\nvolume e pico medidos, sem validação cruzada", ICO.Y_OBS, ICO.Y_SIM_CAL, LARANJA))):
     a_.fill_between(lim, lim / 2, lim * 2, color="#e8eef6")
     a_.plot(lim, lim, color="k", lw=0.8)
     a_.scatter(obs, sim, c=cor, s=34, zorder=3, edgecolor="white", linewidth=0.5)
@@ -48,7 +48,7 @@ for a_, (tit, obs, sim, cor) in zip(ax, (("Modelo simples com a chuva do evento\
     a_.set_xlabel("Descarga de sedimentos medida (t)")
     print(tit.split("\n")[0], "| fator 2", round(dentro), "| erro mediano", round(float(np.median(100*np.abs(sim-obs)/obs)), 1))
 ax[0].set_ylabel("Descarga de sedimentos simulada,\nvalidação leave-one-out (t)")
-ax[2].set_ylabel("Descarga de sedimentos simulada,\nvalidação leave-one-out (t)\n(IC: ajuste nos próprios 17 eventos)")
+ax[2].set_ylabel("Descarga de sedimentos simulada,\nvalidação leave-one-out (t)\n(modelo concentrado: ajuste nos próprios 17 eventos)")
 for a_ in ax[:2]:
     a_.set_xlabel("")
 fig.suptitle("Descarga de sedimentos simulada x medida nos 17 eventos (números = evento)", fontsize=11)
