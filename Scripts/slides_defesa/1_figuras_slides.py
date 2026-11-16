@@ -12,6 +12,44 @@ BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 FIG = os.path.join(BASE, "TCC_Texto", "figuras"); OUT = os.path.join(FIG, "slides")
 os.makedirs(OUT, exist_ok=True)
 
+# ---- fonte: Calibri (no PC do autor); aqui, Carlito, que tem as mesmas medidas da Calibri
+import runpy, sys
+import matplotlib.figure
+from matplotlib import font_manager
+FONTE = "Calibri" if any(f.name == "Calibri" for f in font_manager.fontManager.ttflist) else "Carlito"
+plt.rcParams["font.family"] = FONTE
+print("fonte dos graficos:", FONTE)
+
+# versoes dos graficos do TCC com a fonte dos slides, salvas em figuras/slides (as do TCC nao mudam)
+_savefig = matplotlib.figure.Figure.savefig
+def _salva_em_slides(self, fname, *a, **k):
+    return _savefig(self, os.path.join(OUT, os.path.basename(fname)), *a, **k)
+matplotlib.figure.Figure.savefig = _salva_em_slides
+sys.path.insert(0, os.path.join(BASE, "Scripts")); cwd = os.getcwd(); os.chdir(BASE)
+for scr in ("fig_dispersao_descarga.py", "fig_comparacao_barras.py", "fig_grupo_E.py"):
+    runpy.run_path(os.path.join(BASE, "Scripts", scr), run_name="__main__")
+    plt.rcParams["font.family"] = FONTE
+os.chdir(cwd); matplotlib.figure.Figure.savefig = _savefig
+
+# escoamento direto calculado x medido (mesmo grafico da Figura 5 do TCC)
+import numpy as np
+sd = pd.read_csv(os.path.join(BASE, "Dados Iniciais", "comparacao_SY_lambda005_woodward.csv")).sort_values("evento")
+Vm, Vs = sd.V_dir_medido_m3.to_numpy() / 1e3, sd.V_dir_SCS_m3.to_numpy() / 1e3
+lv = np.array([3, 6000])
+fig, ax = plt.subplots(figsize=(5.6, 5.2))
+ax.fill_between(lv, lv / 2, lv * 2, color="#e8eef6"); ax.plot(lv, lv, color="k", lw=0.8)
+ax.scatter(Vm, Vs, c="#1f5fa8", s=36, zorder=3, edgecolor="white", linewidth=0.5)
+for i, n in enumerate(sd.evento.to_numpy()):
+    ax.annotate(str(int(n)), (Vm[i], Vs[i]), fontsize=8, xytext=(3, 3), textcoords="offset points", color="#444")
+ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlim(lv); ax.set_ylim(lv)
+ax.set_xlabel("Escoamento direto medido (10³ m³)"); ax.set_ylabel("Escoamento direto do SCS-CN (10³ m³)")
+r_ = Vs / Vm
+ax.text(0.04, 0.95, f"dentro de fator 2: {100*np.mean((r_ >= 0.5) & (r_ <= 2)):.0f}%\nerro mediano: {np.median(100*np.abs(Vs-Vm)/Vm):.0f}%",
+        transform=ax.transAxes, va="top", fontsize=10)
+ax.set_title("Escoamento direto por evento: SCS-CN x medido", fontsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+fig.tight_layout(); fig.savefig(os.path.join(OUT, "fig_volume_direto.png"), dpi=250); plt.close(fig)
+
 
 def recorta(arq, caixa, nome):
     im = Image.open(os.path.join(FIG, arq)); w, h = im.size
@@ -26,8 +64,8 @@ recorta("mapas/mapa_08a_evento11_chuva_retencao_escoamento.png", (0, 0.683, 1, 0
 recorta("mapas/mapa_08b_evento11_erosao_sedimento.png", (0, 0.058, 0.875, 0.372), "ev11_eunit_sem_escala.png")
 recorta("mapas/mapa_08b_evento11_erosao_sedimento.png", (0, 0.382, 1, 0.698), "ev11_sedimento.png")
 # dispersao: linha de cima (simples com chuva e MC) e linha de baixo (MFM e concentrado)
-recorta("fig_dispersao_descarga.png", (0, 0.045, 1, 0.495), "dispersao_simples_e_MC.png")
-recorta("fig_dispersao_descarga.png", (0, 0.495, 1, 1), "dispersao_MFM_e_concentrado.png")
+recorta("slides/fig_dispersao_descarga.png", (0, 0.045, 1, 0.495), "dispersao_simples_e_MC.png")
+recorta("slides/fig_dispersao_descarga.png", (0, 0.495, 1, 1), "dispersao_MFM_e_concentrado.png")
 # mapa medio e areas criticas do MC (coluna da esquerda)
 recorta("mapas/mapa_07_sedimento_medio.png", (0, 0.11, 0.50, 0.93), "mapa_medio_e_criticas_MC.png")
 
@@ -37,7 +75,7 @@ d = d.rename(columns={d.columns[1]: "P_DBT5", d.columns[2]: "P_CL", d.columns[4]
 ini, fim = pd.Timestamp("2019-07-04 12:00"), pd.Timestamp("2019-07-08 07:00")
 j = d[(d.Data >= ini - pd.Timedelta(hours=12)) & (d.Data <= fim + pd.Timedelta(hours=12))].copy()
 e = j[(j.Data >= ini) & (j.Data <= fim)]
-plt.rcParams.update({"font.size": 13, "font.family": "DejaVu Sans"})
+plt.rcParams.update({"font.size": 13, "font.family": FONTE})
 fig, (a1, a2) = plt.subplots(2, 1, figsize=(12, 6.4), sharex=True, gridspec_kw={"height_ratios": [1, 2.2]})
 a1.bar(j.Data - pd.Timedelta(minutes=15), j.P_DBT5, width=0.02, color="#7FA7D9", label="DBT5 (leste)")
 a1.bar(j.Data + pd.Timedelta(minutes=15), j.P_CL, width=0.02, color="#1F4E8C", label="Campo Limpo (oeste)")

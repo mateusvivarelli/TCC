@@ -104,7 +104,7 @@ pres.addSection({ title: SM });
     showTitle: true, title: "Carga de sedimentos medida por evento (t)", titleFontSize: 15, titleColor: TEXT, titleFontFace: "Calibri",
     showLegend: true, legendPos: "b", legendFontSize: 12, legendFontFace: "Calibri", legendColor: TEXT,
     catAxisLabelColor: MUTED, valAxisLabelColor: MUTED, catAxisLabelFontSize: 12, valAxisLabelFontSize: 12, catAxisLabelFontFace: "Calibri", valAxisLabelFontFace: "Calibri",
-    showCatAxisTitle: true, catAxisTitle: "Evento", catAxisTitleFontSize: 12, catAxisTitleColor: MUTED,
+    showCatAxisTitle: true, catAxisTitle: "Evento", catAxisTitleFontSize: 12, catAxisTitleColor: MUTED, catAxisTitleFontFace: "Calibri", dataLabelFontFace: "Calibri",
     valGridLine: { color: "E3E7ED", size: 0.5 }, catGridLine: { style: "none" }, valAxisLabelFormatCode: "#,##0",
   });
   s.addNotes("Os dados vêm do monitoramento do rio Jundiaí feito pelo grupo do Luis (Murillo-Bermúdez e Martim, 2022; Murillo-Bermúdez et al., 2023). A chuva vem de dois postos; um deles, o DBT5, fica fora da bacia, a leste. A vazão é da estação do DAEE no exutório. O sedimento não é medido direto: a SABESP mede a turbidez da água bruta de hora em hora, e uma curva de calibração converte turbidez em concentração. A carga de cada evento é a soma, hora a hora, da vazão vezes a concentração. São 17 eventos, de novembro de 2018 a fevereiro de 2020, com cargas de cerca de 200 t a 3.800 t. Os mapas, todos em pixels de 30 m, vêm de três fontes: o relevo e o fator LS, do modelo digital de elevação do USGS; o solo e o uso, que dão K e C, do Plano de Bacias (Consórcio Profill-Rhama, 2020), com os valores por classe de Vivarelli et al. (2025); e o número de curva, da base nacional BR_CN-2022 da Agência Nacional de Águas e Saneamento Básico (2024). Vou acompanhar o evento 11, em laranja, do começo ao fim, como no Apêndice A.");
@@ -261,7 +261,7 @@ pres.addSection({ title: SR });
 // ---------------------------------------------------------------- 21 escoamento e o gargalo
 {
   const s = base(SR, "O erro vem do escoamento calculado", "Fontes: elaborado pelo autor; Baert et al. (2026)");
-  img(s, "fig_volume_direto.png", M, 1.65, 5.6, 5.2, "Escoamento direto calculado pelo SCS-CN contra o medido");
+  img(s, "slides/fig_volume_direto.png", M, 1.65, 5.6, 5.2, "Escoamento direto calculado pelo SCS-CN contra o medido");
   stat(s, "46%", "erro mediano do volume de cada evento (viés total de só +3%)", 6.6, 1.75, 2.95);
   stat(s, "91%", "da variância do erro do sedimento é explicada pelo erro do escoamento", 9.8, 1.75, 2.95, ORANGE);
   marcadores(s, [
@@ -295,7 +295,7 @@ pres.addSection({ title: SR });
 // ---------------------------------------------------------------- 23 comparacao
 {
   const s = base(SR, "Com o escoamento medido, o erro cai de 81% para 21%", "Fonte: elaborado pelo autor; modelo concentrado com os valores originais de Vivarelli et al. (2025)");
-  img(s, "escada_gargalo_vivarelli.png", M, 1.6, 12.1, 3.75, "Erro mediano e eventos dentro de fator 2, com escoamento calculado e com escoamento medido");
+  img(s, "slides/escada_gargalo_vivarelli.png", M, 1.6, 12.1, 3.75, "Erro mediano e eventos dentro de fator 2, com escoamento calculado e com escoamento medido");
   const cards = [
     ["MFM × regra com o volume medido", "21% × 16% de erro mediano; diferença de +1,6 pontos (IC 95%: −5,5 a +10,4; p = 0,52): não se distinguem"],
     ["MFM × modelo concentrado (Vivarelli et al., 2025)", "21% × 22%: mesma ordem de erro. Comparação indicativa: o concentrado foi ajustado nos próprios eventos, sem validação cruzada"],
@@ -311,7 +311,7 @@ pres.addSection({ title: SR });
 // ---------------------------------------------------------------- 24 leitura critica
 {
   const s = base(SR, "O que o MFM mostra: o peso do volume medido", "Fonte: elaborado pelo autor, com os dados da Tabela 3 do TCC");
-  img(s, "fig_volume_concentracao.png", M, 1.6, 8.6, 3.9, "Descarga de sedimentos contra o volume escoado e variação de volume e concentração entre eventos");
+  img(s, "slides/fig_volume_concentracao.png", M, 1.6, 8.6, 3.9, "Descarga de sedimentos contra o volume escoado e variação de volume e concentração entre eventos");
   stat(s, "88%", "da variância do log da carga é explicada só pelo volume", 9.45, 1.75, 3.3, ORANGE);
   stat(s, "0,66 × 0,08", "variância do log: volume × concentração", 9.45, 3.25, 3.3);
   s.addText("Carga = volume × concentração média. Quem recebe o volume medido acerta a ordem de grandeza da carga por construção. O bom desempenho do MFM não valida a fórmula de erosão nem o mapa.", { x: M, y: 5.65, w: 12.1, h: 1.2, fontSize: 17, color: NAVY, margin: 0, isTextBox: true, valign: "top" });

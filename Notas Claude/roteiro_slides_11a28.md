@@ -57,3 +57,8 @@ Se estourar: juntar 12 e 13; juntar 21 e 24; falar o 28 em uma frase.
 * Slide 28: o texto é um rascunho; confirme se corresponde ao que você fez e se a FECFAU pede esse slide.
 * A faixa azul com o nome da seção imita o seu modelo; ao colar no seu PowerPoint, use a faixa do modelo e apague a etiqueta.
 * Os números dos eixos do gráfico do slide 11 aparecem com o separador do idioma do PowerPoint (em português, 4.500).
+
+## Fontes (letra)
+* Textos e gráfico nativo do slide 11: Calibri. Equações: Cambria Math (como nos slides 3 a 6 do autor).
+* Gráficos em imagem (hidrograma, dispersões, barras, volume x concentração, escoamento): refeitos por `Scripts/slides_defesa/1_figuras_slides.py`, que usa Calibri se estiver instalada e, se não, Carlito (mesmas medidas da Calibri). Na nuvem saíram em Carlito; rodando no PC com Windows, saem em Calibri. As versões ficam em `TCC_Texto/figuras/slides/`; as figuras do TCC não mudam.
+* Mapas (recortes das Figuras A1, A2 e 13): continuam com a letra original, porque os rasters não estão no repositório. Para refazê-los em Calibri, rodar o script dos mapas no PC com `plt.rcParams["font.family"] = "Calibri"`.
