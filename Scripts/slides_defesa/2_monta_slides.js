@@ -38,7 +38,7 @@ function base(sec, title, fonte) {
   const s = pres.addSlide({ masterName: "CONTEUDO", sectionTitle: sec });
   s.addText(sec.toUpperCase(), { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.08, x: M, y: 0.28, w: 2.9, h: 0.34, fill: { color: NAVY }, color: WHITE, fontSize: 11, bold: true, charSpacing: 1, align: "center", valign: "middle", margin: 0 });
   s.addText(title, { placeholder: "title" });
-  if (fonte) s.addText(fonte, { x: M, y: 6.98, w: W - 2.2, h: 0.32, fontSize: 11, color: MUTED, italic: true, margin: 0, isTextBox: true, valign: "middle" });
+  if (fonte) s.addText(fonte, { x: M, y: 6.86, w: W - 2 * M, h: 0.5, fontSize: 11, color: MUTED, italic: true, margin: 0, isTextBox: true, valign: "middle" });
   return s;
 }
 // marcacao simples: a_{sub} e a^{sup}
@@ -81,13 +81,19 @@ pres.addSection({ title: SM });
 
 // ---------------------------------------------------------------- 11 dados
 {
-  const s = base(SM, "Dados: 17 eventos de chuva monitorados (2018 a 2020)", "Fonte dos dados: Murillo-Bermúdez e Martim (2022); Murillo-Bermúdez et al. (2023)");
+  const s = base(SM, "Dados: 17 eventos monitorados e mapas de 30 m", "Fontes: Murillo-Bermúdez e Martim (2022); Murillo-Bermúdez et al. (2023); Consórcio Profill-Rhama (2020); Agência Nacional de Águas e Saneamento Básico (2024); USGS");
   linhas(s, [
     ["Chuva:", "2 postos com registro horário: DBT5 (fora da bacia, a leste) e Campo Limpo Paulista (perto do exutório)"],
     ["Vazão:", "estação telemétrica do DAEE no exutório (SAISP), usada em intervalo horário"],
     ["Sedimento:", "turbidez horária da água bruta da SABESP, convertida em concentração (CSS) por curva de calibração"],
     ["Carga do evento:", "soma, hora a hora, de vazão × CSS"],
-  ], M, 1.85, 5.2, 4.6, 18);
+  ], M, 1.8, 5.2, 2.75, 16);
+  s.addText([
+    { text: "Dados espaciais (rasters de 30 m)", options: { bold: true, color: NAVY, fontSize: 16, breakLine: true } },
+    { text: "Relevo e fator LS: ", options: { bold: true, color: TEXT, fontSize: 14 } }, { text: "MDE do USGS", options: { color: TEXT, fontSize: 14, breakLine: true } },
+    { text: "Solo e uso (K e C): ", options: { bold: true, color: TEXT, fontSize: 14 } }, { text: "Plano de Bacias (Consórcio Profill-Rhama, 2020)", options: { color: TEXT, fontSize: 14, breakLine: true } },
+    { text: "Número de curva: ", options: { bold: true, color: TEXT, fontSize: 14 } }, { text: "BR_CN-2022 (Agência Nacional de Águas e Saneamento Básico, 2024)", options: { color: TEXT, fontSize: 14 } },
+  ], { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.06, x: M, y: 4.7, w: 5.3, h: 2.0, fill: { color: TINT }, line: { color: LINE, width: 1 }, valign: "top", margin: 10, paraSpaceAfter: 4 });
   const carga = [266, 2040, 928, 1380, 1372, 199, 1317, 2109, 1155, 847, 1822, 211, 1196, 1731, 3829, 1736, 1710];
   const labels = carga.map((_, i) => String(i + 1));
   s.addChart(pres.charts.BAR, [
@@ -101,7 +107,7 @@ pres.addSection({ title: SM });
     showCatAxisTitle: true, catAxisTitle: "Evento", catAxisTitleFontSize: 12, catAxisTitleColor: MUTED,
     valGridLine: { color: "E3E7ED", size: 0.5 }, catGridLine: { style: "none" }, valAxisLabelFormatCode: "#,##0",
   });
-  s.addNotes("Os dados vêm do monitoramento do rio Jundiaí feito pelo grupo do Luis (Murillo-Bermúdez e Martim, 2022; Murillo-Bermúdez et al., 2023). A chuva vem de dois postos; um deles, o DBT5, fica fora da bacia, a leste. A vazão é da estação do DAEE no exutório. O sedimento não é medido direto: a SABESP mede a turbidez da água bruta de hora em hora, e uma curva de calibração converte turbidez em concentração. A carga de cada evento é a soma, hora a hora, da vazão vezes a concentração. São 17 eventos, de novembro de 2018 a fevereiro de 2020, com cargas de cerca de 200 t a 3.800 t. Vou acompanhar o evento 11, em laranja, do começo ao fim, como no Apêndice A.");
+  s.addNotes("Os dados vêm do monitoramento do rio Jundiaí feito pelo grupo do Luis (Murillo-Bermúdez e Martim, 2022; Murillo-Bermúdez et al., 2023). A chuva vem de dois postos; um deles, o DBT5, fica fora da bacia, a leste. A vazão é da estação do DAEE no exutório. O sedimento não é medido direto: a SABESP mede a turbidez da água bruta de hora em hora, e uma curva de calibração converte turbidez em concentração. A carga de cada evento é a soma, hora a hora, da vazão vezes a concentração. São 17 eventos, de novembro de 2018 a fevereiro de 2020, com cargas de cerca de 200 t a 3.800 t. Os mapas, todos em pixels de 30 m, vêm de três fontes: o relevo e o fator LS, do modelo digital de elevação do USGS; o solo e o uso, que dão K e C, do Plano de Bacias (Consórcio Profill-Rhama, 2020), com os valores por classe de Vivarelli et al. (2025); e o número de curva, da base nacional BR_CN-2022 da Agência Nacional de Águas e Saneamento Básico (2024). Vou acompanhar o evento 11, em laranja, do começo ao fim, como no Apêndice A.");
 }
 
 // ---------------------------------------------------------------- 12 evento 11
@@ -131,7 +137,7 @@ pres.addSection({ title: SM });
 
 // ---------------------------------------------------------------- 14 SCS-CN
 {
-  const s = base(SM, "Passo 2: escoamento direto em cada pixel (SCS-CN)", "Fonte: elaborado pelo autor. Método: Chow, Maidment e Mays (1988)");
+  const s = base(SM, "Passo 2: escoamento direto em cada pixel (SCS-CN)", "Fonte: elaborado pelo autor. Método: Chow, Maidment e Mays (1988). CN: raster BR_CN-2022 (Agência Nacional de Águas e Saneamento Básico, 2024)");
   img(s, "slides/ev11_escoamento.png", M, 1.7, 7.6, 5.1, "Escoamento direto calculado no evento 11");
   eq(s, "Q = (P − 0,05 S)^{2} / (P + 0,95 S)", 8.6, 1.85, 4.15, 0.8, 20);
   s.addText("Pixel de exemplo (lavoura temporária sobre Argissolo)", { x: 8.6, y: 2.85, w: 4.15, h: 0.4, fontSize: 15, bold: true, color: NAVY, margin: 0, isTextBox: true });
@@ -145,7 +151,7 @@ pres.addSection({ title: SM });
 
 // ---------------------------------------------------------------- 15 parentese 1
 {
-  const s = base(SM, "Parêntese 1: condição seca (CN-I) e λ = 0,05", "Fontes: Woodward et al. (2003); Brandão et al. (2025)");
+  const s = base(SM, "Parêntese 1: condição seca (CN-I) e λ = 0,05", "Fontes: Woodward et al. (2003); Brandão et al. (2025). CN-II: raster BR_CN-2022 (Agência Nacional de Águas e Saneamento Básico, 2024)");
   const y = 1.95, h = 1.1, bw = 2.15, gap = 0.42;
   const etapas = [["CN-II = 81,0", "tabelado (uso × solo)"], ["CN-I = 64,2", "condição seca"], ["S_{0,20} = 141,9 mm", "retenção do CN"], ["S_{0,05} = 244,2 mm", "convertida (Woodward)"], ["I_{a} = 12,2 mm", "0,05 × S_{0,05}"]];
   etapas.forEach((e, i) => {
@@ -189,7 +195,7 @@ pres.addSection({ title: SM });
 
 // ---------------------------------------------------------------- 17 erosao local
 {
-  const s = base(SM, "Passo 4: erosão local em cada pixel (Williams, 1975)", "Fonte: elaborado pelo autor. Equação: Williams (1975); K e C adotados de Vivarelli et al. (2025)");
+  const s = base(SM, "Passo 4: erosão local em cada pixel (Williams, 1975)", "Fonte: elaborado pelo autor. Equação: Williams (1975). K e C: mapas de solo e uso do Consórcio Profill-Rhama (2020), com valores por classe de Vivarelli et al. (2025); LS: MDE de 30 m do USGS (Moore e Burch, 1986)");
   img(s, "slides/ev11_eunit_sem_escala.png", M, 1.7, 7.2, 4.55, "Índice de erosão E_unit no evento 11");
   s.addText("Mais escuro = maior índice de erosão (valor relativo)", { x: M, y: 6.3, w: 7.2, h: 0.4, fontSize: 14, color: MUTED, italic: true, margin: 0, isTextBox: true, align: "center" });
   eq(s, "E_{unit} = 11,8 (Q · p_{r} · A_{pix})^{0,56} · K · LS · C · P", 8.15, 1.85, 4.6, 0.85, 18);
@@ -314,7 +320,7 @@ pres.addSection({ title: SR });
 
 // ---------------------------------------------------------------- 25 mapas e areas criticas
 {
-  const s = base(SR, "Mapa de erosão média e áreas críticas", "Fonte: elaborado pelo autor. Erosão média dos 17 eventos (MC); áreas críticas = 5% dos pixels de maior erosão");
+  const s = base(SR, "Mapa de erosão média e áreas críticas", "Fonte: elaborado pelo autor. Erosão média dos 17 eventos (MC); áreas críticas = 5% dos pixels de maior erosão. Fatores: Consórcio Profill-Rhama (2020), Vivarelli et al. (2025), USGS e Agência Nacional de Águas e Saneamento Básico (2024)");
   img(s, "slides/mapa_medio_e_criticas_MC.png", M, 1.6, 5.4, 5.3, "Erosão média dos 17 eventos e áreas críticas do modelo calculado");
   stat(s, "46% → 83%", "campo, silvicultura e lavoura temporária: % da área → % da erosão", 6.4, 1.7, 3.1);
   stat(s, "93%", "da erosão vem dos Cambissolos Háplicos (69% da área)", 9.7, 1.7, 3.05);

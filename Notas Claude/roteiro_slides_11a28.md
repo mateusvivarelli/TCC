@@ -16,7 +16,7 @@ No plano, "Resultados: escoamento e sedimento" era o 23, depois do MFM. Passei p
 
 | # | Título | O que aparece | Mensagem (uma frase) | Tempo |
 |---|---|---|---|---|
-| 11 | Dados: 17 eventos de chuva monitorados (2018 a 2020) | 4 linhas (chuva, vazão, sedimento, carga) + gráfico de barras da carga medida por evento, evento 11 em laranja | De onde vêm os dados e qual o tamanho dos eventos | 1:00 |
+| 11 | Dados: 17 eventos monitorados e mapas de 30 m | 4 linhas (chuva, vazão, sedimento, carga) + caixa "Dados espaciais" (MDE do USGS; solo e uso do Consórcio Profill-Rhama, 2020; CN BR_CN-2022 da Agência Nacional de Águas e Saneamento Básico, 2024) + gráfico da carga medida por evento, evento 11 em laranja | De onde vêm os dados medidos e os mapas | 1:00 |
 | 12 | Evento 11: 4 a 8 de julho de 2019 | Hietograma, hidrograma com escoamento direto e CSS + 4 números (74,0 mm; 11,8 mm/h; 1.479 mil m³; 1.822 t) | É esse valor (1.822 t) que o modelo tenta reproduzir | 0:25 |
 | 13 | Passo 1: chuva em cada pixel (IDW) | Mapa da chuva + fórmula do IDW + 62,8 / 79,0 mm; pixel com 75,4 mm | Com 2 postos, a chuva é um gradiente suave | 0:25 |
 | 14 | Passo 2: escoamento direto em cada pixel (SCS-CN) | Mapa do escoamento + conta do pixel (Q = 13,0 mm) + volume 997 contra 1.479 mil m³ | O SCS-CN dá 67% do volume medido neste evento | 0:45 |
@@ -38,6 +38,12 @@ No plano, "Resultados: escoamento e sedimento" era o 23, depois do MFM. Passei p
 
 Soma dos slides 11 a 28: cerca de 14 min; com a introdução (cerca de 4:30), cerca de 18:30 dos 20 min.
 Se estourar: juntar 12 e 13; juntar 21 e 24; falar o 28 em uma frase.
+
+## Fontes dos rasters nos rodapés
+* Slide 11: todas (monitoramento e rasters).
+* Slides 14 e 15: CN do raster BR_CN-2022 (Agência Nacional de Águas e Saneamento Básico, 2024).
+* Slide 17: K e C dos mapas do Consórcio Profill-Rhama (2020), com valores de Vivarelli et al. (2025); LS do MDE de 30 m do USGS (Moore e Burch, 1986).
+* Slide 25: todas as fontes dos fatores.
 
 ## Cuidados na fala (do plano, ainda valem)
 * K e C: "adotados de Vivarelli et al. (2025), não recalibrados aqui". Não dizer que "não foram confirmados".
