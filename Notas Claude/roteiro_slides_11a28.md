@@ -68,3 +68,14 @@ Se estourar: juntar 12 e 13; juntar 21 e 24; falar o 28 em uma frase.
 * Três slides de apoio novos: histerese (CSS antes da vazão), o índice RI/R nos eventos 1 e 12, e a cadeia CN-II → CN-I (Chow) → S0,20 → S0,05 (Woodward).
 * Slide 12: hidrograma com "início do evento" e "fim do evento". Slide 15: Chow et al. (1988) no rodapé e na caixa do CN-I. Slide 16: unidades explícitas (0,013 m × 897 m²; 11,8 mm/h ÷ 74,0 mm). Slide 17: nota sobre o 11,8 de Williams.
 * Achado para discutir com o orientador: no evento 11, choveu 11,8 mm (DBT5) e 13,6 mm (Campo Limpo) nas 9 horas antes do início da janela (04/07, 3h às 11h). Essa chuva ficou fora de R (cerca de 16% do total) e não entra no SCS-CN, embora tenha molhado o solo antes do evento. É um exemplo concreto da limitação da delimitação manual (seção 4.6).
+
+## Atualização de 18/11 (depois da reunião com o orientador)
+Arquivos: `TCC_Texto/slides/slides_defesa_completo.pptx` (slide 8 e do 11 em diante) e `TCC_Texto/slides/slides_novos_8_e_20_em_diante.pptx` (só os novos, para colar). Os antigos `slides_11a28` e `slides_17a28` foram substituídos.
+* Estilo: faixa azul no topo com o nome da seção; título abaixo; conteúdo no meio e embaixo.
+* Slide 8 novo: solo e uso do solo (Figura 2 do TCC).
+* 21: gráfico de barras medido x calculado por evento (no lugar da dispersão); fala explica o expoente 1,12: (Q · pico)^0,56 com pico ∝ Q → Q^1,12.
+* 24 novo: como medimos o desempenho (erro mediano, fator 2, NSE em log, Spearman, R², validação cruzada).
+* 25: tabela de todos os modelos (era apoio).
+* "O que o MFM mostra" virou slide de apoio.
+* Depois do mapa de áreas críticas: mapa dos 17 eventos e mapa médio grande (MC).
+* Conclusões com o mapa de áreas críticas; limitações em dois slides: de onde vem o erro (hidrologia: 81% → 21%; 91%) e o que falta validar, com os próximos passos.

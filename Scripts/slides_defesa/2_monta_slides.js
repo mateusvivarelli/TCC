@@ -1,6 +1,6 @@
 // Slides 11 a 28 da defesa (e um slide de apoio), seguindo Notas Claude/plano_slides_defesa_14-11.md.
 // Uso: node Scripts/slides_defesa/2_monta_slides.js   (depois de rodar 1_figuras_slides.py)
-// Saida: TCC_Texto/slides/slides_11a28_defesa.pptx
+// Saida: TCC_Texto/slides/slides_defesa_completo.pptx (slide 8 e do 11 em diante)
 const fs = require("fs");
 const path = require("path");
 const pptxgen = require("pptxgenjs");
@@ -16,7 +16,7 @@ const W = 13.333, M = 0.6;
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE";
 pres.author = "Mateus Guilherme Vivarelli";
-pres.title = "Defesa do TCC: slides 11 a 28";
+pres.title = "Defesa do TCC: slides 8 e 11 em diante";
 pres.theme = { headFontFace: "Calibri", bodyFontFace: "Calibri" };
 
 pres.defineSlideMaster({
@@ -36,7 +36,8 @@ function img(s, rel, x, y, w, h, alt) {
 }
 function base(sec, title, fonte) {
   const s = pres.addSlide({ masterName: "CONTEUDO", sectionTitle: sec });
-  s.addText(sec.toUpperCase(), { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.08, x: M, y: 0.28, w: 2.9, h: 0.34, fill: { color: NAVY }, color: WHITE, fontSize: 11, bold: true, charSpacing: 1, align: "center", valign: "middle", margin: 0 });
+  s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: W, h: 0.55, fill: { color: NAVY }, line: { color: NAVY } });
+  s.addText(sec, { x: M, y: 0, w: 8, h: 0.55, fontSize: 16, bold: true, color: WHITE, valign: "middle", margin: 0, isTextBox: true });
   s.addText(title, { placeholder: "title" });
   if (fonte) s.addText(fonte, { x: M, y: 6.86, w: W - 2 * M, h: 0.5, fontSize: 11, color: MUTED, italic: true, margin: 0, isTextBox: true, valign: "middle" });
   return s;
@@ -77,6 +78,18 @@ function caixa(s, txt, x, y, w, h, opt) {
 function seta(s, x, y, w) { s.addShape(pres.shapes.RIGHT_ARROW, { x, y, w, h: 0.32, fill: { color: BLUE }, line: { color: BLUE } }); }
 
 const SM = "Método: o evento 11", SR = "Resultados", SC = "Conclusão", SE = "Encerramento", SA = "Apoio";
+pres.addSection({ title: "Área de estudo" });
+// ---------------------------------------------------------------- 8 solo e uso
+{
+  const s = base("Área de estudo", "Solo e uso do solo na parte alta da bacia", "Fonte: elaborado pelo autor, com os mapas de solo e de uso do Plano de Bacias (Consórcio Profill-Rhama, 2020)");
+  img(s, "mapas/mapa_02_solo_uso.png", M, 1.7, W - 2 * M, 4.1, "Classes de solo e de uso do solo na área de estudo");
+  linhas(s, [
+    ["Solo:", "Cambissolos Háplicos em 69% da área (K = 0,0475) e Argissolos Vermelho-Amarelos em 18% (K = 0,0351)"],
+    ["Uso:", "mata nativa 40%, campo 29%, área urbana 14%, silvicultura 13%, lavoura temporária 4%"],
+  ], M, 5.95, W - 2 * M, 0.9, 16);
+  s.addNotes("Antes do método, a distribuição do solo e do uso na bacia. O solo é dominado pelos Cambissolos Háplicos, cerca de 69% da área, com a maior erodibilidade (K = 0,0475); os Argissolos ocupam cerca de 18%. No uso, a mata nativa cobre cerca de 40%, sobretudo na cabeceira a leste; o campo, 29%; a área urbana, 14%, perto do exutório; a silvicultura, 13%; e a lavoura temporária, 4%. Esses mapas dão os fatores K e C de cada pixel, com os valores por classe de Vivarelli et al. (2025).");
+}
+
 pres.addSection({ title: SM });
 
 // ---------------------------------------------------------------- 11 dados
@@ -260,17 +273,27 @@ pres.addSection({ title: SR });
 
 // ---------------------------------------------------------------- 21 escoamento e o gargalo
 {
-  const s = base(SR, "O erro vem do escoamento calculado", "Fontes: elaborado pelo autor; Baert et al. (2026)");
-  img(s, "slides/fig_volume_direto.png", M, 1.65, 5.6, 5.2, "Escoamento direto calculado pelo SCS-CN contra o medido");
-  stat(s, "46%", "erro mediano do volume de cada evento (viés total de só +3%)", 6.6, 1.75, 2.95);
-  stat(s, "91%", "da variância do erro do sedimento é explicada pelo erro do escoamento", 9.8, 1.75, 2.95, ORANGE);
+  const s = base(SR, "O erro vem do escoamento calculado", "Fontes: elaborado pelo autor; Baert et al. (2026). Escoamento direto medido = volume total menos a vazão de base");
+  const med = [224, 1731, 585, 987, 832, 183, 650, 1250, 801, 552, 1479, 101, 735, 931, 2177, 1595, 449];
+  const calc = [36, 521, 751, 154, 695, 158, 142, 1336, 1725, 57, 997, 63, 1073, 1363, 3963, 1934, 734];
+  const labels = med.map((_, i) => String(i + 1));
+  s.addChart(pres.charts.BAR, [{ name: "Medido", labels, values: med }, { name: "Calculado (SCS-CN)", labels, values: calc }], {
+    x: M, y: 1.6, w: 7.6, h: 5.2, barGrouping: "clustered", barGapWidthPct: 40, chartColors: [NAVY, "E39B3A"],
+    showTitle: true, title: "Escoamento direto por evento (mil m³)", titleFontSize: 15, titleColor: TEXT, titleFontFace: "Calibri",
+    showLegend: true, legendPos: "t", legendFontSize: 13, legendFontFace: "Calibri", legendColor: TEXT,
+    catAxisLabelColor: MUTED, valAxisLabelColor: MUTED, catAxisLabelFontSize: 12, valAxisLabelFontSize: 12, catAxisLabelFontFace: "Calibri", valAxisLabelFontFace: "Calibri",
+    showCatAxisTitle: true, catAxisTitle: "Evento", catAxisTitleFontSize: 12, catAxisTitleColor: MUTED, catAxisTitleFontFace: "Calibri", dataLabelFontFace: "Calibri",
+    valGridLine: { color: "E3E7ED", size: 0.5 }, catGridLine: { style: "none" }, valAxisLabelFormatCode: "#,##0",
+  });
+  stat(s, "+3%", "no total dos 17 eventos (15,7 contra 15,3 milhões de m³)", 8.55, 1.65, 2.05);
+  stat(s, "46%", "de erro mediano em cada evento", 10.75, 1.65, 2.0, ORANGE);
   marcadores(s, [
-    "SCS-CN superestima as chuvas grandes e subestima as pequenas; os erros se compensam no total",
-    "E cresce com Q elevado a 1,12: o erro do escoamento passa ao sedimento um pouco ampliado",
-    "K, LS e C não mudam de um evento para outro: tudo o que muda entre eventos vem da chuva e do escoamento",
+    "Superestima as chuvas grandes (9, 15) e subestima as pequenas (1, 4, 7, 10): os erros se compensam no total",
+    "Em 15 de 17 eventos, o sedimento erra no mesmo sentido do escoamento",
+    "A erosão cresce com Q elevado a 1,12: o erro do escoamento chega ao sedimento um pouco ampliado",
     "Baert et al. (2026): MUSLE com escoamento previsto teve NSE ≈ 0; com o medido, 0,66",
-  ], 6.6, 3.6, 6.15, 3.2, 16);
-  s.addNotes("O escoamento direto calculado acerta o total dos 17 eventos, com 3% de viés, mas erra 46% evento a evento. O SCS-CN superestima as chuvas grandes e subestima as pequenas, e os erros se compensam na soma. Esse erro vai direto para o sedimento: o erro do escoamento explica 91% da variância do erro da carga. Faz sentido pela fórmula: K, LS e C são fixos, e tudo o que diferencia um evento do outro vem da chuva convertida em escoamento, com expoente 1,12. Baert et al. (2026) encontraram o mesmo: com escoamento previsto a MUSLE não teve desempenho; com o medido, sim. (Sugestão de ordem: este slide vem antes do MFM, para explicar por que o testamos.)");
+  ], 8.55, 3.5, 4.2, 3.3, 15);
+  s.addNotes("Este gráfico compara, evento a evento, o escoamento direto medido (azul) com o calculado pelo SCS-CN (laranja). Na soma dos 17 eventos, os dois quase coincidem: 15,7 contra 15,3 milhões de m³, 3% de diferença. Mas evento a evento o erro é grande, 46% na mediana: o método superestima as chuvas grandes, como os eventos 9 e 15, e subestima as pequenas, como 1, 4, 7 e 10, onde calcula menos de um quarto do medido. Esse erro passa direto para o sedimento: em 15 de 17 eventos, o sedimento erra no mesmo sentido do escoamento, e o erro do escoamento explica 91% da variação do erro do sedimento. De onde vem o expoente 1,12: a erosão de Williams usa (Q vezes o pico) elevado a 0,56; como o pico local é proporcional a Q (pico = Q vezes RI/R, com RI/R igual em todos os pixels), fica (Q vezes Q) elevado a 0,56, ou Q elevado a 1,12. Então um escoamento com metade do valor medido dá sedimento com cerca de 46% do valor. Baert et al. (2026) encontraram o mesmo: com escoamento previsto, a MUSLE não teve desempenho; com o medido, sim.");
 }
 
 // ---------------------------------------------------------------- 22 MFM
@@ -308,14 +331,49 @@ pres.addSection({ title: SR });
   s.addNotes("Com o escoamento medido, o erro mediano da MUSLE espacializada cai de 81% para 21%, e 94% dos eventos ficam dentro de fator 2. Mas duas comparações são importantes. Primeiro, uma regra simples com o volume de escoamento direto medido, sem MUSLE, erra 16%: a diferença para o MFM é pequena e o intervalo de confiança inclui o zero; com 17 eventos, os dois não se distinguem. Segundo, o modelo concentrado de Vivarelli et al. (2025) erra 22%, a mesma ordem; mas ele foi ajustado nos próprios eventos, sem validação cruzada, então a comparação é só indicativa.");
 }
 
-// ---------------------------------------------------------------- 24 leitura critica
+// ---------------------------------------------------------------- 24 metricas
 {
-  const s = base(SR, "O que o MFM mostra: o peso do volume medido", "Fonte: elaborado pelo autor, com os dados da Tabela 3 do TCC");
-  img(s, "slides/fig_volume_concentracao.png", M, 1.6, 8.6, 3.9, "Descarga de sedimentos contra o volume escoado e variação de volume e concentração entre eventos");
-  stat(s, "88%", "da variância do log da carga é explicada só pelo volume", 9.45, 1.75, 3.3, ORANGE);
-  stat(s, "0,66 × 0,08", "variância do log: volume × concentração", 9.45, 3.25, 3.3);
-  s.addText("Carga = volume × concentração média. Quem recebe o volume medido acerta a ordem de grandeza da carga por construção. O bom desempenho do MFM não valida a fórmula de erosão nem o mapa.", { x: M, y: 5.65, w: 12.1, h: 1.2, fontSize: 17, color: NAVY, margin: 0, isTextBox: true, valign: "top" });
-  s.addNotes("Por que o MFM vai tão bem? A carga de um evento é o volume escoado vezes uma concentração média. Entre os 17 eventos, o volume varia muito mais que a concentração: a variância do log do volume é 0,66, contra 0,08 da concentração, e só o volume explica 88% da variância da carga. Então qualquer modelo que receba o volume medido acerta a ordem de grandeza. A conclusão honesta é: o trabalho mostra o peso do escoamento, mas não consegue avaliar separadamente a fórmula de erosão e os fatores K, LS e C. O evento 17 é o mais difícil para todos os modelos com volume medido, com concentração bem acima dos outros; foi mantido porque não há base para excluí-lo.");
+  const s = base(SR, "Como medimos o desempenho", "Fonte: elaborado pelo autor. Métodos: Nash e Sutcliffe (1970); Cawley e Talbot (2010). O = carga observada; S = carga simulada; n = evento");
+  const cards = [
+    ["Erro percentual mediano", "|S − O| / O em cada evento; mediana dos 17", "Quanto o modelo erra num evento típico. A mediana não deixa poucos eventos muito errados dominarem", "ideal: 0%"],
+    ["Fator 2", "% de eventos com S entre O/2 e 2·O", "Quantos eventos ficam na ordem de grandeza certa", "ideal: 100%"],
+    ["NSE (em log)", "1 − Σ(ln O − ln S)^{2} / Σ(ln O − ln Ō)^{2}", "Compara o modelo com prever sempre a média. Em log, pesa o erro relativo", "1 = perfeito; 0 = igual à média; < 0 = pior"],
+    ["Spearman", "correlação entre as posições dos eventos", "Se o modelo coloca os eventos na ordem certa, do menor ao maior", "ideal: 1"],
+    ["R²", "fração da variação explicada por uma regressão", "Usado para medir o que explica a carga (volume: 88%) e o padrão do mapa", "de 0 a 1"],
+    ["Validação cruzada", "deixa um evento de fora, ajusta c nos outros 16", "Todas as métricas usam a previsão do evento que ficou de fora, sem viés de otimismo", "17 rodadas"],
+  ];
+  const cw = 3.85, ch = 2.45, gx = 0.275, gy = 0.2;
+  cards.forEach((c, i) => {
+    const x = M + (i % 3) * (cw + gx), y = 1.65 + Math.floor(i / 3) * (ch + gy);
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w: cw, h: ch, rectRadius: 0.06, fill: { color: TINT }, line: { color: LINE, width: 1 } });
+    s.addText(c[0], { x: x + 0.15, y: y + 0.1, w: cw - 0.3, h: 0.4, fontSize: 17, bold: true, color: NAVY, margin: 0, isTextBox: true });
+    s.addText(rt(c[1], { fontFace: "Cambria Math", fontSize: 13, color: TEXT }), { x: x + 0.15, y: y + 0.52, w: cw - 0.3, h: 0.5, margin: 0, isTextBox: true, valign: "top" });
+    s.addText(c[2], { x: x + 0.15, y: y + 1.05, w: cw - 0.3, h: 0.95, fontSize: 13, color: TEXT, margin: 0, isTextBox: true, valign: "top" });
+    s.addText(c[3], { x: x + 0.15, y: y + 2.0, w: cw - 0.3, h: 0.35, fontSize: 13, bold: true, color: ORANGE, margin: 0, isTextBox: true });
+  });
+  s.addNotes("Para comparar os modelos, usei quatro métricas, todas calculadas na validação cruzada. O erro percentual mediano diz quanto o modelo erra num evento típico; uso a mediana para que poucos eventos muito errados não dominem. O fator 2 é a fração de eventos em que o simulado fica entre a metade e o dobro do medido, ou seja, na ordem de grandeza certa. O NSE compara o modelo com a alternativa de prever sempre a média: 1 é perfeito, 0 é tão bom quanto a média e negativo é pior; calculo em log para pesar o erro relativo, como na calibração. O Spearman diz se o modelo ordena os eventos corretamente. O R² aparece em duas análises: quanto da carga o volume explica e quanto do padrão do mapa vem de cada fator. Para comparar dois modelos nos mesmos eventos, usei a mediana da diferença dos erros, com intervalo de confiança por bootstrap e o teste de Wilcoxon.");
+}
+
+// ---------------------------------------------------------------- apoio: tabela 13
+
+{
+  const s = base(SR, "Desempenho de todos os modelos", "Fonte: elaborado pelo autor (Tabela 13 do TCC). Validação cruzada, exceto o modelo concentrado (ajuste nos 17 eventos do trabalho original)");
+  const H = (t) => ({ text: t, options: { bold: true, color: WHITE, fill: { color: NAVY } } });
+  const rows = [
+    [H("Modelo"), H("Informação medida"), H("Erro mediano"), H("Fator 2"), H("NSE log"), H("Spearman")],
+    ["Regra simples com a chuva", "chuva", "41,9%", "82%", "0,53", "0,63"],
+    ["MC (MUSLE espacializada)", "chuva", "81,1%", "35%", "−0,69", "0,59"],
+    ["Regra simples com o volume", "escoamento direto", "15,9%", "94%", "0,85", "0,90"],
+    ["MFM (MUSLE espacializada)", "escoamento direto", "20,6%", "94%", "0,84", "0,83"],
+    ["Concentrado (Vivarelli et al., 2025)", "volume total e pico", "22,5%", "100%", "0,91", "0,93"],
+  ];
+  s.addTable(rows, { x: M, y: 1.9, w: 12.1, colW: [3.9, 2.5, 1.5, 1.3, 1.4, 1.5], fontSize: 16, fontFace: "Calibri", color: TEXT, border: { type: "solid", pt: 0.75, color: LINE }, rowH: 0.55, valign: "middle", align: "center" });
+  marcadores(s, [
+    "Com a mesma informação (só a chuva), a regra simples supera o MC",
+    "Com o escoamento medido, MFM e regra com o volume não se distinguem (diferença de +1,6 pontos; p = 0,52)",
+    "O concentrado foi ajustado nos próprios eventos, sem validação cruzada: comparação indicativa",
+  ], M, 5.4, W - 2 * M, 1.4, 16);
+  s.addNotes("Esta tabela reúne todos os modelos, com as quatro métricas. As duas primeiras linhas usam só a chuva: a regra simples erra 42% e o MC 81%. As duas seguintes usam o escoamento direto medido: a regra com o volume erra 16% e o MFM 21%; a diferença entre eles é pequena e, com 17 eventos, não se distingue de zero. A última é o modelo concentrado de Vivarelli et al. (2025), com os valores originais, ajustado nos mesmos 17 eventos e sem validação cruzada: tem a melhor métrica, mas a comparação é só indicativa.");
 }
 
 // ---------------------------------------------------------------- 25 mapas e areas criticas
@@ -334,24 +392,78 @@ pres.addSection({ title: SR });
   s.addNotes("Essa é a contribuição que o modelo concentrado não dá: onde a erosão acontece. As áreas críticas ficam na porção central e oeste. Campo, silvicultura e lavoura temporária ocupam 46% da área e respondem por 83% da erosão média; 93% vem dos Cambissolos; as encostas acima de 20% respondem por 78%. O mapa do MC e o do MFM coincidem em 94% das áreas críticas, o que é esperado, porque usam o mesmo padrão espacial; não é validação. Em escala logarítmica, 63% da variação espacial vem do escoamento, isto é, da chuva de dois postos e do CN, que é a parte menos confiável do mapa. Ressalvas: o mapa é relativo, depende dos K e C adotados de Vivarelli et al. (2025), considera a área urbana sem erosão e mostra onde a erosão é produzida, não onde chega ao rio.");
 }
 
-// ---------------------------------------------------------------- 26 limitacoes e conclusao
+// ---------------------------------------------------------------- mapas grandes
+{
+  const s = base(SR, "Sedimento estimado em cada evento (MC)", "Fonte: elaborado pelo autor. Mesma escala de cores em todos os eventos; sedimento estimado c × E por pixel");
+  img(s, "slides/mapa_17_eventos_MC.png", M, 1.5, 9.4, 5.35, "Sedimento estimado em cada pixel nos 17 eventos");
+  marcadores(s, [
+    "As mesmas manchas se repetem em todos os eventos",
+    "A intensidade acompanha a chuva e o escoamento: eventos 8, 9, 15 e 16 os mais fortes",
+    "Eventos de pouca chuva (1, 4, 6, 7, 10 e 12): erosão baixa em quase toda a bacia",
+    "Cabeceira a leste: pouca erosão (menos chuva, CN baixo, mata)",
+  ], 10.1, 1.8, 2.65, 5.0, 15);
+  s.addNotes("Aqui está o sedimento estimado em cada pixel nos 17 eventos, com a mesma escala de cores. As manchas de maior erosão se repetem de um evento para outro; o que muda é a intensidade, que acompanha a chuva e o escoamento: os eventos 8, 9, 15 e 16, os de maior chuva, são os mais fortes. Nos eventos de pouca chuva, a erosão é baixa em quase toda a bacia. A cabeceira, a leste, produz pouco em todos os eventos, porque recebe menos chuva, tem número de curva mais baixo e é coberta sobretudo por mata. Lembrando: a intensidade de cada mapa depende do escoamento calculado, que erra 46% na mediana.");
+}
+{
+  const s = base(SR, "Sedimento médio dos 17 eventos (MC)", "Fonte: elaborado pelo autor. Média, em cada pixel, do sedimento estimado nos 17 eventos (kg por pixel de 897 m²)");
+  img(s, "slides/mapa_medio_MC.png", M, 1.5, W - 2 * M, 5.35, "Sedimento médio dos 17 eventos em cada pixel");
+  s.addNotes("A média dos 17 eventos em cada pixel. As manchas mais escuras, na porção central e oeste, são campo, silvicultura e lavoura temporária sobre Cambissolos, em encostas íngremes; as manchas isoladas mais fortes são solo exposto e mineração, que têm C = 1 adotado. O mapa é relativo: depende dos K e C adotados e mostra onde a erosão é produzida, não onde o sedimento chega ao rio.");
+}
+
+// ---------------------------------------------------------------- conclusoes
 pres.addSection({ title: SC });
 {
-  const s = base(SC, "Conclusões e limitações", null);
-  s.addText("Conclusões", { x: M, y: 1.75, w: 5.9, h: 0.45, fontSize: 20, bold: true, color: NAVY, margin: 0, isTextBox: true });
+  const s = base(SC, "Conclusões", null);
   marcadores(s, [
     "A conversão da chuva em escoamento é o principal limite: com a chuva, o MC erra 81%; com o volume medido, 21%",
     "Com o volume medido, a MUSLE espacializada não se distinguiu da regra com o volume: o trabalho não isola a contribuição da fórmula de erosão",
-    "A espacialização chega a um erro da mesma ordem do modelo concentrado (22%) e acrescenta o mapa de áreas críticas",
-    "Áreas críticas: campo, silvicultura e lavoura temporária sobre Cambissolos, em encostas acima de 20%",
-  ], M, 2.3, 5.9, 4.5, 16);
-  s.addText([{ text: "Limitações", options: { bold: true, color: NAVY, fontSize: 20, breakLine: true } },
-    { text: "Delimitação manual dos eventos; chuva de 2 postos; CN-I e λ escolhidos nos mesmos eventos; vazão de base estimada; curva turbidez × CSS; K e C adotados; 17 eventos; mapa sem validação espacial", options: { color: TEXT, fontSize: 15 } }],
-    { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.06, x: 6.85, y: 1.75, w: 5.9, h: 2.3, fill: { color: TINT }, line: { color: LINE, width: 1 }, valign: "top", margin: 10 });
-  s.addText([{ text: "Próximos passos", options: { bold: true, color: ORANGE, fontSize: 20, breakLine: true } },
-    { text: "Medir sedimento em sub-bacias e verificar as áreas críticas em campo; mais postos ou radar; índice de conectividade por pixel no lugar de c único; novos eventos como teste independente", options: { color: TEXT, fontSize: 15 } }],
-    { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.06, x: 6.85, y: 4.3, w: 5.9, h: 2.0, fill: { color: "FCEFD9" }, line: { color: "E8C79A", width: 1 }, valign: "top", margin: 10 });
-  s.addNotes("Para fechar. Primeiro: o que mais limita a estimativa da carga a partir da chuva é a conversão da chuva em escoamento; trocando pelo volume medido, o erro cai de 81% para 21%. Segundo: com o volume medido, a MUSLE espacializada não se distinguiu de uma regra simples com o volume; então o trabalho mostra o peso do escoamento, mas não isola a contribuição da fórmula e dos fatores. Terceiro: a espacialização chega a um erro da mesma ordem do modelo concentrado e acrescenta o mapa. Quarto: as áreas críticas ficam no campo, na silvicultura e na lavoura temporária sobre Cambissolos, nas encostas mais íngremes. As limitações estão à direita; com 17 eventos, as conclusões são qualitativas. Como próximos passos: validar o mapa com medições em sub-bacias e em campo, melhorar a chuva com mais postos ou radar, e trocar o c único por uma conectividade por pixel, como em Hao et al. (2022).");
+    "A espacialização chega a um erro da mesma ordem do modelo concentrado (22%) e acrescenta o mapa",
+    "Áreas críticas: campo, silvicultura e lavoura temporária sobre Cambissolos, em encostas acima de 20% (46% da área, 83% da erosão)",
+  ], M, 1.75, 5.6, 5.0, 17);
+  img(s, "slides/mapa_criticas_MC.png", 6.45, 1.6, 6.3, 4.6, "Áreas críticas de erosão: 5% dos pixels de maior erosão média");
+  s.addText("Áreas críticas: 5% dos pixels de maior erosão média (MC); 94% coincidem com o MFM", { x: 6.45, y: 6.25, w: 6.3, h: 0.5, fontSize: 14, italic: true, color: MUTED, margin: 0, isTextBox: true, align: "center" });
+  s.addNotes("Primeiro: o que mais limita a estimativa da carga a partir da chuva é a conversão da chuva em escoamento; trocando pelo volume medido, o erro cai de 81% para 21%. Segundo: com o volume medido, a MUSLE espacializada não se distinguiu de uma regra simples com o volume; então o trabalho mostra o peso do escoamento, mas não isola a contribuição da fórmula e dos fatores. Terceiro: a espacialização chega a um erro da mesma ordem do modelo concentrado e acrescenta o mapa. Quarto: as áreas críticas, à direita, ficam no campo, na silvicultura e na lavoura temporária sobre Cambissolos, nas encostas mais íngremes: 46% da área respondem por 83% da erosão.");
+}
+
+// ---------------------------------------------------------------- limitacoes 1: origem do erro
+{
+  const s = base(SC, "Limitações: de onde vem o erro", "Fonte: elaborado pelo autor");
+  stat(s, "81% → 21%", "erro mediano com o escoamento calculado e com o medido: cerca de 3/4 do erro vem da hidrologia", M, 1.6, 5.2, ORANGE);
+  stat(s, "91%", "da variação do erro do sedimento é explicada pelo erro do escoamento", 6.6, 1.6, 6.1);
+  const itens = [
+    ["Chuva de 2 postos", "um deles fora da bacia; a chuva vira um gradiente suave e núcleos de chuva entre os postos não aparecem"],
+    ["Delimitação manual dos eventos", "no evento 11, 12 a 14 mm em cada posto (cerca de 16% da chuva do evento) caíram nas 9 h antes do início da janela e ficaram fora do cálculo"],
+    ["Forma do SCS-CN", "a fração da chuva que escoa não cresceu com a chuva (r = −0,01); CN-I e λ ajustam o total (+3%), mas não o erro de cada evento"],
+    ["Vazão de base estimada", "o escoamento direto \"medido\" depende do filtro (BFImax = 0,70) e também é incerto"],
+  ];
+  itens.forEach((it, i) => {
+    const y = 3.2 + i * 0.9;
+    s.addText(String(i + 1), { shape: pres.shapes.OVAL, x: M, y: y + 0.05, w: 0.5, h: 0.5, fill: { color: NAVY }, color: WHITE, fontSize: 16, bold: true, align: "center", valign: "middle", margin: 0 });
+    s.addText([{ text: it[0] + ": ", options: { bold: true, color: NAVY } }, { text: it[1], options: { color: TEXT } }], { x: M + 0.7, y, w: W - 2 * M - 0.7, h: 0.8, fontSize: 16, margin: 0, isTextBox: true, valign: "middle" });
+  });
+  s.addNotes("A maior parte do erro está na hidrologia, não na fórmula de erosão. Com o escoamento calculado, o erro mediano é 81%; com o medido, 21%: cerca de três quartos do erro vêm de transformar a chuva em escoamento, e o erro do escoamento explica 91% da variação do erro do sedimento. As causas, em ordem de importância provável: primeiro, a chuva de só dois postos, um fora da bacia, que vira um gradiente suave. Segundo, a delimitação manual dos eventos: no evento 11, por exemplo, choveram cerca de 12 a 14 mm em cada posto nas 9 horas antes do início da janela, e essa chuva ficou fora do cálculo, embora tenha molhado o solo. Terceiro, a forma do SCS-CN: nesta bacia, a fração da chuva que escoa não cresceu com a chuva, ao contrário do que o método supõe; a escolha de CN-I e lambda ajusta o volume total, mas não corrige o erro de cada evento. Quarto, a separação da vazão de base, que torna incerto até o escoamento direto medido. Resolver essas quatro é o que mais melhoraria o resultado.");
+}
+
+// ---------------------------------------------------------------- limitacoes 2: validacao e mapa
+{
+  const s = base(SC, "Limitações: o que falta validar", "Fonte: elaborado pelo autor");
+  const cards = [
+    ["Mapa sem validação espacial", "Só há medição de sedimento no exutório; não dá para testar se a erosão está onde o mapa aponta"],
+    ["K e C adotados", "Valores por classe de Vivarelli et al. (2025), sem recalibração; área urbana com erosão nula"],
+    ["c único", "Sem conectividade: o mapa mostra onde a erosão é produzida, não onde o sedimento chega ao rio"],
+    ["Medição do sedimento", "Curva turbidez × CSS sem incerteza estimada; parte da carga pode vir do canal (pico de CSS antes da vazão)"],
+    ["Poucos eventos", "17 eventos: diferenças de poucos pontos não são interpretáveis; conclusões qualitativas"],
+  ];
+  const cw = 3.85, ch = 2.45;
+  cards.forEach((c, i) => {
+    const x = M + (i % 3) * (cw + 0.275), y = 1.65 + Math.floor(i / 3) * (ch + 0.2);
+    s.addText([{ text: c[0], options: { bold: true, color: NAVY, fontSize: 17, breakLine: true } }, { text: c[1], options: { color: TEXT, fontSize: 16 } }],
+      { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.06, x, y, w: cw, h: ch, fill: { color: TINT }, line: { color: LINE, width: 1 }, valign: "top", margin: 10 });
+  });
+  s.addText([{ text: "Próximos passos", options: { bold: true, color: ORANGE, fontSize: 17, breakLine: true } },
+    { text: "Medir sedimento em sub-bacias e verificar as áreas críticas em campo; mais postos ou radar; índice de conectividade por pixel; novos eventos como teste independente", options: { color: TEXT, fontSize: 16 } }],
+    { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.06, x: M + 2 * (cw + 0.275), y: 1.65 + ch + 0.2, w: cw, h: ch, fill: { color: "FCEFD9" }, line: { color: "E8C79A", width: 1 }, valign: "top", margin: 10 });
+  s.addNotes("Outras limitações não explicam tanto o erro, mas impedem validar o resultado, principalmente o mapa. Não há medição de sedimento dentro da bacia, então o mapa não pode ser validado no espaço. K e C foram adotados de Vivarelli et al. (2025), sem recalibração, e a área urbana tem erosão nula por hipótese. O coeficiente c é único, sem conectividade, então o mapa mostra onde a erosão acontece, não onde o sedimento chega ao rio. A carga medida depende da curva entre turbidez e concentração, cuja incerteza não foi estimada, e o pico de concentração antes da vazão sugere fontes perto do canal, que o modelo não representa. E, com 17 eventos, as conclusões são qualitativas. Os próximos passos atacam essas lacunas: medir sedimento em sub-bacias, mais postos ou radar, conectividade por pixel e novos eventos.");
 }
 
 // ---------------------------------------------------------------- 27 agradecimentos
@@ -406,6 +518,16 @@ pres.addSection({ title: SA });
   s.addNotes("Se perguntarem sobre a histerese: o pico de concentração vem antes do pico de vazão, um laço horário, típico de sedimento disponível perto do canal que se esgota durante o evento. O modelo não representa essa dinâmica dentro do evento, nem as fontes do canal. Mas, no total do evento, o volume escoado explica 88% da variação da carga, e a intensidade da chuva aparece mais na concentração, o que o modelo considera em parte pelo pico local (RI/R). No evento 11, 68% da carga passa até o pico de vazão e cerca de 72% está na parcela do escoamento direto (supondo a mesma concentração na vazão de base). Com 17 eventos e vários testes, os valores de p são só indícios.");
 }
 
+// ---------------------------------------------------------------- 24 leitura critica
+{
+  const s = base(SA, "Apoio: o peso do volume medido", "Fonte: elaborado pelo autor, com os dados da Tabela 3 do TCC");
+  img(s, "slides/fig_volume_concentracao.png", M, 1.6, 8.6, 3.9, "Descarga de sedimentos contra o volume escoado e variação de volume e concentração entre eventos");
+  stat(s, "88%", "da variância do log da carga é explicada só pelo volume", 9.45, 1.75, 3.3, ORANGE);
+  stat(s, "0,66 × 0,08", "variância do log: volume × concentração", 9.45, 3.25, 3.3);
+  s.addText("Carga = volume × concentração média. Quem recebe o volume medido acerta a ordem de grandeza da carga por construção. O bom desempenho do MFM não valida a fórmula de erosão nem o mapa.", { x: M, y: 5.65, w: 12.1, h: 1.2, fontSize: 17, color: NAVY, margin: 0, isTextBox: true, valign: "top" });
+  s.addNotes("Por que o MFM vai tão bem? A carga de um evento é o volume escoado vezes uma concentração média. Entre os 17 eventos, o volume varia muito mais que a concentração: a variância do log do volume é 0,66, contra 0,08 da concentração, e só o volume explica 88% da variância da carga. Então qualquer modelo que receba o volume medido acerta a ordem de grandeza. A conclusão honesta é: o trabalho mostra o peso do escoamento, mas não consegue avaliar separadamente a fórmula de erosão e os fatores K, LS e C. O evento 17 é o mais difícil para todos os modelos com volume medido, com concentração bem acima dos outros; foi mantido porque não há base para excluí-lo.");
+}
+
 // ---------------------------------------------------------------- apoio: RI/R
 {
   const s = base(SA, "Apoio: o índice RI/R e os eventos 1 e 12", "Fonte: elaborado pelo autor. RI = maior chuva em 1 h no posto mais intenso; R = chuva total ponderada dos dois postos");
@@ -444,21 +566,4 @@ pres.addSection({ title: SA });
   s.addNotes("Se perguntarem: Woodward converte só o lambda; o CN-I vem da fórmula de Chow, Maidment e Mays (1988). A combinação foi escolhida porque aproxima o volume total dos 17 eventos, e foi feita olhando os mesmos eventos. Como é aplicada a retenções grandes (CN da condição seca), a conversão de Woodward é extrapolada em 8,4% dos pixels.");
 }
 
-// ---------------------------------------------------------------- apoio: tabela 13
-
-{
-  const s = base(SA, "Apoio: desempenho de todos os modelos", "Fonte: elaborado pelo autor (Tabela 13 do TCC). Validação cruzada, exceto o modelo concentrado (ajuste nos 17 eventos do trabalho original)");
-  const H = (t) => ({ text: t, options: { bold: true, color: WHITE, fill: { color: NAVY } } });
-  const rows = [
-    [H("Modelo"), H("Informação medida"), H("Erro mediano"), H("Fator 2"), H("NSE log"), H("Spearman")],
-    ["Regra simples com a chuva", "chuva", "41,9%", "82%", "0,53", "0,63"],
-    ["MC (MUSLE espacializada)", "chuva", "81,1%", "35%", "−0,69", "0,59"],
-    ["Regra simples com o volume", "escoamento direto", "15,9%", "94%", "0,85", "0,90"],
-    ["MFM (MUSLE espacializada)", "escoamento direto", "20,6%", "94%", "0,84", "0,83"],
-    ["Concentrado (Vivarelli et al., 2025)", "volume total e pico", "22,5%", "100%", "0,91", "0,93"],
-  ];
-  s.addTable(rows, { x: M, y: 1.9, w: 12.1, colW: [3.9, 2.5, 1.5, 1.3, 1.4, 1.5], fontSize: 16, fontFace: "Calibri", color: TEXT, border: { type: "solid", pt: 0.75, color: LINE }, rowH: 0.55, valign: "middle", align: "center" });
-  s.addNotes("Slide de apoio para perguntas. Fator 2 = eventos com o simulado entre a metade e o dobro do medido.");
-}
-
-pres.writeFile({ fileName: path.join(OUTDIR, "slides_11a28_defesa.pptx") }).then(f => { require("child_process").execSync(`zip -dq "${f}" "*/" || true`); console.log("ok", f); });
+pres.writeFile({ fileName: path.join(OUTDIR, "slides_defesa_completo.pptx") }).then(f => { require("child_process").execSync(`zip -dq "${f}" "*/" || true`); console.log("ok", f); });

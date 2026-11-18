@@ -68,6 +68,9 @@ recorta("slides/fig_dispersao_descarga.png", (0, 0.045, 1, 0.495), "dispersao_si
 recorta("slides/fig_dispersao_descarga.png", (0, 0.495, 1, 1), "dispersao_MFM_e_concentrado.png")
 # mapa medio e areas criticas do MC (coluna da esquerda)
 recorta("mapas/mapa_07_sedimento_medio.png", (0, 0.11, 0.50, 0.93), "mapa_medio_e_criticas_MC.png")
+recorta("mapas/mapa_07_sedimento_medio.png", (0, 0.085, 0.499, 0.525), "mapa_medio_MC.png")
+recorta("mapas/mapa_07_sedimento_medio.png", (0, 0.57, 0.47, 0.93), "mapa_criticas_MC.png")
+recorta("mapas/mapa_06_sedimento_eventos.png", (0, 0.055, 1, 0.925), "mapa_17_eventos_MC.png")
 
 # hidrograma, chuva e concentracao do evento 11
 d = pd.read_excel(os.path.join(BASE, "Dados Iniciais", "Dados_finais_histereses_corrigido.xlsx"))
