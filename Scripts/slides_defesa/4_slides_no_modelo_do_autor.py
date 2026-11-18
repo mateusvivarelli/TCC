@@ -68,6 +68,14 @@ cx = troca(19, "Nenhum evento grande comanda o ajuste.", "Nenhum evento grande c
 par = cx.text_frame.add_paragraph(); r = par.add_run()
 r.text = "Equivale a maximizar o NSE em log, a função objetivo de Hao et al. (2022)."
 r.font.size = Pt(14); r.font.color.rgb = RGBColor.from_string("5F6670")
+# slide 8: mapa grande da bacia com os dois postos pluviometricos (mesmo tamanho de imagem)
+s8 = p.slides[7]
+for sh in list(s8.shapes):
+    if sh.shape_type == 13:
+        l, t, w, h = sh.left, sh.top, sh.width, sh.height
+        sh._element.getparent().remove(sh._element)
+        s8.shapes.add_picture(os.path.join(FIG, "mapas", "mapa_bacia_jundiai_postos.png"), l, t, w, h)
+        break
 # slide 12: hidrograma com inicio e fim do evento
 s12 = p.slides[11]
 for sh in list(s12.shapes):
