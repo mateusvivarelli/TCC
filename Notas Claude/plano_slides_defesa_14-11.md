@@ -49,7 +49,7 @@ R 74,0 mm; RI 11,8 mm/h; RI/R 0,159 por hora; chuva nos pixels 63,2 a 79,0 mm (m
 ## Explicações dos três parênteses (para a fala)
 1. **CN-I e λ = 0,05:** combinação escolhida porque aproxima o volume total dos 17 eventos (+3%), com apoio da literatura (Brandão et al., 2025) e conversão de Woodward. Não dizer "calibrado com base naquela pesquisa". Limitação: a escolha foi feita sobre os mesmos eventos da avaliação.
 2. **Pico local (Hao et al., 2022):** pr = (Q/1000)*A*(RI/R)/3600. Não há hidrograma no pixel; espalha-se o volume do pixel conforme a concentração da chuva. RI/R é um número por evento, logo pr é proporcional a Q: o pico local não traz informação espacial além do escoamento (dá peso a eventos de chuva concentrada; E cresce com Q^1,12). Dizer isso antes de perguntarem. Nos eventos 1 e 12, RI/R passa de 1.
-3. **Coeficiente c:** a equação de Williams foi ajustada para bacias inteiras (m³ e m³/s) e aqui é aplicada a pixels de 897 m² com escoamento em mm; E é um índice, não toneladas. Se somássemos E como toneladas, o evento 11 daria 40.885 t, 22 vezes o medido (1.822 t). c converte o índice em toneladas (0,0344 MC; 0,0222 MFM) e faz o papel de uma conectividade média. Usar **c minúsculo** (coeficiente de escala) e **C maiúsculo** (cobertura) e avisar na fala.
+3. **Coeficiente c:** a equação de Williams foi ajustada para bacias inteiras (m³ e m³/s) e aqui é aplicada a pixels de 897 m² com escoamento em mm; E é um índice, não toneladas. Se somássemos E como toneladas, o evento 11 daria 40.885 t, 22 vezes o medido (1.822 t). c converte o índice em toneladas (0,0344 MC; 0,0222 MFM). Texto atual do TCC (3.4.4 e 4.6): representa, fisicamente, uma taxa de transferência de sedimentos média da bacia, mas por ser calibrado também absorve a diferença de escala (Williams x pixel) e parte do erro do escoamento (c do MC difere do c do MFM); não deve ser lido isoladamente como taxa de transferência. O TCC chama de "coeficiente de escala c" em 3 lugares (visão geral de 3.4, Tabela 7, conclusão) e "coeficiente c" no resto; ver sugestão de nome em 18/11: "coeficiente de calibração c". Usar **c minúsculo** (coeficiente de escala) e **C maiúsculo** (cobertura) e avisar na fala.
 
 ## Sobre K e C na fala (atenção)
 O texto atual do TCC diz só que K e C foram **adotados de Vivarelli et al. (2025)** e não foram recalibrados; as Tabelas 5 e 6 usam "com base em". Não afirmar em slide que "o TCC diz que não foram confirmados" (essa frase saiu do texto). Se a banca perguntar a origem de C do campo (0,050), da lavoura (0,212) e do K do Cambissolo (0,0475): foram adotados da IC e não foram recalibrados nem revalidados aqui. O artefato do deck ainda tem frases antigas de "fontes não confirmadas" nos slides de limitações e classes (corrigir se for reutilizado).
@@ -63,3 +63,21 @@ O texto atual do TCC diz só que K e C foram **adotados de Vivarelli et al. (202
 6. Conferir a frase do slide 10 com a seção 1.3.1 do TCC.
 
 * Os scripts em Scripts/mapa_bacia_jundiai/ foram escritos com o caminho de uma pasta temporária (variável D) e precisam dessa pasta ajustada; os dados vêm de: tiles https://s3.amazonaws.com/elevation-tiles-prod/geotiff/10/{x}/{y}.tif (x 376 a 380, y 578 a 581) e malha municipal do IBGE (API servicodados.ibge.gov.br/api/v3/malhas/estados/35, intrarregiao=municipio).
+
+* Tamanho das bacias de Williams (1975): segundo fonte secundária (não conferida no original ARS-S-40), 778 eventos em 18 bacias pequenas de 15 a 1.500 ha (0,15 a 15 km²). O pixel tem 0,09 ha (897 m²) e a nossa bacia 138 km², ou seja, tanto o pixel quanto a bacia inteira ficam fora da faixa de Williams. Hao et al. (2022): 1.310 a 8.973 km².
+
+## Sensibilidade do critério de calibração (18/11/2026, leave-one-out, mesma lista de eventos)
+Script: `Scripts/_sensibilidade_criterio_calibracao_18-11.py`. Erro percentual mediano / fração em fator 2:
+
+| Modelo | log (TCC) | linear (t) | erro relativo (peso 1/SY^2) | mediana das razões |
+|---|---|---|---|---|
+| MC | 81,1% / 35% | 44,8% / 59% | 40,4% / 59% | 71,1% / 59% |
+| MFM | 20,6% / 94% | 20,4% / 94% | 21,1% / 94% | 20,8% / 94% |
+| Regra com a chuva | 41,8% / 82% | 38,8% / 88% | 51,7% / 47% | 38,8% / 82% |
+| Regra com o volume | 15,9% / 94% | 20,3% / 94% | 19,7% / 94% | 16,1% / 94% |
+
+* O evento 15 responde por 48,7% da soma dos quadrados da carga medida em torno da média (2,8 vezes a mediana dos demais). É disso que vem a frase do TCC (3.4.5), que não é "50% do valor da calibração".
+* MFM e a regra com o volume quase não dependem do critério. O MC depende muito: com log fica em 81%, com erro relativo ou linear fica em 40 a 45%.
+* Consequência: a frase "o MC é pior que a regra simples com a chuva" vale com o critério log (81% contra 42%), é quase um empate no linear (45% contra 39%) e se inverte no erro mediano com peso relativo (40% contra 52%, embora a regra com a chuva também mude). O que não depende do critério: o MC tem erro alto (40 a 80%) e o MFM, com o escoamento medido, chega a cerca de 20%.
+* Ajustes por erro relativo tendem a subestimar (6 super e 11 sub no MC), porque o erro percentual pune mais a superestimativa.
+* Decisão pendente do autor: se isso entra no TCC (4.3 ou 4.6) e como responder na defesa. Análise rápida, sem bootstrap.
