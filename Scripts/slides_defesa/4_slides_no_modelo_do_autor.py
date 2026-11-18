@@ -34,6 +34,48 @@ FONTE_Y = 6.85
 p = Presentation(SRC)
 LAY = p.slide_layouts[1]           # Titulo e Conteudo (faixa azul + logo)
 
+
+# =============================================================== sugestoes aplicadas nos slides 1 a 19 do autor
+def troca(n, velho, novo_txt, size=None, bold=None, cor=None):
+    """troca texto num paragrafo do slide n (numeracao original), mantendo a formatacao do primeiro trecho"""
+    for sh in p.slides[n - 1].shapes:
+        if not sh.has_text_frame:
+            continue
+        for par in sh.text_frame.paragraphs:
+            t = "".join(r.text for r in par.runs)
+            if velho in t and par.runs:
+                par.runs[0].text = t.replace(velho, novo_txt)
+                for r in par.runs[1:]:
+                    r._r.getparent().remove(r._r)
+                f = par.runs[0].font
+                if size: f.size = Pt(size)
+                if bold is not None: f.bold = bold
+                if cor: f.color.rgb = RGBColor.from_string(cor)
+                return sh
+    raise SystemExit(f"nao achei no slide {n}: {velho}")
+
+
+troca(4, "Qp: vazão de pico", "qp: vazão de pico")
+troca(15, "condição seca", "condição seca (Chow)")
+troca(15, "Fontes: Woodward et al. (2003);", "Fontes: Chow, Maidment e Mays (1988); Woodward et al. (2003);")
+troca(16, "13,0 mm × 897 m²", "0,013 m × 897 m²")
+troca(16, "11,8 / 74,0", "11,8 mm/h ÷ 74,0 mm")
+troca(18, "c faz o papel de uma taxa de transferência média da bacia (conectividade)",
+      "c faz o papel de uma taxa de transferência de sedimentos média da bacia; por ser calibrado, também absorve a diferença de escala e parte do erro do escoamento")
+troca(18, "c = 0,0344 no pixel de exemplo, com c × E = 40,1 kg", "c = 0,0344 t por unidade de E (MC): no pixel de exemplo, c × E = 40,1 kg", size=16, bold=True, cor="C77B12")
+cx = troca(19, "Nenhum evento grande comanda o ajuste.", "Nenhum evento grande comanda o ajuste (o evento 15 responde por 48,7% da variabilidade da carga medida).")
+par = cx.text_frame.add_paragraph(); r = par.add_run()
+r.text = "Equivale a maximizar o NSE em log, a função objetivo de Hao et al. (2022)."
+r.font.size = Pt(14); r.font.color.rgb = RGBColor.from_string("5F6670")
+# slide 12: hidrograma com inicio e fim do evento
+s12 = p.slides[11]
+for sh in list(s12.shapes):
+    if sh.shape_type == 13:
+        l, t, w, h = sh.left, sh.top, sh.width, sh.height
+        sh._element.getparent().remove(sh._element)
+        s12.shapes.add_picture(os.path.join(FIG, "slides", "ev11_hidrograma.png"), l, t, w, h)
+        break
+
 # ---- fala dos slides: anotacoes do deck de referencia, pelo titulo
 falas = {}
 for s in Presentation(REF).slides:
