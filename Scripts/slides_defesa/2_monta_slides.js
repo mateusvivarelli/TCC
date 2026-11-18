@@ -151,9 +151,9 @@ pres.addSection({ title: SM });
 
 // ---------------------------------------------------------------- 15 parentese 1
 {
-  const s = base(SM, "Parêntese 1: condição seca (CN-I) e λ = 0,05", "Fontes: Woodward et al. (2003); Brandão et al. (2025). CN-II: raster BR_CN-2022 (Agência Nacional de Águas e Saneamento Básico, 2024)");
+  const s = base(SM, "Parêntese 1: condição seca (CN-I) e λ = 0,05", "Fontes: Chow, Maidment e Mays (1988); Woodward et al. (2003); Brandão et al. (2025). CN-II: raster BR_CN-2022 (Agência Nacional de Águas e Saneamento Básico, 2024)");
   const y = 1.95, h = 1.1, bw = 2.15, gap = 0.42;
-  const etapas = [["CN-II = 81,0", "tabelado (uso × solo)"], ["CN-I = 64,2", "condição seca"], ["S_{0,20} = 141,9 mm", "retenção do CN"], ["S_{0,05} = 244,2 mm", "convertida (Woodward)"], ["I_{a} = 12,2 mm", "0,05 × S_{0,05}"]];
+  const etapas = [["CN-II = 81,0", "tabelado (uso × solo)"], ["CN-I = 64,2", "condição seca (Chow)"], ["S_{0,20} = 141,9 mm", "retenção do CN"], ["S_{0,05} = 244,2 mm", "convertida (Woodward)"], ["I_{a} = 12,2 mm", "0,05 × S_{0,05}"]];
   etapas.forEach((e, i) => {
     const x = M + i * (bw + gap);
     s.addText(rt(e[0], { bold: true, fontSize: 17, color: NAVY }).concat([{ text: "", options: { breakLine: true } }], rt(e[1], { fontSize: 13, color: MUTED })),
@@ -176,7 +176,7 @@ pres.addSection({ title: SM });
   const s = base(SM, "Passo 3: vazão de pico local (Hao et al., 2022)", "Fonte: elaborado pelo autor, com a formulação de Hao et al. (2022)");
   eq(s, "p_{r,k} = (Q_{k} / 1000) × A_{pix} × (RI / R) / 3600", M, 1.85, 7.2, 0.95, 22);
   s.addText("Pixel de exemplo, evento 11", { x: M, y: 3.05, w: 7.2, h: 0.4, fontSize: 16, bold: true, color: NAVY, margin: 0, isTextBox: true });
-  const cx = [["11,67 m³", "volume do pixel\n13,0 mm × 897 m²"], ["0,159 /h", "RI / R\n11,8 / 74,0"], ["5,17 × 10^{−4} m³/s", "pico local\n÷ 3.600 s"]];
+  const cx = [["11,67 m³", "volume do pixel\n0,013 m × 897 m²"], ["0,159 /h", "RI / R\n11,8 mm/h ÷ 74,0 mm"], ["5,17 × 10^{−4} m³/s", "pico local\n÷ 3.600 s"]];
   cx.forEach((c, i) => {
     const x = M + i * 2.45;
     s.addText(rt(c[0], { bold: true, fontSize: 18, color: NAVY }).concat([{ text: "", options: { breakLine: true } }], rt(c[1], { fontSize: 13, color: MUTED })),
@@ -206,7 +206,7 @@ pres.addSection({ title: SM });
     ["LS = 4,869", "(declividade e comprimento de rampa)   "],
     ["C = 0,212", "(lavoura temporária);  P = 1"],
   ], 8.15, 4.8, 4.6, 1.6, 15);
-  s.addNotes("Com o escoamento e o pico de cada pixel, a erosão local é a equação de Williams com os coeficientes originais, 11,8 e 0,56. K e C vêm de Vivarelli et al. (2025) e não foram recalibrados aqui. No pixel de exemplo, o resultado é 1,167. Esse número é um índice, não toneladas: o mapa mostra onde a erosão é maior em termos relativos. Por que não é tonelada é o próximo parêntese.");
+  s.addNotes("Com o escoamento e o pico de cada pixel, a erosão local é a equação de Williams com os coeficientes originais, 11,8 e 0,56. K e C vêm de Vivarelli et al. (2025) e não foram recalibrados aqui. Atenção: o 11,8 da equação é a constante de Williams, não a intensidade da chuva do slide anterior (coincidência de valores). No pixel de exemplo, o resultado é 1,167. Esse número é um índice, não toneladas: o mapa mostra onde a erosão é maior em termos relativos. Por que não é tonelada é o próximo parêntese.");
 }
 
 // ---------------------------------------------------------------- 18 parentese 2: c
@@ -385,8 +385,67 @@ pres.addSection({ title: SE });
   s.addNotes("Opcional. Se não couber, falar em uma frase depois dos agradecimentos, ou deixar o slide oculto. Ajuste os itens ao que realmente foi feito.");
 }
 
-// ---------------------------------------------------------------- apoio: tabela 13
+// ---------------------------------------------------------------- apoio: histerese
 pres.addSection({ title: SA });
+{
+  const s = base(SA, "Apoio: a concentração chega antes da vazão", "Fonte: elaborado pelo autor, com os dados de Murillo-Bermúdez e Martim (2022). Correlações com 17 eventos: valores de p apenas indicativos");
+  img(s, "slides/ev11_hidrograma.png", M, 1.65, 6.6, 3.6, "Hidrograma e concentração de sedimentos no evento 11");
+  s.addText("Evento 11", { x: M, y: 5.35, w: 6.6, h: 0.4, fontSize: 16, bold: true, color: NAVY, margin: 0, isTextBox: true });
+  marcadores(s, [
+    "Pico de CSS cerca de 25 h antes do pico de vazão (laço horário)",
+    "68% da carga passa até o pico de vazão; cerca de 72% está na parcela do escoamento direto",
+  ], M, 5.75, 6.6, 1.1, 15);
+  s.addText("Nos 17 eventos", { x: 7.5, y: 1.7, w: 5.25, h: 0.45, fontSize: 18, bold: true, color: NAVY, margin: 0, isTextBox: true });
+  stat(s, "88%", "da variação da carga (log) explicada pelo volume escoado", 7.5, 2.15, 2.5, ORANGE);
+  stat(s, "0%", "explicada só pela intensidade máxima da chuva", 10.25, 2.15, 2.5);
+  marcadores(s, [
+    "13 de 17 eventos com laço horário (planilha de eventos)",
+    "A intensidade da chuva aparece na concentração média (Spearman 0,49; p = 0,04)",
+    "O modelo trabalha com o total do evento; a dinâmica dentro do evento e as fontes perto do canal não são representadas",
+  ], 7.5, 3.75, 5.25, 3.1, 15);
+  s.addNotes("Se perguntarem sobre a histerese: o pico de concentração vem antes do pico de vazão, um laço horário, típico de sedimento disponível perto do canal que se esgota durante o evento. O modelo não representa essa dinâmica dentro do evento, nem as fontes do canal. Mas, no total do evento, o volume escoado explica 88% da variação da carga, e a intensidade da chuva aparece mais na concentração, o que o modelo considera em parte pelo pico local (RI/R). No evento 11, 68% da carga passa até o pico de vazão e cerca de 72% está na parcela do escoamento direto (supondo a mesma concentração na vazão de base). Com 17 eventos e vários testes, os valores de p são só indícios.");
+}
+
+// ---------------------------------------------------------------- apoio: RI/R
+{
+  const s = base(SA, "Apoio: o índice RI/R e os eventos 1 e 12", "Fonte: elaborado pelo autor. RI = maior chuva em 1 h no posto mais intenso; R = chuva total ponderada dos dois postos");
+  const H = (t) => ({ text: t, options: { bold: true, color: WHITE, fill: { color: NAVY } } });
+  s.addTable([
+    [H("Evento"), H("DBT5: total; maior hora"), H("Campo Limpo: total; maior hora"), H("R ponderado"), H("RI"), H("RI/R")],
+    ["1", "32,8 mm; 23,6 mm/h", "19,2 mm; 16,2 mm/h", "23,4 mm", "23,6 mm/h", "1,01"],
+    ["12", "0 (sem registro)", "34,2 mm; 32,8 mm/h", "23,7 mm", "32,8 mm/h", "1,38"],
+    ["11", "62,8 mm; 11,8 mm/h", "79,0 mm; 9,4 mm/h", "74,0 mm", "11,8 mm/h", "0,16"],
+  ], { x: M, y: 1.85, w: 12.1, colW: [1.1, 2.9, 3.1, 1.8, 1.7, 1.5], fontSize: 16, fontFace: "Calibri", color: TEXT, border: { type: "solid", pt: 0.75, color: LINE }, rowH: 0.55, valign: "middle", align: "center" });
+  marcadores(s, [
+    "RI/R mede quanto da chuva do evento caiu na hora mais intensa; é único por evento, igual em todos os pixels",
+    "Acima de 1 não é físico: RI vem do posto mais intenso e R é a média dos dois; a chuva forte pegou praticamente um só posto",
+    "No mesmo posto: 0,72 (evento 1) e 0,96 (evento 12), chuvas curtas e muito concentradas",
+    "Efeito: pico local cerca de 1,4 vez maior e índice E cerca de 20% maior nesses dois eventos pequenos",
+  ], M, 4.35, 12.1, 2.5, 16);
+  s.addNotes("RI/R acima de 1 não é físico: aparece porque a intensidade vem do posto mais chuvoso e a lâmina é a média ponderada dos dois. Nos eventos 1 e 12, um temporal curto pegou praticamente um só posto. Calculado num mesmo posto, daria 0,72 e 0,96. Por isso o TCC trata RI/R como índice de concentração temporal da chuva, e não como fração. Uma forma mais consistente seria calcular RI e R no mesmo posto ou ponderar também a intensidade.");
+}
+
+// ---------------------------------------------------------------- apoio: CN-I e Woodward
+{
+  const s = base(SA, "Apoio: do CN tabelado à retenção usada", "Fontes: Agência Nacional de Águas e Saneamento Básico (2024); Chow, Maidment e Mays (1988); Woodward et al. (2003)");
+  const y = 1.95, h = 1.3, bw = 2.6, gap = 0.5;
+  const etapas = [["CN-II", "raster BR_CN-2022 (Agência\nNacional de Águas, 2024)"], ["CN-I", "condição seca\nChow et al. (1988)"], ["S_{0,20}", "25,4 (1000/CN − 10)"], ["S_{0,05}", "1,33 S_{0,20}^{1,15} (pol.)\nWoodward et al. (2003)"]];
+  etapas.forEach((e, i) => {
+    const x = M + i * (bw + gap);
+    s.addText(rt(e[0], { bold: true, fontSize: 20, color: NAVY }).concat([{ text: "", options: { breakLine: true } }], rt(e[1], { fontSize: 13, color: MUTED })),
+      { shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.06, x, y, w: bw, h, fill: { color: TINT }, line: { color: LINE, width: 1 }, align: "center", valign: "middle", margin: 0.05 });
+    if (i < etapas.length - 1) seta(s, x + bw + 0.08, y + h / 2 - 0.16, gap - 0.16);
+  });
+  marcadores(s, [
+    "Woodward et al. (2003) convertem só a razão de abstração inicial (de 0,20 para 0,05); a umidade antecedente vem de Chow et al. (1988)",
+    "A combinação das duas conversões é escolha deste trabalho: aproxima o volume total dos 17 eventos (+3%)",
+    "Aplicada ao CN-I, a conversão de Woodward é extrapolada em 8,4% dos pixels (CN-I abaixo de 35)",
+  ], M, 3.7, 12.1, 3.0, 17);
+  s.addNotes("Se perguntarem: Woodward converte só o lambda; o CN-I vem da fórmula de Chow, Maidment e Mays (1988). A combinação foi escolhida porque aproxima o volume total dos 17 eventos, e foi feita olhando os mesmos eventos. Como é aplicada a retenções grandes (CN da condição seca), a conversão de Woodward é extrapolada em 8,4% dos pixels.");
+}
+
+// ---------------------------------------------------------------- apoio: tabela 13
+
 {
   const s = base(SA, "Apoio: desempenho de todos os modelos", "Fonte: elaborado pelo autor (Tabela 13 do TCC). Validação cruzada, exceto o modelo concentrado (ajuste nos 17 eventos do trabalho original)");
   const H = (t) => ({ text: t, options: { bold: true, color: WHITE, fill: { color: NAVY } } });

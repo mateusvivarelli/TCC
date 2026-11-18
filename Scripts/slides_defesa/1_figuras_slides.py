@@ -89,6 +89,8 @@ for ax in (a1, a2):
     ax.axvline(ini, color="k", lw=0.8, ls=":"); ax.axvline(fim, color="k", lw=0.8, ls=":")
     ax.spines[["top", "right"]].set_visible(False)
 b.spines[["top"]].set_visible(False)
+a2.text(ini, 0.97, " início do evento", fontsize=11, va="top", ha="left", color="#333", transform=a2.get_xaxis_transform())
+a2.text(fim, 0.62, "fim do evento ", fontsize=11, va="top", ha="right", color="#333", transform=a2.get_xaxis_transform())
 h1, l1 = a2.get_legend_handles_labels(); h2, l2 = b.get_legend_handles_labels()
 a2.legend(h1 + h2, l1 + l2, frameon=False, loc="upper right", fontsize=11)
 a2.xaxis.set_major_formatter(matplotlib.dates.DateFormatter("%d/%m"))

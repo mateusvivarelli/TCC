@@ -62,3 +62,9 @@ Se estourar: juntar 12 e 13; juntar 21 e 24; falar o 28 em uma frase.
 * Textos e gráfico nativo do slide 11: Calibri. Equações: Cambria Math (como nos slides 3 a 6 do autor).
 * Gráficos em imagem (hidrograma, dispersões, barras, volume x concentração, escoamento): refeitos por `Scripts/slides_defesa/1_figuras_slides.py`, que usa Calibri se estiver instalada e, se não, Carlito (mesmas medidas da Calibri). Na nuvem saíram em Carlito; rodando no PC com Windows, saem em Calibri. As versões ficam em `TCC_Texto/figuras/slides/`; as figuras do TCC não mudam.
 * Mapas (recortes das Figuras A1, A2 e 13): continuam com a letra original, porque os rasters não estão no repositório. Para refazê-los em Calibri, rodar o script dos mapas no PC com `plt.rcParams["font.family"] = "Calibri"`.
+
+## Atualização de 18/11
+* `TCC_Texto/slides/slides_17a28_defesa.pptx`: só os slides 17 em diante (gerado por `Scripts/slides_defesa/3_recorta_17_em_diante.py`).
+* Três slides de apoio novos: histerese (CSS antes da vazão), o índice RI/R nos eventos 1 e 12, e a cadeia CN-II → CN-I (Chow) → S0,20 → S0,05 (Woodward).
+* Slide 12: hidrograma com "início do evento" e "fim do evento". Slide 15: Chow et al. (1988) no rodapé e na caixa do CN-I. Slide 16: unidades explícitas (0,013 m × 897 m²; 11,8 mm/h ÷ 74,0 mm). Slide 17: nota sobre o 11,8 de Williams.
+* Achado para discutir com o orientador: no evento 11, choveu 11,8 mm (DBT5) e 13,6 mm (Campo Limpo) nas 9 horas antes do início da janela (04/07, 3h às 11h). Essa chuva ficou fora de R (cerca de 16% do total) e não entra no SCS-CN, embora tenha molhado o solo antes do evento. É um exemplo concreto da limitação da delimitação manual (seção 4.6).
