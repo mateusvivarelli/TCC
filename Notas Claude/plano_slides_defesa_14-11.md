@@ -81,3 +81,14 @@ Script: `Scripts/_sensibilidade_criterio_calibracao_18-11.py`. Erro percentual m
 * Consequência: a frase "o MC é pior que a regra simples com a chuva" vale com o critério log (81% contra 42%), é quase um empate no linear (45% contra 39%) e se inverte no erro mediano com peso relativo (40% contra 52%, embora a regra com a chuva também mude). O que não depende do critério: o MC tem erro alto (40 a 80%) e o MFM, com o escoamento medido, chega a cerca de 20%.
 * Ajustes por erro relativo tendem a subestimar (6 super e 11 sub no MC), porque o erro percentual pune mais a superestimativa.
 * Decisão pendente do autor: se isso entra no TCC (4.3 ou 4.6) e como responder na defesa. Análise rápida, sem bootstrap.
+
+## Estado em 18/11/2026: slides 1 a 19 prontos no PowerPoint
+Arquivo versionado: `Apresentacao/slideTCC_18-11.pptx` (cópia de `C:\Users\user\OneDrive\Documentos\slideTCC.pptx`). Já feitos: 1 a 10 (introdução), 11 dados e fontes, 12 evento 11, 13 chuva (IDW), 14 escoamento do pixel, 15 CN e retenção, 16 pico local, 17 MUSLE com o pixel de exemplo (E = 1,167), 18 coeficiente de escala, 19 calibração e validação (evento 11 no MC: 1.406 t no ajuste, 1.383 t na validação, 1.822 t medido). Faltam resultados e conclusões (slides 20 em diante do plano).
+
+### Pendências levantadas na revisão de 18/11
+1. **Slide 18:** não mostra o valor de c (0,0344 t por unidade de E no MC); acrescentar. A razão 40.885 / 1.822 = 22 é o melhor argumento para "E não é tonelada": destacar. Decidir o nome (TCC usa "coeficiente de escala c" em 3 lugares; sugestão: "coeficiente de calibração c"). O texto atual do TCC diz "taxa de transferência de sedimentos média", e o slide diz "(conectividade)": alinhar, e dizer que c também absorve a escala e parte do erro do escoamento.
+2. **Slide 19:** acrescentar que minimizar a soma dos quadrados em log equivale a maximizar o NSE em log (critério de Hao et al., 2022); o evento 15 responde por 48,7% da variabilidade da carga medida. Hao usou o NSE em log como função objetivo (2 parâmetros de conectividade por bacia), não "c em log".
+3. **Slide 13:** Shepard (1968) não está nas referências do TCC.
+4. **Sensibilidade do critério de calibração:** a frase "MC pior que a regra com a chuva" depende do critério (ver tabela acima). Preparar resposta para a banca; decidir se entra no TCC.
+5. **Unidades do c:** com Q em metros no termo principal (unidades consistentes), c seria cerca de 1,65 (MC) e 1,06 (MFM) e as previsões em t seriam idênticas; hoje, seguindo Hao (Q em mm), c = 0,0344 e 0,0222. Preparar resposta se perguntarem por que c é pequeno.
+6. Tempo: 1 a 19 ocupam cerca de 11,5 min; restam cerca de 8,5 min para MC, MFM, comparação, resultados, mapas, limitações, conclusão e agradecimentos.
