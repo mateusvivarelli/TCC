@@ -58,7 +58,7 @@ Não diga que o índice "não mudaria nada".
 - **"Woodward converte o quê?"** — "Só o λ (de 0,20 para 0,05). O CN-I vem da fórmula de Chow, Maidment e Mays (1988). Combinar as duas foi escolha minha."
 - **"Brandão et al. (2025) não associam clima úmido e pastagem a λ mais alto?"** — "Sim, e o TCC cita isso (4.6): o alto Jundiaí tem clima úmido e 29% de campo. O 0,05 não é consenso; foi escolhido pelo volume."
 - **"O coeficiente de escoamento não cresceu com a chuva (r = −0,01). O que isso diz sobre como o escoamento é gerado?"** — "Sugere que boa parte do escoamento rápido não é por excesso de infiltração nas encostas, e sim de áreas saturadas perto dos canais e fluxo subsuperficial raso, comum em clima úmido com solo profundo. Por isso o SCS-CN não acompanha. Com a ressalva de que o coeficiente medido depende da separação da base e da chuva de dois postos." (boa pergunta para mostrar que entende o processo)
-- **"De onde vêm os pesos 0,307 e 0,693 da chuva média?"** — O TCC não diz. **Confirmar com o Luis** (provavelmente Thiessen ou fração de área). Se não souber: "vieram da planilha de eventos do grupo; não recalculei".
+- **"De onde vêm os pesos 0,307 e 0,693 da chuva média?"** — O TCC não diz, mas a conta confere com **polígonos de Thiessen**: 30,8% da área da bacia fica mais perto do DBT5 e 69,2% mais perto de Campo Limpo (*). "São os pesos de Thiessen dos dois postos: a fração da bacia mais próxima de cada um. Com eles se calcula a chuva do evento, R, usada no RI/R e na regra simples com a chuva. A chuva de cada pixel é outra coisa: vem do IDW, em que cada pixel tem os seus próprios pesos (1/d²). Por isso a média dos pixels no evento 11 (73,5 mm) é um pouco diferente de R (74,0 mm)."
 - **"RI/R maior que 1 nos eventos 1 e 12?"** — "Não é físico: RI vem do posto mais intenso e R é a média dos dois. A chuva forte pegou praticamente um posto só (no 12, o DBT5 marcou 0). Num mesmo posto, daria 0,72 e 0,96. Por isso é tratado como índice." (slide de apoio)
 - **"Como os 17 eventos foram escolhidos e delimitados? O 15 e o 16 estão colados."** — "São eventos do monitoramento do grupo, com pico acima de 10 m³/s (Murillo-Bermúdez e Martim, 2022), delimitados à mão sobre o hidrograma. É uma limitação: no evento 11, 12 a 14 mm caíram nas 9 h antes da janela. No 15 e 16, parte da recessão do 15 pode estar no 16." **Confirmar com o Luis** se são os mesmos 17 eventos do artigo de 2022.
 - **"Dois postos, um fora da bacia. Não havia outros?"** — "Eram os dois com registro horário no período. É a primeira causa de erro que aponto. Os postos ficam a cerca de 29 km um do outro (*)."
@@ -97,7 +97,7 @@ Não diga que o índice "não mudaria nada".
 - **"Na introdução você diz que o modelo pode prever cenários futuros."** — "Em valor absoluto, ainda não, com estes dados. Em termos relativos (trocar o C de uma classe), o mapa indicaria a tendência, sem validação. A frase é uma possibilidade futura."
 - **"O objetivo era validar o modelo distribuído."** — "A validação foi feita no exutório, para a soma da bacia; o mapa não pôde ser validado no espaço."
 - **"A comparação com o seu trabalho anterior é justa?"** — "Não totalmente, por isso a chamo de indicativa: o concentrado foi ajustado nos próprios eventos, sem validação cruzada, e usa o volume total e o pico medidos. Dá para dizer que, com o volume medido, a espacialização chega a um erro da mesma ordem e acrescenta o mapa."
-- **"Qual é a área da bacia?"** — "137,8 km² pela acumulação de fluxo; a área de cálculo tem 138,1 km² e a literatura cita 139,3 km²." (O mapa grande dos slides 7 e 8 mostra 138,8 km² na legenda: é engano do mapa.)
+- **"Qual é a área da bacia?"** — "137,8 km² pela acumulação de fluxo; a área de cálculo tem 138,1 km² e a literatura cita 139,3 km²." (O mapa grande dos slides 7 e 8 mostra 138,8 km²: é a área do polígono da máscara da bacia (*), outra delimitação. Se perguntarem: "137,8 pela acumulação de fluxo; 138,8 é a área do contorno usado no mapa".)
 
 ---
 
@@ -166,12 +166,12 @@ Não diga que o índice "não mudaria nada".
 - **"Com o volume medido"**: quem chega a 21%, perto do concentrado (22%), é o MFM, não o MC.
 - **Volume**: "regra com o volume" usa o escoamento direto; os "88% explicados pelo volume" usam o volume total.
 - **41,8% × 41,9%**: use 41,9% (Tabela 13).
-- **Área**: 137,8 km² (o mapa grande diz 138,8).
+- **Área**: 137,8 km² pela acumulação de fluxo; o mapa grande diz 138,8, que é a área do contorno da máscara (*).
 - **Evento 16, Tabela 2**: R = 97,7 mm, mas 0,307 × 63,6 + 0,693 × 113,6 = 98,2 mm (*). Diferença pequena; se perguntarem, "vou conferir a planilha".
 - **f do evento 10**: o texto diz 9,75; pela Tabela 11 arredondada, 552/57 = 9,68. É arredondamento.
 
 ## 7. Confirmar com o Luis antes da defesa
-1. De onde vêm os pesos 0,307 e 0,693 da chuva média (Thiessen?).
+1. Os pesos 0,307 e 0,693 da chuva média batem com Thiessen (conferido: 30,8% e 69,2%); só confirmar.
 2. Se os 17 eventos são os mesmos do artigo de 2022 e qual foi o critério de seleção.
 3. Onde fica a captação da SABESP (turbidez) em relação à estação do DAEE.
 4. Número de amostras, faixa e R² da curva turbidez × CSS (artigo de 2023).
@@ -182,6 +182,6 @@ Não diga que o índice "não mudaria nada".
 **Já feitos no meu exemplo** (`Apresentacao/slideTCC_18-11_sugestoes.pptx`): slide de apoio da histerese sem "laço horário"; conclusão das áreas críticas separando uso de solo e declive; conclusão do concentrado com "com o volume medido"; "3/4" trocado por "a maior parte"; rótulo do c no slide do MFM; métricas antes dos resultados; marcadores "[e-mail]" e "[Opcional]" removidos; caminho do script removido do slide de apoio; 41,9%; nota de unidade no slide da MUSLE; c "calibrado nos 17 eventos" no slide do coeficiente.
 
 **Nos seus slides (pontuais, se quiser):**
-1. **Mapa grande (slides 7 e 8):** a legenda diz 138,8 km²; o TCC diz 137,8. Se não der para refazer, não leia o número em voz alta.
+1. **Mapa grande (slides 7 e 8):** a legenda diz 138,8 km² (área do contorno da máscara); o TCC usa 137,8 (acumulação de fluxo). Não é erro, são duas delimitações; só saiba explicar.
 2. **Slide do evento 11:** "1.479 mil m³" pode virar "1,48 milhão de m³".
 3. **Gráfico de barras do slide 11:** separador de milhar em inglês (4,500) aparece na renderização; no PowerPoint em português deve sair 4.500 — confira.
