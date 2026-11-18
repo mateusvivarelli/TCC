@@ -310,7 +310,7 @@ pres.addSection({ title: SR });
   s.addText("Evento 11", { x: M, y: 3.45, w: 6, h: 0.45, fontSize: 18, bold: true, color: NAVY, margin: 0, isTextBox: true });
   stat(s, "f = 1,48", "1.479 / 997 mil m³", M, 3.9, 2.8);
   stat(s, "1,55 ×", "a soma do índice (1,48 elevado a 1,12)", M + 3.0, 3.9, 2.8);
-  stat(s, "1.387 t", "validação cruzada, c = 0,0222 (−24%)", M + 6.0, 3.9, 3.1);
+  stat(s, "1.387 t", "validação cruzada (−24%); c = 0,0222 no ajuste dos 17", M + 6.0, 3.9, 3.1);
   s.addText("O MFM não é uma previsão: usa o volume medido no mesmo hidrograma em que se mede a carga. Serve para isolar o efeito do escoamento.", { x: M, y: 5.6, w: 12.1, h: 0.9, fontSize: 17, italic: true, color: NAVY, margin: 0, isTextBox: true, valign: "top" });
   s.addNotes("Para testar o peso do escoamento, fiz uma segunda versão: o modelo forçado ao medido. Tudo continua igual, a mesma chuva distribuída, o mesmo padrão do SCS-CN, a mesma fórmula; só o volume de cada evento passa a ser o medido. Todos os pixels do evento são multiplicados pelo mesmo fator f, limitado à chuva do pixel. No evento 11, f é 1,48, a soma do índice cresce 1,55 vez, e o c recalibrado cai para 0,0222. Esse modelo não é uma previsão, porque usa o volume medido; ele serve para isolar o efeito do escoamento.");
 }
@@ -417,8 +417,8 @@ pres.addSection({ title: SC });
   marcadores(s, [
     "A conversão da chuva em escoamento é o principal limite: com a chuva, o MC erra 81%; com o volume medido, 21%",
     "Com o volume medido, a MUSLE espacializada não se distinguiu da regra com o volume: o trabalho não isola a contribuição da fórmula de erosão",
-    "A espacialização chega a um erro da mesma ordem do modelo concentrado (22%) e acrescenta o mapa",
-    "Áreas críticas: campo, silvicultura e lavoura temporária sobre Cambissolos, em encostas acima de 20% (46% da área, 83% da erosão)",
+    "Com o volume medido, a espacialização chega a um erro da mesma ordem do modelo concentrado (22%) e acrescenta o mapa",
+    "Áreas críticas: campo, silvicultura e lavoura temporária (46% da área, 83% da erosão), sobretudo sobre Cambissolos e em encostas acima de 20%",
   ], M, 1.75, 5.6, 5.0, 17);
   img(s, "slides/mapa_criticas_MC.png", 6.45, 1.6, 6.3, 4.6, "Áreas críticas de erosão: 5% dos pixels de maior erosão média");
   s.addText("Áreas críticas: 5% dos pixels de maior erosão média (MC); 94% coincidem com o MFM", { x: 6.45, y: 6.25, w: 6.3, h: 0.5, fontSize: 14, italic: true, color: MUTED, margin: 0, isTextBox: true, align: "center" });
@@ -428,7 +428,7 @@ pres.addSection({ title: SC });
 // ---------------------------------------------------------------- limitacoes 1: origem do erro
 {
   const s = base(SC, "Limitações: de onde vem o erro", "Fonte: elaborado pelo autor");
-  stat(s, "81% → 21%", "erro mediano com o escoamento calculado e com o medido: cerca de 3/4 do erro vem da hidrologia", M, 1.6, 5.2, ORANGE);
+  stat(s, "81% → 21%", "erro mediano com o escoamento calculado e com o medido: a maior parte do erro vem da hidrologia", M, 1.6, 5.2, ORANGE);
   stat(s, "91%", "da variação do erro do sedimento é explicada pelo erro do escoamento", 6.6, 1.6, 6.1);
   const itens = [
     ["Chuva de 2 postos", "um deles fora da bacia; a chuva vira um gradiente suave e núcleos de chuva entre os postos não aparecem"],
@@ -504,18 +504,18 @@ pres.addSection({ title: SA });
   img(s, "slides/ev11_hidrograma.png", M, 1.65, 6.6, 3.6, "Hidrograma e concentração de sedimentos no evento 11");
   s.addText("Evento 11", { x: M, y: 5.35, w: 6.6, h: 0.4, fontSize: 16, bold: true, color: NAVY, margin: 0, isTextBox: true });
   marcadores(s, [
-    "Pico de CSS cerca de 25 h antes do pico de vazão (laço horário)",
+    "Pico de CSS cerca de 25 h antes do pico de vazão",
     "68% da carga passa até o pico de vazão; cerca de 72% está na parcela do escoamento direto",
   ], M, 5.75, 6.6, 1.1, 15);
   s.addText("Nos 17 eventos", { x: 7.5, y: 1.7, w: 5.25, h: 0.45, fontSize: 18, bold: true, color: NAVY, margin: 0, isTextBox: true });
   stat(s, "88%", "da variação da carga (log) explicada pelo volume escoado", 7.5, 2.15, 2.5, ORANGE);
   stat(s, "0%", "explicada só pela intensidade máxima da chuva", 10.25, 2.15, 2.5);
   marcadores(s, [
-    "13 de 17 eventos com laço horário (planilha de eventos)",
+    "Pico de CSS antes do pico de vazão em 13 de 17 eventos",
     "A intensidade da chuva aparece na concentração média (Spearman 0,49; p = 0,04)",
     "O modelo trabalha com o total do evento; a dinâmica dentro do evento e as fontes perto do canal não são representadas",
   ], 7.5, 3.75, 5.25, 3.1, 15);
-  s.addNotes("Se perguntarem sobre a histerese: o pico de concentração vem antes do pico de vazão, um laço horário, típico de sedimento disponível perto do canal que se esgota durante o evento. O modelo não representa essa dinâmica dentro do evento, nem as fontes do canal. Mas, no total do evento, o volume escoado explica 88% da variação da carga, e a intensidade da chuva aparece mais na concentração, o que o modelo considera em parte pelo pico local (RI/R). No evento 11, 68% da carga passa até o pico de vazão e cerca de 72% está na parcela do escoamento direto (supondo a mesma concentração na vazão de base). Com 17 eventos e vários testes, os valores de p são só indícios.");
+  s.addNotes("Se perguntarem sobre a histerese: o pico de concentração vem antes do pico de vazão, o que costuma indicar sedimento disponível perto do canal, que se esgota durante o evento. O modelo não representa essa dinâmica dentro do evento, nem as fontes do canal. Mas, no total do evento, o volume escoado explica 88% da variação da carga, e a intensidade da chuva aparece mais na concentração, o que o modelo considera em parte pelo pico local (RI/R). No evento 11, 68% da carga passa até o pico de vazão e cerca de 72% está na parcela do escoamento direto (supondo a mesma concentração na vazão de base). Com 17 eventos e vários testes, os valores de p são só indícios.");
 }
 
 // ---------------------------------------------------------------- 24 leitura critica

@@ -59,10 +59,11 @@ troca(4, "Qp: vazão de pico", "qp: vazão de pico")
 troca(15, "condição seca", "condição seca (Chow)")
 troca(15, "Fontes: Woodward et al. (2003);", "Fontes: Chow, Maidment e Mays (1988); Woodward et al. (2003);")
 troca(16, "13,0 mm × 897 m²", "0,013 m × 897 m²")
+troca(17, "Mais escuro = maior índice de erosão (valor relativo)", "Mais escuro = maior índice (valor relativo). Q em mm, como em Hao et al. (2022): unidade e escala ficam no c", size=13)
 troca(16, "11,8 / 74,0", "11,8 mm/h ÷ 74,0 mm")
 troca(18, "c faz o papel de uma taxa de transferência média da bacia (conectividade)",
       "c faz o papel de uma taxa de transferência de sedimentos média da bacia; por ser calibrado, também absorve a diferença de escala e parte do erro do escoamento")
-troca(18, "c = 0,0344 no pixel de exemplo, com c × E = 40,1 kg", "c = 0,0344 t por unidade de E (MC): no pixel de exemplo, c × E = 40,1 kg", size=16, bold=True, cor="C77B12")
+troca(18, "c = 0,0344 no pixel de exemplo, com c × E = 40,1 kg", "c = 0,0344 t por unidade de E (MC), calibrado nos 17 eventos: no pixel de exemplo, c × E = 40,1 kg", size=16, bold=True, cor="C77B12")
 cx = troca(19, "Nenhum evento grande comanda o ajuste.", "Nenhum evento grande comanda o ajuste (o evento 15 responde por 48,7% da variabilidade da carga medida).")
 par = cx.text_frame.add_paragraph(); r = par.add_run()
 r.text = "Equivale a maximizar o NSE em log, a função objetivo de Hao et al. (2022)."
@@ -242,7 +243,7 @@ marcadores(s, 8.5, 3.45, 4.25, 3.3, [
 fonte(s, "Fontes: elaborado pelo autor; Baert et al. (2026). Escoamento direto medido = volume total menos a vazão de base")
 
 s = novo("Resultados: modelo forçado ao medido (MFM)", "Modelo forçado ao medido (MFM): troca só o escoamento")
-etapas = [("Chuva IDW", ""), ("SCS-CN", "padrão espacial"), ("Q × f", "f = V medido / V calculado"), ("Williams e c", "c recalibrado")]
+etapas = [("Chuva IDW", ""), ("SCS-CN", "padrão espacial"), ("Q × f", "f = V medido / V calculado; Q ≤ P"), ("Williams e c", "c recalibrado")]
 for i, (a, b) in enumerate(etapas):
     x = X0 + i * 3.1
     destaque = i == 2
@@ -253,7 +254,7 @@ for i, (a, b) in enumerate(etapas):
 caixa_texto(s, X0, 3.6, 6, 0.4, ["Evento 11"], size=17, bold=True, color=BLUE)
 numero(s, X0, 4.0, 3.2, "f = 1,48", "1.479 / 997 mil m³")
 numero(s, X0 + 3.6, 4.0, 3.6, "1,55 ×", "a soma do índice (1,48 elevado a 1,12)")
-numero(s, X0 + 7.6, 4.0, 4.4, "1.387 t", "validação cruzada, c = 0,0222 (−24% do medido)")
+numero(s, X0 + 7.6, 4.0, 4.4, "1.387 t", "validação cruzada (−24% do medido); c = 0,0222 no ajuste dos 17")
 caixa_texto(s, X0, 5.75, W, 0.9, ["O MFM não é uma previsão: usa o volume medido no mesmo hidrograma em que se mede a carga. Serve para isolar o efeito do escoamento."], size=16, italic=True, color=BLUE)
 fonte(s, "Fonte: elaborado pelo autor")
 
@@ -270,7 +271,7 @@ cards = [
     ("NSE (em log)", "1 − Σ(ln O − ln S)^{2} / Σ(ln O − ln Ō)^{2}", "Compara o modelo com prever sempre a média; em log, pesa o erro relativo", "1 = perfeito; 0 = média; < 0 = pior"),
     ("Spearman", "correlação entre as posições dos eventos", "Se o modelo ordena os eventos do menor ao maior", "ideal: 1"),
     ("R²", "fração da variação explicada por uma regressão", "O que explica a carga (volume: 88%) e o padrão do mapa", "de 0 a 1"),
-    ("Validação cruzada", "deixa um evento de fora e ajusta c nos outros 16", "Todas as métricas usam a previsão do evento que ficou de fora", "17 rodadas"),
+    ("Validação cruzada", "deixa um evento de fora e ajusta c nos outros 16", "As métricas usam a previsão do evento que ficou de fora (exceto o concentrado)", "17 rodadas"),
 ]
 cw, ch_ = 3.9, 2.3
 for i, (a, f_, d, ideal) in enumerate(cards):
@@ -338,14 +339,14 @@ s = novo("Conclusões", "Conclusões")
 marcadores(s, X0, 2.0, 5.6, 4.8, [
     "A conversão da chuva em escoamento é o principal limite: com a chuva, o MC erra 81%; com o volume medido, 21%",
     "Com o volume medido, a MUSLE espacializada não se distinguiu da regra com o volume: não se isola a contribuição da fórmula de erosão",
-    "A espacialização chega a um erro da mesma ordem do modelo concentrado (22%) e acrescenta o mapa",
-    "Áreas críticas: campo, silvicultura e lavoura temporária sobre Cambissolos, em encostas acima de 20% (46% da área, 83% da erosão)",
+    "Com o volume medido, a espacialização chega a um erro da mesma ordem do modelo concentrado (22%) e acrescenta o mapa",
+    "Áreas críticas: campo, silvicultura e lavoura temporária (46% da área, 83% da erosão), sobretudo sobre Cambissolos e em encostas acima de 20%",
 ], size=16)
 imagem(s, "slides/mapa_criticas_MC.png", 6.4, 1.95, 6.35, 4.3)
 caixa_texto(s, 6.4, 6.3, 6.35, 0.45, ["Áreas críticas: 5% dos pixels de maior erosão média (MC); 94% coincidem com o MFM"], size=12, italic=True, color=MUTED, align=PP_ALIGN.CENTER)
 
 s = novo("Limitações: de onde vem o erro", "Limitações: de onde vem o erro")
-numero(s, X0, 1.85, 5.6, "81% → 21%", "erro mediano com o escoamento calculado e com o medido: cerca de 3/4 do erro vem da hidrologia", ORANGE)
+numero(s, X0, 1.85, 5.6, "81% → 21%", "erro mediano com o escoamento calculado e com o medido: a maior parte do erro vem da hidrologia", ORANGE)
 numero(s, 6.6, 1.85, 6.1, "91%", "da variação do erro do sedimento é explicada pelo erro do escoamento")
 itens = [("Chuva de 2 postos", "um deles fora da bacia; a chuva vira um gradiente suave e núcleos de chuva entre os postos não aparecem"),
          ("Delimitação manual dos eventos", "no evento 11, 12 a 14 mm em cada posto (cerca de 16% da chuva) caíram nas 9 h antes da janela e ficaram fora"),
@@ -380,10 +381,8 @@ caixa_texto(s, X0, 2.1, 8.4, 4.5, [
     [("CNPq / PIBIC", {"bold": True, "color": BLUE}), (" — bolsa de iniciação científica", {})],
     [("Família, Larissa e amigos", {"bold": True, "color": BLUE}), (" — apoio durante a graduação", {})]], size=19, espaco=12)
 caixa_texto(s, 9.2, 2.9, 3.55, 1.0, ["Obrigado!"], size=44, bold=True, color=BLUE, align=PP_ALIGN.RIGHT)
-caixa_texto(s, 9.2, 3.9, 3.55, 0.5, ["[e-mail de contato]"], size=16, color=MUTED, align=PP_ALIGN.RIGHT)
 
 s = novo("Uso de inteligência artificial", "Uso de inteligência artificial")
-caixa_texto(s, X0, 1.95, W, 0.4, ["[Opcional: confirme se o texto corresponde ao que você fez e ao que a FECFAU pede]"], size=13, italic=True, color=ORANGE)
 for i, (a, b) in enumerate([("Programação", "apoio na escrita e revisão das rotinas em Python"), ("Texto", "revisão de redação e da formatação"), ("Figuras", "apoio na preparação de gráficos e mapas")]):
     cartao(s, X0 + i * 4.135, 2.6, 3.9, 1.6, a, b, centro=True, size=15)
 caixa_texto(s, X0, 4.6, W, 0.8, ["As escolhas de método, os cálculos e os resultados foram conferidos pelo autor e discutidos com o orientador."], size=18, color=BLUE)
@@ -391,11 +390,11 @@ caixa_texto(s, X0, 4.6, W, 0.8, ["As escolhas de método, os cálculos e os resu
 # =============================================================== apoio (para perguntas)
 s = novo("Apoio: a concentração chega antes da vazão", "Apoio: a concentração chega antes da vazão")
 imagem(s, "slides/ev11_hidrograma.png", X0, 1.85, 6.8, 3.6)
-marcadores(s, X0, 5.6, 6.8, 1.2, ["Evento 11: pico de CSS cerca de 25 h antes do pico de vazão (laço horário)",
+marcadores(s, X0, 5.6, 6.8, 1.2, ["Evento 11: pico de CSS cerca de 25 h antes do pico de vazão",
                                   "68% da carga passa até o pico de vazão; cerca de 72% na parcela do escoamento direto"], size=14)
 numero(s, 7.7, 1.85, 2.4, "88%", "da variação da carga (log) explicada pelo volume", ORANGE)
 numero(s, 10.3, 1.85, 2.45, "0%", "explicada só pela intensidade máxima da chuva")
-marcadores(s, 7.7, 3.5, 5.05, 3.3, ["13 de 17 eventos com laço horário (planilha de eventos)",
+marcadores(s, 7.7, 3.5, 5.05, 3.3, ["Pico de CSS antes do pico de vazão em 13 de 17 eventos",
                                     "A intensidade da chuva aparece na concentração média (Spearman 0,49; p = 0,04)",
                                     "O modelo trabalha com o total do evento; a dinâmica dentro do evento e as fontes perto do canal não são representadas"], size=14)
 fonte(s, "Fonte: elaborado pelo autor, com os dados de Murillo-Bermúdez e Martim (2022). Valores de p apenas indicativos")
@@ -408,7 +407,7 @@ s = novo("Apoio: o critério de calibração", fala=(
 linhas_t = [["Modelo", "log (TCC)", "linear", "erro relativo", "mediana das razões"],
             ["MC", "81,1% / 35%", "44,8% / 59%", "40,4% / 59%", "71,1% / 59%"],
             ["MFM", "20,6% / 94%", "20,4% / 94%", "21,1% / 94%", "20,8% / 94%"],
-            ["Regra com a chuva", "41,8% / 82%", "38,8% / 88%", "51,7% / 47%", "38,8% / 82%"],
+            ["Regra com a chuva", "41,9% / 82%", "38,8% / 88%", "51,7% / 47%", "38,8% / 82%"],
             ["Regra com o volume", "15,9% / 94%", "20,3% / 94%", "19,7% / 94%", "16,1% / 94%"]]
 tb = s.shapes.add_table(5, 5, Inches(X0), Inches(1.95), Inches(W), Inches(2.8)).table
 for j, wj in enumerate([3.0, 2.3, 2.3, 2.3, 2.27]):
@@ -422,7 +421,7 @@ for i, row in enumerate(linhas_t):
 marcadores(s, X0, 5.0, W, 1.7, ["Erro mediano / fração em fator 2, na validação cruzada, para cada critério de ajuste do coeficiente",
                                 "O MC depende muito do critério (40 a 81%); o MFM e a regra com o volume quase não dependem",
                                 "Log: o evento 15 responde por 48,7% da variabilidade da carga e dominaria um ajuste linear"], size=15)
-fonte(s, "Fonte: elaborado pelo autor (Scripts/_sensibilidade_criterio_calibracao_18-11.py)")
+fonte(s, "Fonte: elaborado pelo autor (análise de sensibilidade, validação cruzada)")
 
 # =============================================================== afasta o conteudo da faixa azul
 # (o conteudo foi desenhado entre y = 1,8 e 7,3 pol.; comprime para 2,1 a 7,3, como nos slides do autor)
@@ -450,5 +449,10 @@ for parte in p.part.package.iter_parts():
         xml = xml.replace('<a:latin typeface="Aptos Display"', '<a:latin typeface="Calibri"').replace('<a:latin typeface="Aptos"', '<a:latin typeface="Calibri"')
         parte._blob = xml.encode("utf-8")
 
+# metricas antes dos resultados (definir fator 2, erro mediano e NSE antes de usar)
+lst = p.slides._sldIdLst
+for i, sl in enumerate(p.slides):
+    if sl.shapes.title is not None and sl.shapes.title.text == "Resultados: métricas de desempenho":
+        el = lst[i]; lst.remove(el); lst.insert(20, el); break
 p.save(DST)
 print("ok", DST, len(p.slides), "slides")
